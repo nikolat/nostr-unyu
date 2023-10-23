@@ -1,8 +1,15 @@
+import type { Readable } from 'node:stream';
 import { Buffer } from 'node:buffer';
-import { finishEvent, getPublicKey } from 'nostr-tools';
+import { type EventTemplate, finishEvent, getPublicKey } from 'nostr-tools';
 
-export const buffer = async (readable) => {
-	const chunks = [];
+export const enum Mode {
+	Normal,
+	Reply,
+	Fav,
+};
+
+export const buffer = async (readable: Readable) => {
+	const chunks: Uint8Array[] = [];
 	for await (const chunk of readable) {
 		chunks.push(typeof chunk === 'string' ? Buffer.from(chunk) : chunk);
 	}
@@ -11,9 +18,9 @@ export const buffer = async (readable) => {
 
 export class Signer {
 
-	#seckey;
+	#seckey: string;
 
-	constructor(seckey) {
+	constructor(seckey: string) {
 		this.#seckey = seckey;
 	}
 
@@ -21,7 +28,7 @@ export class Signer {
 		return getPublicKey(this.#seckey);
 	};
 
-	finishEvent = (unsignedEvent) => {
+	finishEvent = (unsignedEvent: EventTemplate) => {
 		return finishEvent(unsignedEvent, this.#seckey);
 	};
 

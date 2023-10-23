@@ -1,11 +1,12 @@
-import { nip19, validateEvent, verifySignature } from 'nostr-tools';
-import { Signer } from './utils.js';
-import { getResponseEvent } from './response.js';
+import type { VercelResponse } from '@vercel/node';
+import { type VerifiedEvent, type Event as NostrEvent, nip19, validateEvent, verifySignature } from 'nostr-tools';
+import { Mode, Signer } from './utils';
+import { getResponseEvent } from './response';
 
 //入力イベントを検証するかどうか(デバッグ時は無効化した方が楽)
 const verifyInputEvent = true;
 
-export const base = (rawBody, response) => {
+export const base = async (rawBody: string, response: VercelResponse, mode: Mode) => {
 	//署名用インスタンスを準備
 	const nsec = process.env.NOSTR_PRIVATE_KEY;
 	if (nsec === undefined) {
@@ -18,13 +19,13 @@ export const base = (rawBody, response) => {
 	const seckey = dr.data;
 	const signer = new Signer(seckey);
 	//入力イベントを準備
-	let body;
+	let body: any;
 	try {
 		body = JSON.parse(rawBody);
 	} catch (error) {
 		return response.status(400).json({ error: 'JSON parse failed' });
 	}
-	const requestEvent = body;
+	const requestEvent: NostrEvent = body;
 	if (!validateEvent(requestEvent)) {
 		return response.status(400).json({ error: 'Invalid event' });
 	}
@@ -32,9 +33,9 @@ export const base = (rawBody, response) => {
 		return response.status(400).json({ error: 'Unverified event' });
 	}
 	//出力イベントを取得
-	let responseEvent;
+	let responseEvent: VerifiedEvent | null;
 	try {
-		responseEvent = getResponseEvent(requestEvent, signer);
+		responseEvent = await getResponseEvent(requestEvent, signer, mode);
 	} catch (error) {
 		if (error instanceof Error) {
 			return response.status(400).json({ error: error.message });
@@ -46,7 +47,7 @@ export const base = (rawBody, response) => {
 	}
 	//出力
 	if (responseEvent === null) {
-		return response.status(204).send('');
+		return response.status(204).send('');;
 	}
 	return response.status(200).setHeader('content-type', 'application/json; charset=utf-8').send(JSON.stringify(responseEvent));
 };

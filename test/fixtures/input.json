@@ -1,0 +1,16 @@
+{
+	"kind": 42,
+	"pubkey": "6b0a60cff3eca5a2b2505ccb3f7133d8422045cbef40f3d2c6189fb0b952e7d4",
+	"created_at": 1693523776,
+	"content": "ここではうにゅうが反応してもいい？",
+	"tags": [
+		[
+			"e",
+			"be8e52c0c70ec5390779202b27d9d6fc7286d0e9a2bc91c001d6838d40bafa4a",
+			"wss://nostr.holybea.com",
+			"root"
+		]
+	],
+	"id": "31c25c2427d386d86edd2d2bfde140377b5252786b880990947737deb113b652",
+	"sig": "6017ffc9957f6de3b79dc37df2de0a50bf27d8c6778efeb09985ba0a47b939c5be658ef3b52a8b368d239168f83e8a813e40e0dd352332e56ce8dfa74fa6b923"
+}
