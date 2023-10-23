@@ -1,0 +1,16 @@
+{
+  "name": "nostr-webhook-vercel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node ./main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "CC0-1.0",
+  "dependencies": {
+    "nostr-tools": "^1.17.0"
+  },
+  "type": "module"
+}
