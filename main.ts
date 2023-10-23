@@ -1,4 +1,4 @@
-//curl -X POST -H "Content-Type: application/json" -d @test/fixtures/input.json https://vercel-test-nikolat.vercel.app/api/iiyo
+//curl -X POST -H "Content-Type: application/json" -d @test/fixtures/input.json https://nostr-unyu.vercel.app/api/iiyo
 import * as fs from 'node:fs/promises';
 import { generatePrivateKey, type Event as NostrEvent } from 'nostr-tools';
 import { Mode, Signer } from './src/utils';
