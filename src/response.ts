@@ -317,7 +317,13 @@ const res_news = async (event: NostrEvent): Promise<[string, string[][]]> => {
 };
 
 const res_nakami = (event: NostrEvent): [string, string[][]] => {
-	return ['準備中やで', getTagsReply(event)];
+	let content: string;
+	let tags: string[][];
+	const url = 'https://github.com/nikolat/nostr-unyu';
+	content = url;
+	tags = getTagsReply(event);
+	tags.push(['r', url]);
+	return [content, tags];
 };
 
 const res_jihou = (event: NostrEvent): [string, string[][]] => {
