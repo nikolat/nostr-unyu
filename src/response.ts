@@ -634,33 +634,33 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 	const text = match[1].trim();
 	const emoji_tags = event.tags.filter(tag => tag.length >= 3 && tag[0] === 'emoji');
 	if (/潰して[^るた]?$/us.test(event.content)) {
-		content = `🫸${text.replace(/[^\S\n\r]/gu, '') }🫷`;
+		content = `🫸${text.replace(/[^\S\n\r]/gu, '')}🫷`;
 	}
 	else if (/ど[突つ]いて[^るた]?$/us.test(event.content)) {
 		content = `🤜${text}🤛`;
 	}
 	else {
 		const emoji_words = emoji_tags.map(tag => `:${tag[1]}:`);
-		const str = emoji_words.reduce((accumulator, currentValue) => accumulator.replace(new RegExp(currentValue, 'g'), '_'.repeat(2)), text);
+		const str = emoji_words.reduce((accumulator, currentValue) => accumulator.replaceAll(currentValue, '_'.repeat(2)), text);
 		const lines = str.split(/\r\n|\r|\n/);
 		const count = lines.reduce((accumulator, currentValue) => Math.max(accumulator, mb_strwidth(currentValue)), 0);
 		let fire = '🔥';
-		const firemap = {
-			'[踏ふ]んで[^るた]?$': '🦶',
-			'(凍らせて|冷やして)[^るた]?$': '🧊',
-			'萌やして[^るた]?$': '💕',
-			'通報して[^るた]?$': '⚠️',
-			'磨いて[^るた]?$': '🪥',
-			'爆破して[^るた]?$': '💣',
-			'(注射して|打って)[^るた]?$': '💉',
-			'(駐車して|停めて)[^るた]?$': '🚗',
-			'豆腐|とうふ|トウフ|トーフ|tofu': '📛',
-			'魂|心|いのち|命|ハート|はーと|はあと|はぁと': '❤️‍🔥',
-			'陽性|妖精': any(['🧚', '🧚‍♂', '🧚‍♀']),
-		};
-		for (const [key, value] of Object.entries(firemap)) {
-			if ((new RegExp(key, 'ui')).test(event.content)) {
-				fire = value;
+		const firemap: [RegExp, string][] = [
+			[/[踏ふ]んで[^るた]?$/, '🦶'],
+			[/(凍らせて|冷やして)[^るた]?$/, '🧊'],
+			[/萌やして[^るた]?$/, '💕'],
+			[/通報して[^るた]?$/, '⚠️'],
+			[/磨いて[^るた]?$/, '🪥'],
+			[/爆破して[^るた]?$/, '💣'],
+			[/(注射して|打って)[^るた]?$/, '💉'],
+			[/(駐車して|停めて)[^るた]?$/, '🚗'],
+			[/豆腐|とうふ|トウフ|トーフ|tofu/i, '📛'],
+			[/魂|心|いのち|命|ハート|はーと|はあと|はぁと/, '❤️‍🔥'],
+			[/陽性|妖精/, any(['🧚', '🧚‍♂', '🧚‍♀'])],
+		];
+		for (const [reg, emoji] of firemap) {
+			if (reg.test(event.content)) {
+				fire = emoji;
 				break;
 			} 
 		}
