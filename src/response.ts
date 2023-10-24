@@ -105,8 +105,8 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/すき|好き|愛してる|あいしてる/, res_suki],
 		[/ランド|開いてる|閉じてる|開園|閉園/, res_ochinchinland],
 		[/招待コード/, res_invitecode],
-		[/(🫂|🤗)/, res_hug],
-		[/[💋💕]/, res_chu],
+		[/(🫂|🤗)/u, res_hug],
+		[/[💋💕]/u, res_chu],
 		[/(？|\?)$/, res_hatena],
 	];
 	switch (mode) {
