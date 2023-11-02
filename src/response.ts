@@ -71,11 +71,11 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/[行い]っ?てきます.?$/u, res_itera],
 		[/^((う|ぐ)っにゅう?ーん|ぎゅ(うっ|っう)にゅう?ーん).?$/u, res_unnyuuun],
 		[/(フォロー|ふぉろー)[飛と]んだ.?$/u, res_nostrflu],
-		[/^(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|ど[突つ]いて|[踏ふ]んで|(捌|さば)いて)[^るた]?$/us, res_fire],
+		[/^(うにゅう、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|ど[突つ]いて|[踏ふ]んで|(捌|さば)いて)[^るた]?$/us, res_fire],
 	];
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
 		[/占って|占い/, res_uranai],
-		[/(^|\s+)(\S+)の(週間)?天気/, res_tenki],
+		[/(^|\s+)(うにゅう、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(npub\w{59})\s?(さん)?に(.{1,50})を/us, res_okutte],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
@@ -202,7 +202,7 @@ const res_tenki = async (event: NostrEvent, mode: Mode, regstr: RegExp): Promise
 	if (match === null) {
 		throw new Error();
 	}
-	const text = match[2];
+	const text = match[3];
 	const url_area = 'http://www.jma.go.jp/bosai/common/const/area.json';
 	const response_area = await fetch(url_area);
 	const json_area: any = await response_area.json();
@@ -241,7 +241,7 @@ const res_tenki = async (event: NostrEvent, mode: Mode, regstr: RegExp): Promise
 		return [content, tags];
 	}
 	let baseurl: string;
-	const m3 = match[3];
+	const m3 = match[4];
 	if (m3) {
 		baseurl = 'https://www.jma.go.jp/bosai/forecast/data/overview_week/';
 	}
@@ -631,7 +631,7 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 	if (match === null) {
 		throw new Error();
 	}
-	const text = match[1].trim();
+	const text = match[2].trim();
 	const emoji_tags = event.tags.filter(tag => tag.length >= 3 && tag[0] === 'emoji');
 	if (/潰して[^るた]?$/us.test(event.content)) {
 		content = `🫸${text.replace(/[^\S\n\r]/gu, '')}🫷`;
