@@ -125,6 +125,10 @@ const mode_normal = async (event: NostrEvent): Promise<[string, number, string[]
 	if (event.tags.some(tag => tag.length >= 2 && (tag[0] === 'p'))) {
 		return null;
 	}
+	//自分への話しかけはreplyで対応する
+	if (/^うにゅう、/.test(event.content)) {
+		return null
+	}
 	const resmap = getResmap(Mode.Normal);
 	for (const [reg, func] of resmap) {
 		if (reg.test(event.content)) {
