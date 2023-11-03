@@ -71,7 +71,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/[行い]っ?てきます.?$/u, res_itera],
 		[/^((う|ぐ)っにゅう?ーん|ぎゅ(うっ|っう)にゅう?ーん).?$/u, res_unnyuuun],
 		[/(フォロー|ふぉろー)[飛と]んだ.?$/u, res_nostrflu],
-		[/^(うにゅう、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|ど[突つ]いて|[踏ふ]んで|(捌|さば)いて)[^るた]?$/us, res_fire],
+		[/^(うにゅう、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|ど[突つ]いて|[踏ふ]んで|(捌|さば)いて|出して)[^るた]?$/us, res_fire],
 	];
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
 		[/占って|占い/, res_uranai],
@@ -637,11 +637,16 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 	}
 	const text = match[2].trim();
 	const emoji_tags = event.tags.filter(tag => tag.length >= 3 && tag[0] === 'emoji');
+	tags = [...getTags(event, mode), ...emoji_tags];
 	if (/潰して[^るた]?$/us.test(event.content)) {
 		content = `🫸${text.replace(/[^\S\n\r]/gu, '')}🫷`;
 	}
 	else if (/ど[突つ]いて[^るた]?$/us.test(event.content)) {
 		content = `🤜${text}🤛`;
+	}
+	else if (/出して[^るた]?$/us.test(event.content)) {
+		content = `:te:${text}`;
+		tags = [...tags, ['emoji', 'te', 'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/te.webp']];
 	}
 	else {
 		const emoji_words = emoji_tags.map(tag => `:${tag[1]}:`);
@@ -681,7 +686,6 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			content = `${text}\n${fire.repeat(count <= 1 ? 1 : count/2)}`;
 		}
 	}
-	tags = [...getTags(event, mode), ...emoji_tags];
 	return [content, tags];
 };
 
