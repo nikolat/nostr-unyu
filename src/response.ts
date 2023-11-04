@@ -98,6 +98,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/ぬるぽが?(を?呼んで|どこ).?$/u, res_nurupoga],
 		[/うにゅう(を?呼んで|どこ).?$/u, res_unyu],
 		[/Don(さん)?(を?呼んで|どこ).?$/ui, res_don],
+		[/(マグロ|ﾏｸﾞﾛ)の?元ネタ(を?呼んで|どこ).?$/u, res_maguro],
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
 		[/[呼よ](んだだけ|んでみた)|(何|なん)でもない/, res_yondadake],
@@ -471,6 +472,15 @@ const res_don = (event: NostrEvent): [string, string[][]] => {
 	const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 	content = `nostr:${npub_don} 呼ばれとるで\nnostr:${quote}`;
 	tags = [...getTagsAirrep(event), ['p', nip19.decode(npub_don).data, '']];
+	return [content, tags];
+};
+
+const res_maguro = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const note = 'note14pcdgkgz2teu2q9zd8nvlfayqa7awl07tejp6zpvgtum5jayc2hsfvzwpf';
+	content = `nostr:${note}`;
+	tags = [...getTagsReply(event), ['e', nip19.decode(note).data, '', 'mention']];
 	return [content, tags];
 };
 
