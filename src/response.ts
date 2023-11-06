@@ -71,7 +71,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/[行い]っ?てきます.?$/u, res_itera],
 		[/^((う|ぐ)っにゅう?ーん|ぎゅ(うっ|っう)にゅう?ーん).?$/u, res_unnyuuun],
 		[/(フォロー|ふぉろー)[飛と]んだ.?$/u, res_nostrflu],
-		[/^(うにゅう、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って)[^るた]?$/us, res_fire],
+		[/^(うにゅう、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|伸ばして|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って)[^るた]?$/us, res_fire],
 	];
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
 		[/占って|占い/, res_uranai],
@@ -650,6 +650,9 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 	tags = [...getTags(event, mode), ...emoji_tags];
 	if (/潰して[^るた]?$/us.test(event.content)) {
 		content = `🫸${text.replace(/[^\S\n\r]/gu, '')}🫷`;
+	}
+	else if (/伸ばして[^るた]?$/us.test(event.content)) {
+		content = `${Array.from(text).join(' ')}`;
 	}
 	else if (/ど[突つ]いて[^るた]?$/us.test(event.content)) {
 		content = `🤜${text}🤛`;
