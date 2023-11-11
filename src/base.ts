@@ -47,7 +47,7 @@ export const base = async (rawBody: string, response: VercelResponse, mode: Mode
 	}
 	//出力
 	if (responseEvent === null) {
-		return response.status(204).send('');;
+		return response.status(204).send('');
 	}
 	return response.status(200).setHeader('content-type', 'application/json; charset=utf-8').send(JSON.stringify(responseEvent));
 };
