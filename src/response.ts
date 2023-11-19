@@ -723,7 +723,12 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			content = `${fire.repeat(count <= 1 ? 1 : count/len)}\n${text}`;
 		}
 		else if (/(詰めて|梱包して)[^るた]?$/u.test(event.content)) {
-			content = `${fire.repeat((count <= 1 ? 1 : count/len) + 2)}\n${fire}${text}${fire}\n${fire.repeat((count <= 1 ? 1 : count/len) + 2)}`;
+			const n = (count <= 1 ? 1 : count/len) + 2;
+			content = fire.repeat(n) + '\n';
+			for (const line of lines) {
+				content += `${fire}${line.padEnd(n - 2, '　')}${fire}\n`;
+			}
+			content += fire.repeat(n);
 		}
 		else {
 			content = `${text}\n${fire.repeat(count <= 1 ? 1 : count/len)}`;
