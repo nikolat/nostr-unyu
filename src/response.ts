@@ -1,5 +1,5 @@
 import { type EventTemplate, type VerifiedEvent, type Event as NostrEvent, nip19 } from 'nostr-tools';
-import { mb_strwidth } from "@demouth/mb_strwidth";
+import mb_strwidth from "./mb_strwidth";
 import Parser from 'rss-parser';
 import { Mode, Signer } from './utils';
 
