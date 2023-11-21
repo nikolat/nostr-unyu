@@ -1,7 +1,6 @@
 import type { Readable } from 'node:stream';
 import { Buffer } from 'node:buffer';
-import { type EventTemplate, finishEvent, getPublicKey, relayInit } from 'nostr-tools';
-import { getSingle, upsertTableOrCreate } from 'nostr-key-value';
+import { type EventTemplate, finishEvent, getPublicKey } from 'nostr-tools';
 
 export const enum Mode {
 	Normal,
@@ -20,10 +19,6 @@ export const buffer = async (readable: Readable) => {
 export class Signer {
 
 	#seckey: string;
-	#relayUrl = 'wss://nostr-relay.nokotaro.com';
-	#tableName = 'bot';
-	#tableTitle = 'bot';
-	#keyname = 'memo';
 
 	constructor(seckey: string) {
 		this.#seckey = seckey;
@@ -37,35 +32,4 @@ export class Signer {
 		return finishEvent(unsignedEvent, this.#seckey);
 	};
 
-	getSingle = async () => {
-		return await getSingle([this.#relayUrl], this.getPublicKey(), this.#tableName, this.#keyname);
-	};
-
-	upsertTable = async (memo: string) => {
-		const values = [[this.#keyname, memo]];
-		const table_ev = await upsertTableOrCreate(
-			[this.#relayUrl],
-			this.getPublicKey(),
-			this.#tableName,
-			this.#tableTitle,
-			[],
-			values,
-		);
-		await this.#postNostr(table_ev);
-	};
-
-	#postNostr = async (ev: EventTemplate) => {
-		const relay = relayInit(this.#relayUrl);
-		relay.connect();
-		return new Promise((resolve, reject) => {
-			const data = finishEvent(ev, this.#seckey);
-			const pub = relay.publish(data);
-			pub.then(() => {
-				resolve('success');
-			});
-			pub.catch(() => {
-				reject('failed');
-			});
-		});
-	};
 };

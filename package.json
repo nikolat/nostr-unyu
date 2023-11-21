@@ -13,7 +13,6 @@
 	"dependencies": {
 		"@types/node": "^20.8.7",
 		"@vercel/node": "^3.0.1",
-		"nostr-key-value": "^0.3.4",
 		"nostr-tools": "^1.17.0",
 		"rss-parser": "^3.13.0",
 		"typescript": "^5.2.2"
