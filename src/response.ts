@@ -8,7 +8,7 @@ export const getResponseEvent = async (requestEvent: NostrEvent, signer: Signer,
 		//自分自身の投稿には反応しない
 		return null;
 	}
-	const res = await selectResponse(requestEvent, mode, signer);
+	const res = await selectResponse(requestEvent, mode);
 	if (res === null) {
 		//反応しないことを選択
 		return null;
@@ -16,17 +16,17 @@ export const getResponseEvent = async (requestEvent: NostrEvent, signer: Signer,
 	return signer.finishEvent(res);
 };
 
-const selectResponse = async (event: NostrEvent, mode: Mode, signer: Signer): Promise<EventTemplate | null> => {
+const selectResponse = async (event: NostrEvent, mode: Mode): Promise<EventTemplate | null> => {
 	if (!isAllowedToPost(event)) {
 		return null;
 	}
 	let res;
 	switch (mode) {
 		case Mode.Normal:
-			res = await mode_normal(event, signer);
+			res = await mode_normal(event);
 			break;
 		case Mode.Reply:
-			res = await mode_reply(event, signer);
+			res = await mode_reply(event);
 			break;
 		case Mode.Fav:
 			res = mode_fav(event);
@@ -61,12 +61,11 @@ const isAllowedToPost = (event: NostrEvent) => {
 	throw new TypeError(`kind ${event.kind} is not supported`);
 };
 
-const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer) => Promise<[string, string[][]]> | [string, string[][]]][] => {
-	const resmapNormal: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer) => Promise<[string, string[][]]> | [string, string[][]]][] = [
+const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] => {
+	const resmapNormal: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => [string, string[][]]][] = [
 		[/いいの?か?(？|\?)$/, res_iiyo],
 		[/\\e$/, res_enyee],
 		[/^うにゅう画像$/, res_unyupic],
-		[/^うにゅうメモ\n/, res_unyumemo],
 		[/^ちくわ大明神$/, res_chikuwa],
 		[/(ほめて|褒めて|のでえらい).?$/u, res_igyo],
 		[/[行い]っ?てきます.?$/u, res_itera],
@@ -123,7 +122,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 	}
 };
 
-const mode_normal = async (event: NostrEvent, signer: Signer): Promise<[string, number, string[][]] | null> => {
+const mode_normal = async (event: NostrEvent): Promise<[string, number, string[][]] | null> => {
 	//自分への話しかけはreplyで対応する
 	//自分以外に話しかけている場合は割り込まない
 	if (event.tags.some(tag => tag.length >= 2 && (tag[0] === 'p'))) {
@@ -136,18 +135,18 @@ const mode_normal = async (event: NostrEvent, signer: Signer): Promise<[string, 
 	const resmap = getResmap(Mode.Normal);
 	for (const [reg, func] of resmap) {
 		if (reg.test(event.content)) {
-			const [content, tags] = await func(event, Mode.Normal, reg, signer);
+			const [content, tags] = await func(event, Mode.Normal, reg);
 			return [content, event.kind, tags];
 		} 
 	}
 	return null;
 };
 
-const mode_reply = async (event: NostrEvent, signer: Signer): Promise<[string, number, string[][]] | null> => {
+const mode_reply = async (event: NostrEvent): Promise<[string, number, string[][]] | null> => {
 	const resmap = getResmap(Mode.Reply);
 	for (const [reg, func] of resmap) {
 		if (reg.test(event.content)) {
-			const [content, tags] = await func(event, Mode.Reply, reg, signer);
+			const [content, tags] = await func(event, Mode.Reply, reg);
 			return [content, event.kind, tags];
 		} 
 	}
@@ -603,35 +602,6 @@ const res_unyupic = (event: NostrEvent): [string, string[][]] => {
 	tags = getTagsReply(event);
 	tags.push(['e', dr.data, '', 'mention']);
 	tags.push(['t', 'うにゅう画像']);
-	return [content, tags];
-};
-
-const res_unyumemo = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer): Promise<[string, string[][]]> => {
-	let content: string;
-	let tags: string[][];
-	const lines = event.content.split(/\r\n|\r|\n/);
-	const command = lines.at(1);
-	if (command === undefined) {
-		content = '何を？';
-	}
-	else if (command === '出して') {
-		const single = await signer.getSingle();
-		if (single === null || single === '') {
-			content = '無いで';
-		}
-		else {
-			content = single;
-		}
-	}
-	else if (command === 'クリア') {
-		await signer.upsertTable('');
-		content = '消したで';
-	}
-	else {
-		await signer.upsertTable(lines.splice(1).join('\n'));
-		content = '覚えたで';
-	}
-	tags = getTagsReply(event);
 	return [content, tags];
 };
 
