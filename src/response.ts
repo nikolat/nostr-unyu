@@ -682,8 +682,8 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 	else {
 		const emoji_words = emoji_tags.map(tag => `:${tag[1]}:`);
 		const str = emoji_words.reduce((accumulator, currentValue) => accumulator.replaceAll(currentValue, '_'.repeat(2)), text);
-		const lines = str.split(/\r\n|\r|\n/);
-		const count = lines.reduce((accumulator, currentValue) => Math.max(accumulator, mb_strwidth(currentValue)), 0);
+		const lines_l = str.split(/\r\n|\r|\n/);
+		const count = lines_l.reduce((accumulator, currentValue) => Math.max(accumulator, mb_strwidth(currentValue)), 0);
 		let fire = '🔥';
 		let len = 2;
 		const firemap: [RegExp, string, number][] = [
@@ -726,6 +726,7 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 		else if (/(詰めて|梱包して)[^るた]?$/u.test(event.content)) {
 			const n = (count <= 1 ? 1 : count/len) + 2;
 			content = fire.repeat(n) + '\n';
+			const lines = text.split(/\r\n|\r|\n/);
 			for (const line of lines) {
 				content += `${fire}${line.padEnd(n - 2, '　')}${fire}\n`;
 			}
@@ -734,6 +735,7 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 		else if (/詰んで[^るた]?$/u.test(event.content)) {
 			const n = (count <= 1 ? 1 : count/len);
 			content = '🧱' + fire.repeat(n) + '🧱\n';
+			const lines = text.split(/\r\n|\r|\n/);
 			for (const line of lines) {
 				content += `${fire}${line.padEnd(n - 2, '　')}${fire}\n`;
 			}
