@@ -101,6 +101,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/うにゅう(を?呼んで|どこ).?$/u, res_unyu],
 		[/Don(さん)?(を?呼んで|どこ).?$/ui, res_don],
 		[/(マグロ|ﾏｸﾞﾛ)の?元ネタ(を?呼んで|どこ).?$/u, res_maguro],
+		[/(カレンダー|アドカレ)(を?呼んで|どこ).?$/u, res_adokare],
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
 		[/[呼よ](んだだけ|んでみた)|(何|なん)でもない/, res_yondadake],
@@ -496,6 +497,16 @@ const res_maguro = (event: NostrEvent): [string, string[][]] => {
 	const note = 'note14pcdgkgz2teu2q9zd8nvlfayqa7awl07tejp6zpvgtum5jayc2hsfvzwpf';
 	content = `nostr:${note}`;
 	tags = [...getTagsReply(event), ['e', nip19.decode(note).data, '', 'mention']];
+	return [content, tags];
+};
+
+const res_adokare = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url1 = 'https://adventar.org/calendars/8794';
+	const url2 = 'https://adventar.org/calendars/8880';
+	content = `${url1}\n${url2}`;
+	tags = [...getTagsReply(event), ['r', url1], ['r', url2]];
 	return [content, tags];
 };
 
