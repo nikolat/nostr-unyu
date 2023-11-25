@@ -690,7 +690,7 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 		content = `🤜${text}🤛`;
 	}
 	else if (/[踊躍]らせて[^るた]?$/us.test(event.content)) {
-		content = `₍₍ ${text} ⁾⁾`;
+		content = `₍₍⁽⁽${text}₎₎⁾⁾`;
 	}
 	else if (/出して[^るた]?$/us.test(event.content)) {
 		content = `:te:${text}`;
