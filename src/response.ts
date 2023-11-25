@@ -138,7 +138,7 @@ const mode_normal = async (event: NostrEvent): Promise<[string, number, string[]
 		if (reg.test(event.content)) {
 			const [content, tags] = await func(event, Mode.Normal, reg);
 			return [content, event.kind, tags];
-		} 
+		}
 	}
 	return null;
 };
@@ -149,7 +149,7 @@ const mode_reply = async (event: NostrEvent): Promise<[string, number, string[][
 		if (reg.test(event.content)) {
 			const [content, tags] = await func(event, Mode.Reply, reg);
 			return [content, event.kind, tags];
-		} 
+		}
 	}
 	return ['えんいー', event.kind, getTagsAirrep(event)];
 };
@@ -171,7 +171,7 @@ const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 				tags.push(['emoji', 'unyu', 'https://nikolat.github.io/avatar/disc2.png']);
 			}
 			return [content, kind, tags];
-		} 
+		}
 	}
 	return null;
 };
