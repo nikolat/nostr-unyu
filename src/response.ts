@@ -211,6 +211,12 @@ const res_tenki = async (event: NostrEvent, mode: Mode, regstr: RegExp): Promise
 		throw new Error();
 	}
 	const text = match[3];
+	if (/の天気です！/.test(event.content)) {
+		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+		content = `${any(['ありがとさん', 'さすがやな', '助かったで'])}\nnostr:${quote}`;
+		tags = getTagsAirrep(event);
+		return [content, tags];
+	}
 	const url_area = 'http://www.jma.go.jp/bosai/common/const/area.json';
 	const response_area = await fetch(url_area);
 	const json_area: any = await response_area.json();
