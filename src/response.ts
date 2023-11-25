@@ -71,11 +71,11 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/[行い]っ?てきます.?$/u, res_itera],
 		[/^((う|ぐ)っにゅう?ーん|ぎゅ(うっ|っう)にゅう?ーん).?$/u, res_unnyuuun],
 		[/(フォロー|ふぉろー)[飛と]んだ.?$/u, res_nostrflu],
-		[/^(うにゅう、|うにゅう[くた]ん、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|縮めて|伸ばして|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って|祝って|呪って|鳴らして|詰めて|梱包して|詰んで|漬けて)[^るた]?$/us, res_fire],
+		[/^(うにゅう、|うにゅう[くさた]ん、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|縮めて|伸ばして|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って|祝って|呪って|鳴らして|詰めて|梱包して|詰んで|漬けて)[^るた]?$/us, res_fire],
 	];
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
 		[/占って|占い/, res_uranai],
-		[/(^|\s+)(うにゅう、|うにゅう[くた]ん、)?(\S+)の(週間)?天気/, res_tenki],
+		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(npub\w{59})\s?(さん)?に(.{1,50})を/us, res_okutte],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
@@ -130,7 +130,7 @@ const mode_normal = async (event: NostrEvent): Promise<[string, number, string[]
 		return null;
 	}
 	//自分への話しかけはreplyで対応する
-	if (/^(うにゅう、|うにゅう[くた]ん、)/.test(event.content)) {
+	if (/^(うにゅう、|うにゅう[くさた]ん、)/.test(event.content)) {
 		return null
 	}
 	const resmap = getResmap(Mode.Normal);
