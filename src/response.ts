@@ -745,20 +745,20 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			content = `${fire.repeat(count <= 1 ? 1 : count/len)}\n${text}`;
 		}
 		else if (/(詰めて|梱包して|漬けて)[^るた]?$/u.test(event.content)) {
-			const n = (count <= 1 ? 1 : count/len) + 2;
-			content = fire.repeat(n) + '\n';
+			const n = (count <= 1 ? 1 : count/len);
+			content = fire.repeat(n + 2) + '\n';
 			const lines = text.split(/\r\n|\r|\n/);
 			for (const line of lines) {
-				content += `${fire}${line.padEnd(n - 2, '　')}${fire}\n`;
+				content += `${fire}${line}${'　'.repeat(n - mb_strwidth(line) / 2)}${fire}\n`;
 			}
-			content += fire.repeat(n);
+			content += fire.repeat(n + 2);
 		}
 		else if (/詰んで[^るた]?$/u.test(event.content)) {
 			const n = (count <= 1 ? 1 : count/len);
 			content = '🧱' + fire.repeat(n) + '🧱\n';
 			const lines = text.split(/\r\n|\r|\n/);
 			for (const line of lines) {
-				content += `${fire}${line.padEnd(n - 2, '　')}${fire}\n`;
+				content += `${fire}${line}${'　'.repeat(n - mb_strwidth(line) / 2)}${fire}\n`;
 			}
 			content += '🧱' + fire.repeat(n) + '🧱';
 		}
