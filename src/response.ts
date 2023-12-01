@@ -749,7 +749,8 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			content = fire.repeat(n + 2) + '\n';
 			const lines = text.split(/\r\n|\r|\n/);
 			for (const line of lines) {
-				content += `${fire}${line}${'　'.repeat(n - mb_strwidth(line) / 2)}${fire}\n`;
+				const str = emoji_words.reduce((accumulator, currentValue) => accumulator.replaceAll(currentValue, '_'.repeat(2)), line);
+				content += `${fire}${line}${'　'.repeat(n - mb_strwidth(str) / 2)}${fire}\n`;
 			}
 			content += fire.repeat(n + 2);
 		}
@@ -758,7 +759,8 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			content = '🧱' + fire.repeat(n) + '🧱\n';
 			const lines = text.split(/\r\n|\r|\n/);
 			for (const line of lines) {
-				content += `${fire}${line}${'　'.repeat(n - mb_strwidth(line) / 2)}${fire}\n`;
+				const str = emoji_words.reduce((accumulator, currentValue) => accumulator.replaceAll(currentValue, '_'.repeat(2)), line);
+				content += `${fire}${line}${'　'.repeat(n - mb_strwidth(str) / 2)}${fire}\n`;
 			}
 			content += '🧱' + fire.repeat(n) + '🧱';
 		}
