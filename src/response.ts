@@ -46,6 +46,9 @@ const isAllowedToPost = (event: NostrEvent) => {
 	const allowedChannel = [
 		'be8e52c0c70ec5390779202b27d9d6fc7286d0e9a2bc91c001d6838d40bafa4a',//Nostr伺か部
 	];
+	if (event.tags.some(tag => tag.length >= 1 && tag[0] === 'content-warning')) {
+		return false;
+	}
 	if (event.kind === 1) {
 		return true;
 	}
