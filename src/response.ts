@@ -70,7 +70,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/\\e$/, res_enyee],
 		[/^うにゅう画像$/, res_unyupic],
 		[/^ちくわ大明神$/, res_chikuwa],
-		[/(ほめて|褒めて|のでえらい).?$/u, res_igyo],
+		[/(ほめて|褒めて|のでえらい|えらいので).?$|^えらいので/u, res_igyo],
 		[/[行い]っ?てきます.?$/u, res_itera],
 		[/^((う|ぐ)っにゅう?ーん|ぎゅ(うっ|っう)にゅう?ーん).?$/u, res_unnyuuun],
 		[/(フォロー|ふぉろー)[飛と]んだ.?$/u, res_nostrflu],
