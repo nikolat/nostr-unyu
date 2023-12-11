@@ -74,7 +74,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/[行い]っ?てきます.?$/u, res_itera],
 		[/^((う|ぐ)っにゅう?ーん|ぎゅ(うっ|っう)にゅう?ーん).?$/u, res_unnyuuun],
 		[/(フォロー|ふぉろー)[飛と]んだ.?$/u, res_nostrflu],
-		[/^次は「(.)」から！$/, res_shiritori],
+		[/^次は「(.)」から！$/u, res_shiritori],
 		[/^(うにゅう、|うにゅう[くさた]ん、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|縮めて|伸ばして|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って|祝って|呪って|鳴らして|詰めて|梱包して|詰んで|漬けて|[踊躍]らせて|撃って)[^るた]?$/us, res_fire],
 	];
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
@@ -703,10 +703,18 @@ const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, 
 		throw new Error();
 	}
 	const text = match[1];
-	if (!/え|エ/.test(text)) {
+	if ('あア'.includes(text)) {
+		content = 'あかんに決まっとるやろ';
+	}
+	else if ('えエ'.includes(text)) {
+		content = 'えんいー';
+	}
+	else if ('しシ'.includes(text)) {
+		content = '知らんがな';
+	}
+	else {
 		return null;
 	}
-	content = 'えんいー';
 	tags = getTagsAirrep(event);
 	return [content, tags];
 };
