@@ -64,8 +64,8 @@ const isAllowedToPost = (event: NostrEvent) => {
 	throw new TypeError(`kind ${event.kind} is not supported`);
 };
 
-const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] => {
-	const resmapNormal: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => [string, string[][]]][] = [
+const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]] | null> | [string, string[][]] | null][] => {
+	const resmapNormal: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => [string, string[][]] | null][] = [
 		[/いいの?か?(？|\?)$/, res_iiyo],
 		[/\\e$/, res_enyee],
 		[/^うにゅう画像$/, res_unyupic],
@@ -74,6 +74,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/[行い]っ?てきます.?$/u, res_itera],
 		[/^((う|ぐ)っにゅう?ーん|ぎゅ(うっ|っう)にゅう?ーん).?$/u, res_unnyuuun],
 		[/(フォロー|ふぉろー)[飛と]んだ.?$/u, res_nostrflu],
+		[/^次は「(.)」から！$/, res_shiritori],
 		[/^(うにゅう、|うにゅう[くさた]ん、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|縮めて|伸ばして|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って|祝って|呪って|鳴らして|詰めて|梱包して|詰んで|漬けて|[踊躍]らせて|撃って)[^るた]?$/us, res_fire],
 	];
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
@@ -98,7 +99,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/検索(を?呼んで|どこ).?$/u, res_kensaku],
 		[/(パブ|ぱぶ)(リック)?(チャ|ちゃ|茶)(ット)?(を?呼んで|どこ).?$/u, res_pabucha],
 		[/(じゃんけん|ジャンケン|淀川(さん)?)(を?呼んで|どこ).?$/u, res_janken],
-		[/(しりとり|しりとリレー)(を?呼んで|どこ).?$/u, res_shiritori],
+		[/(しりとり|しりとリレー)(を?呼んで|どこ).?$/u, res_shiritoridoko],
 		[/やぶみ(ちゃ)?ん?(を?呼んで|どこ).?$/u, res_yabumin],
 		[/ぬるぽが?(を?呼んで|どこ).?$/u, res_nurupoga],
 		[/うにゅう(を?呼んで|どこ).?$/u, res_unyu],
@@ -140,7 +141,11 @@ const mode_normal = async (event: NostrEvent): Promise<[string, number, string[]
 	const resmap = getResmap(Mode.Normal);
 	for (const [reg, func] of resmap) {
 		if (reg.test(event.content)) {
-			const [content, tags] = await func(event, Mode.Normal, reg);
+			const res = await func(event, Mode.Normal, reg);
+			if (res === null) {
+				return null;
+			}
+			const [content, tags] = res;
 			return [content, event.kind, tags];
 		}
 	}
@@ -151,7 +156,11 @@ const mode_reply = async (event: NostrEvent): Promise<[string, number, string[][
 	const resmap = getResmap(Mode.Reply);
 	for (const [reg, func] of resmap) {
 		if (reg.test(event.content)) {
-			const [content, tags] = await func(event, Mode.Reply, reg);
+			const res = await func(event, Mode.Reply, reg);
+			if (res === null) {
+				return null;
+			}
+			const [content, tags] = res;
 			return [content, event.kind, tags];
 		}
 	}
@@ -470,7 +479,7 @@ const res_janken = (event: NostrEvent): [string, string[][]] => {
 	return [`nostr:${npub_janken}`, getTagsReply(event)];
 };
 
-const res_shiritori = (event: NostrEvent): [string, string[][]] => {
+const res_shiritoridoko = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const url = 'https://srtrelay.c-stellar.net/';
@@ -683,6 +692,22 @@ const res_nostrflu = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 		tags = getTags(event, mode);
 	}
 	tags.push(['r', url]);
+	return [content, tags];
+};
+
+const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] | null => {
+	let content: string;
+	let tags: string[][];
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const text = match[1];
+	if (!/え|エ/.test(text)) {
+		return null;
+	}
+	content = 'えんいー';
+	tags = getTagsAirrep(event);
 	return [content, tags];
 };
 
