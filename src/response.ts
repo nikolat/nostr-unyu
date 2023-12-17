@@ -707,11 +707,47 @@ const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, 
 	if ('あア'.includes(text)) {
 		content = 'あかんに決まっとるやろ';
 	}
+	else if ('いイ'.includes(text)) {
+		content = 'いちいち呼ばんでくれんか';
+	}
+	else if ('うウ'.includes(text)) {
+		content = 'うるさいで';
+	}
 	else if ('えエ'.includes(text)) {
 		content = 'えんいー';
 	}
+	else if ('おオ'.includes(text)) {
+		content = '思いつかんわ';
+	}
+	else if ('かカ'.includes(text)) {
+		content = '考えるな、感じるんや';
+	}
+	else if ('きキ'.includes(text)) {
+		content = '今日もしりとりが盛り上がっとるな';
+	}
+	else if ('くク'.includes(text)) {
+		content = 'くだらんことしとらんで寝ろ';
+	}
+	else if ('けケ'.includes(text)) {
+		content = '決してあきらめたらあかんで';
+	}
+	else if ('こコ'.includes(text)) {
+		content = '子供みたいな遊びが好きやな';
+	}
+	else if ('さサ'.includes(text)) {
+		content = 'さて、ワイの出番や';
+	}
 	else if ('しシ'.includes(text)) {
 		content = '知らんがな';
+	}
+	else if ('すス'.includes(text)) {
+		content = '少しは自分で考えたらどうや';
+	}
+	else if ('せセ'.includes(text)) {
+		content = 'せやかて工藤';
+	}
+	else if ('そソ'.includes(text)) {
+		content = 'そんな急に言われてもやな…';
 	}
 	else {
 		return null;
