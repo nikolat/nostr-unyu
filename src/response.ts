@@ -698,59 +698,37 @@ const res_nostrflu = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 };
 
 const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] | null => {
-	let content: string;
+	let content: string | undefined;
 	let tags: string[][];
 	const match = event.content.match(regstr);
 	if (match === null) {
 		throw new Error();
 	}
 	const text = match[1];
-	if ('あア'.includes(text)) {
-		content = 'あかんに決まっとるやろ';
+	const table = [
+		['あア', 'あかんに決まっとるやろ'],
+		['いイ', 'いちいち呼ばんでくれんか'],
+		['うウ', 'うるさいで'],
+		['えエ', 'えんいー'],
+		['おオ', '思いつかんわ'],
+		['かカ', '考えるな、感じるんや'],
+		['きキ', '今日もしりとりが盛り上がっとるな'],
+		['くク', 'くだらんことしとらんで寝ろ'],
+		['けケ', '決してあきらめたらあかんで'],
+		['こコ', '子供みたいな遊びが好きやな'],
+		['さサ', 'さて、ワイの出番や'],
+		['しシ', '知らんがな'],
+		['すス', '少しは自分で考えたらどうや'],
+		['せセ', 'せやかて工藤'],
+		['そソ', 'そんな急に言われてもやな…'],
+	];
+	for (const [top, sentence] of table) {
+		if (top.includes(text)) {
+			content = sentence;
+			break;
+		}
 	}
-	else if ('いイ'.includes(text)) {
-		content = 'いちいち呼ばんでくれんか';
-	}
-	else if ('うウ'.includes(text)) {
-		content = 'うるさいで';
-	}
-	else if ('えエ'.includes(text)) {
-		content = 'えんいー';
-	}
-	else if ('おオ'.includes(text)) {
-		content = '思いつかんわ';
-	}
-	else if ('かカ'.includes(text)) {
-		content = '考えるな、感じるんや';
-	}
-	else if ('きキ'.includes(text)) {
-		content = '今日もしりとりが盛り上がっとるな';
-	}
-	else if ('くク'.includes(text)) {
-		content = 'くだらんことしとらんで寝ろ';
-	}
-	else if ('けケ'.includes(text)) {
-		content = '決してあきらめたらあかんで';
-	}
-	else if ('こコ'.includes(text)) {
-		content = '子供みたいな遊びが好きやな';
-	}
-	else if ('さサ'.includes(text)) {
-		content = 'さて、ワイの出番や';
-	}
-	else if ('しシ'.includes(text)) {
-		content = '知らんがな';
-	}
-	else if ('すス'.includes(text)) {
-		content = '少しは自分で考えたらどうや';
-	}
-	else if ('せセ'.includes(text)) {
-		content = 'せやかて工藤';
-	}
-	else if ('そソ'.includes(text)) {
-		content = 'そんな急に言われてもやな…';
-	}
-	else {
+	if (content === undefined) {
 		return null;
 	}
 	tags = getTagsAirrep(event);
