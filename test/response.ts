@@ -1,12 +1,12 @@
 import * as fs from 'node:fs/promises';
 import { it } from 'mocha';
 import chai from 'chai';
-import { generatePrivateKey, getPublicKey, type Event as NostrEvent } from 'nostr-tools';
+import { generateSecretKey, getPublicKey, type Event as NostrEvent } from 'nostr-tools';
 import { Mode, Signer } from '../src/utils';
 import { getResponseEvent } from '../src/response';
 
 it('get response with JSON file', async() => {
-	const sk = generatePrivateKey();
+	const sk = generateSecretKey();
 	const text = await fs.readFile('./test/fixtures/input.json', { encoding: 'utf8' });
 	const json = JSON.parse(text);
 	const event: NostrEvent = json;

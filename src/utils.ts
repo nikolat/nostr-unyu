@@ -1,6 +1,6 @@
 import type { Readable } from 'node:stream';
 import { Buffer } from 'node:buffer';
-import { type EventTemplate, finishEvent, getPublicKey } from 'nostr-tools';
+import { type EventTemplate, finalizeEvent, getPublicKey } from 'nostr-tools';
 
 export const enum Mode {
 	Normal,
@@ -18,9 +18,9 @@ export const buffer = async (readable: Readable) => {
 
 export class Signer {
 
-	#seckey: string;
+	#seckey: Uint8Array;
 
-	constructor(seckey: string) {
+	constructor(seckey: Uint8Array) {
 		this.#seckey = seckey;
 	}
 
@@ -29,7 +29,7 @@ export class Signer {
 	};
 
 	finishEvent = (unsignedEvent: EventTemplate) => {
-		return finishEvent(unsignedEvent, this.#seckey);
+		return finalizeEvent(unsignedEvent, this.#seckey);
 	};
 
 };

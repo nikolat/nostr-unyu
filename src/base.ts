@@ -1,5 +1,5 @@
 import type { VercelResponse } from '@vercel/node';
-import { type VerifiedEvent, type Event as NostrEvent, nip19, validateEvent, verifySignature } from 'nostr-tools';
+import { type VerifiedEvent, type Event as NostrEvent, nip19, validateEvent, verifyEvent } from 'nostr-tools';
 import { Mode, Signer } from './utils';
 import { getResponseEvent } from './response';
 
@@ -29,7 +29,7 @@ export const base = async (rawBody: string, response: VercelResponse, mode: Mode
 	if (!validateEvent(requestEvent)) {
 		return response.status(400).json({ error: 'Invalid event' });
 	}
-	if (verifyInputEvent && !verifySignature(requestEvent)) {
+	if (verifyInputEvent && !verifyEvent(requestEvent)) {
 		return response.status(400).json({ error: 'Unverified event' });
 	}
 	//出力イベントを取得
