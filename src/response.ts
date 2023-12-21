@@ -603,7 +603,7 @@ const res_hatena = (event: NostrEvent): [string, string[][]] => {
 const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
-	if (/何|なに|誰|だれ|どこ|いつ|どう|どの|どっち|どちら|どれ/.test(event.content)) {
+	if (/何|なに|誰|だれ|どこ|いつ|どう|どんな|どの|どっち|どちら|どれ/.test(event.content)) {
 		content = any(['難しいところやな', '自分の信じた道を進むんや', '知らんがな']);
 	}
 	else {
