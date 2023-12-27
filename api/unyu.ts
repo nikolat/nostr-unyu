@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { buffer, Mode } from '../src/utils.ts';
-import { base } from '../src/base.ts';
+import { buffer, Mode } from '../src/utils.js';
+import { base } from '../src/base.js';
 
 const mode: Mode = Mode.Reply;
 

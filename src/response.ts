@@ -1,7 +1,7 @@
 import { type EventTemplate, type VerifiedEvent, type Event as NostrEvent, nip19 } from 'nostr-tools';
-import mb_strwidth from './mb_strwidth.ts';
+import mb_strwidth from './mb_strwidth.js';
 import Parser from 'rss-parser';
-import { Mode, Signer } from './utils.ts';
+import { Mode, Signer } from './utils.js';
 
 export const getResponseEvent = async (requestEvent: NostrEvent, signer: Signer, mode: Mode): Promise<VerifiedEvent | null> => {
 	if (requestEvent.pubkey === signer.getPublicKey()) {
