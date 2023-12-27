@@ -1,8 +1,8 @@
 //curl -X POST -H "Content-Type: application/json" -d @test/fixtures/input.json https://nostr-unyu.vercel.app/api/iiyo
 import * as fs from 'node:fs/promises';
 import { generateSecretKey, type Event as NostrEvent } from 'nostr-tools';
-import { Mode, Signer } from './src/utils';
-import { getResponseEvent } from './src/response';
+import { Mode, Signer } from './src/utils.ts';
+import { getResponseEvent } from './src/response.ts';
 
 const main = async () => {
 	const text = await fs.readFile('./test/fixtures/input.json', { encoding: 'utf8' });

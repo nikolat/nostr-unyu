@@ -2,8 +2,8 @@ import * as fs from 'node:fs/promises';
 import { it } from 'mocha';
 import chai from 'chai';
 import { generateSecretKey, getPublicKey, type Event as NostrEvent } from 'nostr-tools';
-import { Mode, Signer } from '../src/utils';
-import { getResponseEvent } from '../src/response';
+import { Mode, Signer } from '../src/utils.ts';
+import { getResponseEvent } from '../src/response.ts';
 
 it('get response with JSON file', async() => {
 	const sk = generateSecretKey();
