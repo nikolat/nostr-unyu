@@ -726,6 +726,11 @@ const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, 
 		['すス', '少しは自分で考えたらどうや'],
 		['せセ', 'せやかて工藤'],
 		['そソ', 'そんな急に言われてもやな…'],
+		['たタ', '楽しそうでええな'],
+		['ちチ', 'ちょっと考えるから待っててや'],
+		['つツ', '次は「ツ」でええんか？'],
+		['てテ', '手間のかかるやっちゃな'],
+		['とト', '特に無いで'],
 	];
 	for (const [top, sentence] of table) {
 		if (top.includes(text)) {
