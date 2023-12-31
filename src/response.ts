@@ -447,6 +447,14 @@ const res_ohayo = (event: NostrEvent): [string, string[][]] => {
 	return [any(['おはようやで', 'ほい、おはよう', `もう${date.getHours()}時か、おはよう`]), getTagsReply(event)];
 };
 
+const res_akeome = (event: NostrEvent): [string, string[][]] => {
+	return [any(['今年もよろしゅう', '今年もええ年になるとええね', 'ことよろ']), getTagsReply(event)];
+};
+
+const res_otoshidama = (event: NostrEvent): [string, string[][]] => {
+	return [any(['ワイにたかるな', 'あらへんで', 'しらん子やな']), getTagsReply(event)];
+};
+
 const res_gyunyu = (event: NostrEvent): [string, string[][]] => {
 	return [any(['牛乳は健康にええで🥛', 'カルシウム補給せぇ🥛', 'ワイの奢りや🥛']), getTagsReply(event)];
 };
