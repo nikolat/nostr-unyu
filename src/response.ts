@@ -97,6 +97,8 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/人の心/, res_hitonokokoro],
 		[/ぽわ/, res_powa],
 		[/おはよ/, res_ohayo],
+		[/あけおめ|あけまして|ことよろ/, res_akeome],
+		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
 		[/検索(を?呼んで|どこ).?$/u, res_kensaku],
 		[/(パブ|ぱぶ)(リック)?(チャ|ちゃ|茶)(ット)?(を?呼んで|どこ).?$/u, res_pabucha],
