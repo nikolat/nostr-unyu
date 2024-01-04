@@ -741,6 +741,11 @@ const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, 
 		['つツ', '次は「ツ」でええんか？'],
 		['てテ', '手間のかかるやっちゃな'],
 		['とト', '特に無いで'],
+		['なナ', '何やねん'],
+		['にニ', 'にんげんだもの\nうにゅを'],
+		['ぬヌ', 'ぬこ画像'],
+		['ねネ', '眠いんやけど'],
+		['のノ', 'Nostrって何て読むんやろな'],
 	];
 	for (const [top, sentence] of table) {
 		if (top.includes(text)) {
