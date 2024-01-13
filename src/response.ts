@@ -173,8 +173,13 @@ const mode_reply = async (event: NostrEvent): Promise<[string, number, string[][
 
 const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 	const reactionmap: [RegExp, string][] = [
-		[/ぎゅうにゅう/, '🥛'],
+		[/ぎゅうにゅう|とうにゅう/, '🥛'],
+		[/こうにゅう/, '💸'],
 		[/しゅうにゅう/, '💰'],
+		[/そうにゅう/, '🔖'],
+		[/ちゅうにゅう/, '💉'],
+		[/のうにゅう/, '📦'],
+		[/ふうにゅう/, '💌'],
 		[/うにゅう(?!(ハウス|、))/, ':unyu:'],
 		[/^うちゅう$/, any(['🪐', '🛸', '🚀'])],
 		[/^う[^に]ゅう$/, '❓'],
