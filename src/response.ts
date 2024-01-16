@@ -609,7 +609,7 @@ const res_hug = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string
 		throw new Error();
 	}
 	content = match[1];
-	tags = getTagsAirrep(event);
+	tags = getTags(event, mode);
 	return [content, tags];
 };
 
