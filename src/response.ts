@@ -627,6 +627,9 @@ const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 	if (/(かわいい|可愛い)の?か?(？|\?)$/.test(event.content)) {
 		content = any(['かわいいで', 'ワイは好みやで', 'かわいくはあらへんやろ']);
 	}
+	else if (/(かっこ|カッコ|格好)いいの?か?(？|\?)$/.test(event.content)) {
+		content = any(['かっこいいやん', 'ワイはかっこええと思うで', 'ダサいやろ']);
+	}
 	else if (/何|なに|誰|だれ|どこ|いつ|どう|どんな|どの|どっち|どちら|どれ/.test(event.content)) {
 		content = any(['難しいところやな', '自分の信じた道を進むんや', '知らんがな']);
 	}
