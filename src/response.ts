@@ -173,6 +173,7 @@ const mode_reply = async (event: NostrEvent): Promise<[string, number, string[][
 
 const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 	const reactionmap: [RegExp, string][] = [
+		[/さくら/, ':uka_sakurah00:'],
 		[/ぎゅうにゅう|とうにゅう/, '🥛'],
 		[/こうにゅう/, '💸'],
 		[/しゅうにゅう/, '💰'],
@@ -192,6 +193,9 @@ const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 			const tags: string[][] = getTagsFav(event);
 			if (content === ':unyu:') {
 				tags.push(['emoji', 'unyu', 'https://nikolat.github.io/avatar/disc2.png']);
+			}
+			else if (content === ':uka_sakurah00:') {
+				tags.push(['emoji', 'uka_sakurah00', 'https://ukadon-cdn.de10.moe/system/custom_emojis/images/000/006/840/original/uka_sakurah00.png']);
 			}
 			return [content, kind, tags];
 		}
