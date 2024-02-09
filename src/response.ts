@@ -47,7 +47,8 @@ const isAllowedToPost = (event: NostrEvent) => {
 		'be8e52c0c70ec5390779202b27d9d6fc7286d0e9a2bc91c001d6838d40bafa4a',//Nostr伺か部
 		'8206e76969256cd33277eeb00a45e445504dfb321788b5c3cc5d23b561765a74',//うにゅうハウス開発
 	];
-	if (event.tags.some(tag => tag.length >= 1 && tag[0] === 'content-warning')) {
+	const disallowedTags = ['content-warning', 'proxy'];
+	if (event.tags.some(tag => tag.length >= 1 && disallowedTags.includes(tag[0]))) {
 		return false;
 	}
 	if (event.kind === 1) {
