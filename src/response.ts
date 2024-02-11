@@ -119,7 +119,6 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/すき|好き|愛してる|あいしてる/, res_suki],
 		[/ランド|開いてる|閉じてる|開園|閉園/, res_ochinchinland],
 		[/招待コード/, res_invitecode],
-		[/虚無/, res_empty],
 		[/(🫂|🤗)/u, res_hug],
 		[/[💋💕]/u, res_chu],
 		[/(？|\?)$/, res_hatena],
@@ -175,6 +174,7 @@ const mode_reply = async (event: NostrEvent): Promise<[string, number, string[][
 
 const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 	const reactionmap: [RegExp, string][] = [
+		[/虚無/, ''],
 		[/さくら/, ':uka_sakurah00:'],
 		[/ぎゅうにゅう|とうにゅう/, '🥛'],
 		[/こうにゅう/, '💸'],
@@ -605,12 +605,6 @@ const res_ochinchinland = async (event: NostrEvent): Promise<[string, string[][]
 
 const res_invitecode = (event: NostrEvent): [string, string[][]] => {
 	return [any(['他あたってくれんか', 'あらへんで', '𝑫𝒐 𝑵𝒐𝒔𝒕𝒓']), getTagsReply(event)];
-};
-
-const res_empty = (event: NostrEvent): [string, string[][]] => {
-	const content = '';
-	const tags = getTagsFav(event);
-	return [content, tags];
 };
 
 const res_hug = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
