@@ -629,7 +629,7 @@ const res_chu = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_hatena = (event: NostrEvent): [string, string[][]] => {
-	return [any(['ワイに聞かれても', '知らんて', 'せやな']), getTagsReply(event)];
+	return [any(['ワイに聞かれても', '知らんて', 'せやな', 'たまには自分で考えなあかんで', '他人に頼ってたらあかんで', '大人になったらわかるで']), getTagsReply(event)];
 };
 
 const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
