@@ -328,7 +328,8 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 				content += s;
 			}
 			else {
-				content += '　　';
+				content += ':kubipaca_null:';
+				emoji.add('kubipaca_null');
 			}
 		}
 		content += '\n';
