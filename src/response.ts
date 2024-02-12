@@ -80,6 +80,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/^(うにゅう、|うにゅう[くさた]ん、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|縮めて|伸ばして|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って|祝って|呪って|鳴らして|詰めて|梱包して|囲んで|囲って詰んで|漬けて|[踊躍]らせて|撃って|蒸して)[^るた]?$/us, res_fire],
 	];
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
+		[/アルパカ|🦙/, res_arupaka],
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
@@ -206,6 +207,140 @@ const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 	return null;
 };
 
+const res_arupaka = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	let [x, y] = [0, 1];
+	let b = [0, 0];
+	let c = [x, y];
+	const save: number[][] = [[0, 0], [1, 0], [0, 1]];
+	const arrow = new Map();
+	const emoji = new Set<string>();
+	arrow.set('0,0', ':kubipaca_karada:');
+	arrow.set('1,0', '');
+	emoji.add('kubipaca_karada');
+	while (true) {
+		const n = Math.floor(Math.random() * 4);
+		let cs = '';
+		switch (n) {
+			case 0:
+				x++;
+				cs = '→';
+				break;
+			case 1:
+				x--;
+				cs = '←';
+				break;
+			case 2:
+				y++;
+				cs = '↑';
+				break;
+			case 3:
+				y--;
+				cs = '↓';
+				break;
+			default:
+				break;
+		}
+		let bs = '??';
+		if (c[0] - b[0] === 1) {
+			bs = '←';
+		}
+		else if (c[0] - b[0] === -1) {
+			bs = '→';
+		}
+		else if (c[1] - b[1] === 1) {
+			bs = '↓';
+		}
+		else if (c[1] - b[1] === -1) {
+			bs = '↑';
+		}
+		if (save.some(e => e[0] === x && e[1] === y)) {
+			arrow.set(`${c[0]},${c[1]}`, bs + '■');
+			break;
+		}
+		else {
+			save.push([x, y]);
+			arrow.set(`${c[0]},${c[1]}`, bs + cs);
+		}
+		b = c;
+		c = [x, y];
+	}
+	const x_min = Math.min(...save.map(e => e[0]));
+	const x_max = Math.max(...save.map(e => e[0]));
+	const y_min = Math.min(...save.map(e => e[1]));
+	const y_max = Math.max(...save.map(e => e[1]));
+	content = '';
+	for (let y = y_max; y >= y_min; y--) {
+		for (let x = x_min; x <= x_max; x++) {
+			if (save.some(e => e[0] === x && e[1] === y)) {
+				let s = arrow.get(`${x},${y}`);
+				switch (s) {
+					case '←→':
+					case '→←':
+						s = ':kubipaca_kubi_yoko:';
+						emoji.add('kubipaca_kubi_yoko');
+						break;
+					case '↑↓':
+					case '↓↑':
+						s = ':kubipaca_kubi:';
+						emoji.add('kubipaca_kubi');
+						break;
+					case '↑→':
+					case '→↑':
+						s = ':kubipaca_kubi_uemigi:';
+						emoji.add('kubipaca_kubi_uemigi');
+						break;
+					case '↑←':
+					case '←↑':
+						s = ':kubipaca_kubi_uehidari:';
+						emoji.add('kubipaca_kubi_uehidari');
+						break;
+					case '→↓':
+					case '↓→':
+						s = ':kubipaca_kubi_migisita:';
+						emoji.add('kubipaca_kubi_migisita');
+						break;
+					case '←↓':
+					case '↓←':
+						s = ':kubipaca_kubi_hidarisita:';
+						emoji.add('kubipaca_kubi_hidarisita');
+						break;
+					case '↓■':
+						s = ':kubipaca_kao:';
+						emoji.add('kubipaca_kao');
+						break;
+					case '←■':
+						s = ':kubipaca_kao_migi:';
+						emoji.add('kubipaca_kao_migi');
+						break;
+					case '→■':
+						s = ':kubipaca_kao_hidari:';
+						emoji.add('kubipaca_kao_hidari');
+						break;
+					case '↑■':
+						s = ':kubipaca_kao_sakasa:';
+						emoji.add('kubipaca_kao_sakasa');
+						break;
+					default:
+						break;
+				}
+				content += s;
+			}
+			else {
+				content += '　　';
+			}
+		}
+		content += '\n';
+	}
+	tags = getTagsReply(event);
+	tags = [
+		...tags,
+		...Array.from(emoji).map(s => ['emoji', s, `https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/${s}.webp`])
+	];
+	return [content, tags];
+}
+
 const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
 	let content: string;
 	let tags: string[][];
@@ -220,7 +355,7 @@ const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
 	const url = 'http://buynowforsale.shillest.net/ghosts/ghosts/index.rss';
 	const parser = new Parser();
 	const feed = await parser.parseURL(url);
-	const index =  Math.floor(Math.random() * feed.items.length);
+	const index = Math.floor(Math.random() * feed.items.length);
 	const link = feed.items[index].link;
 	tags = getTagsReply(event);
 	if (link === undefined) {
