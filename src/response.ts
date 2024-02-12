@@ -219,6 +219,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	arrow.set('0,0', ':kubipaca_karada:');
 	arrow.set('1,0', '');
 	emoji.add('kubipaca_karada');
+	let retry = 1;
 	while (true) {
 		const n = Math.floor(Math.random() * 4);
 		let cs = '';
@@ -256,12 +257,18 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			bs = '↑';
 		}
 		if (save.some(e => e[0] === x && e[1] === y)) {
+			if (retry) {
+				retry--;
+				[x, y] = c;
+				continue;
+			}
 			arrow.set(`${c[0]},${c[1]}`, bs + '■');
 			break;
 		}
 		else {
 			save.push([x, y]);
 			arrow.set(`${c[0]},${c[1]}`, bs + cs);
+			retry = 1;
 		}
 		b = c;
 		c = [x, y];
