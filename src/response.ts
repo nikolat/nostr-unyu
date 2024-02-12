@@ -213,13 +213,20 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let [x, y] = [0, 1];
 	let b = [0, 0];
 	let c = [x, y];
+	let retry_max = 1;
+	if (/ながい|長い/.test(event.content)) {
+		retry_max = 2;
+	}
+	else if (/みじかい|短い/.test(event.content)) {
+		retry_max = 0;
+	}
 	const save: number[][] = [[0, 0], [1, 0], [0, 1]];
 	const arrow = new Map();
 	const emoji = new Set<string>();
 	arrow.set('0,0', ':kubipaca_karada:');
 	arrow.set('1,0', '');
 	emoji.add('kubipaca_karada');
-	let retry = 1;
+	let retry = retry_max;
 	while (true) {
 		const n = Math.floor(Math.random() * 4);
 		let cs = '';
@@ -268,7 +275,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		else {
 			save.push([x, y]);
 			arrow.set(`${c[0]},${c[1]}`, bs + cs);
-			retry = 1;
+			retry = retry_max;
 		}
 		b = c;
 		c = [x, y];
