@@ -82,6 +82,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、)?(\S+)の(週間)?天気/, res_tenki],
+		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
 		[/(npub\w{59})\s?(さん)?に(.{1,50})を/us, res_okutte],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
@@ -309,6 +310,10 @@ const res_tenki = async (event: NostrEvent, mode: Mode, regstr: RegExp): Promise
 	content = `${place}の天気やで。\n\n${json.text.replace(/\\n/g, '\n')}\n\n（※出典：気象庁ホームページ）`;
 	tags = getTagsReply(event);
 	return [content, tags];
+};
+
+const res_aura = (event: NostrEvent): [string, string[][]] => {
+	return ['ありえへん……このワイが……', getTagsReply(event)];
 };
 
 const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
