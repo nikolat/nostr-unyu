@@ -210,6 +210,8 @@ const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
+	const LIMIT_WIDTH = 13;
+	const LIMIT_HIGHT = 50;
 	let [x, y] = [0, 1];
 	let b = [0, 0];
 	let c = [x, y];
@@ -267,7 +269,11 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		else if (c[1] - b[1] === -1) {
 			bs = '↑';
 		}
-		if (save.some(e => e[0] === x && e[1] === y)) {
+		const x_min = Math.min(...save.map(e => e[0]), x);
+		const x_max = Math.max(...save.map(e => e[0]), x);
+		const y_min = Math.min(...save.map(e => e[1]), y);
+		const y_max = Math.max(...save.map(e => e[1]), y);
+		if (save.some(e => e[0] === x && e[1] === y) || Math.abs(x_max - x_min) >= LIMIT_WIDTH || Math.abs(y_max - y_min) >= LIMIT_HIGHT) {
 			if (retry) {
 				retry--;
 				[x, y] = c;
