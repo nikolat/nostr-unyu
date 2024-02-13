@@ -84,7 +84,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
-		[/(npub\w{59})\s?(さん)?に(.{1,50})を/us, res_okutte],
+		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/us, res_okutte],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
 		[/誕生日/, res_tanjobi],
