@@ -214,11 +214,15 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let b = [0, 0];
 	let c = [x, y];
 	let retry_max = 1;
+	let isGaming = false;
 	if (/ながい|長い/.test(event.content)) {
 		retry_max = 2;
 	}
 	else if (/みじかい|短い/.test(event.content)) {
 		retry_max = 0;
+	}
+	if (/ゲーミング|光|虹|明|🌈/.test(event.content)) {
+		isGaming = true;
 	}
 	const save: number[][] = [[0, 0], [1, 0], [0, 1]];
 	const arrow = new Map();
@@ -321,20 +325,44 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 						emoji.add('kubipaca_kubi_hidarisita');
 						break;
 					case '↓■':
-						s = ':kubipaca_kao:';
-						emoji.add('kubipaca_kao');
+						if (isGaming) {
+							s = ':kubipaka_kao_gaming:';
+							emoji.add('kubipaka_kao_gaming');
+						}
+						else {
+							s = ':kubipaca_kao:';
+							emoji.add('kubipaca_kao');
+						}
 						break;
 					case '←■':
-						s = ':kubipaca_kao_migi:';
-						emoji.add('kubipaca_kao_migi');
+						if (isGaming) {
+							s = ':kubipaka_kao_migi_gaming:';
+							emoji.add('kubipaka_kao_migi_gaming');
+						}
+						else {
+							s = ':kubipaca_kao_migi:';
+							emoji.add('kubipaca_kao_migi');
+						}
 						break;
 					case '→■':
-						s = ':kubipaca_kao_hidari:';
-						emoji.add('kubipaca_kao_hidari');
+						if (isGaming) {
+							s = ':kubipaka_kao_hidari_gaming:';
+							emoji.add('kubipaka_kao_hidari_gaming');
+						}
+						else {
+							s = ':kubipaca_kao_hidari:';
+							emoji.add('kubipaca_kao_hidari');
+						}
 						break;
 					case '↑■':
-						s = ':kubipaca_kao_sakasa:';
-						emoji.add('kubipaca_kao_sakasa');
+						if (isGaming) {
+							s = ':kubipaka_kao_sakasa_gaming:';
+							emoji.add('kubipaka_kao_sakasa_gaming');
+						}
+						else {
+							s = ':kubipaca_kao_sakasa:';
+							emoji.add('kubipaca_kao_sakasa');
+						}
 						break;
 					default:
 						break;
@@ -348,9 +376,8 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		}
 		content += '\n';
 	}
-	tags = getTagsReply(event);
 	tags = [
-		...tags,
+		...getTagsReply(event),
 		...Array.from(emoji).map(s => ['emoji', s, `https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/${s}.webp`])
 	];
 	return [content, tags];
