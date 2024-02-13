@@ -217,11 +217,14 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let c = [x, y];
 	let retry_max = 1;
 	let isGaming = false;
-	if (/ながい|長い/.test(event.content)) {
-		retry_max = 2;
-	}
-	else if (/みじかい|短い/.test(event.content)) {
+	if (/みじかい|短い/.test(event.content)) {
 		retry_max = 0;
+	}
+	else if (/ながい|長い/.test(event.content)) {
+		retry_max = 2;
+		if (/ちょう|超|めっ?ちゃ|クソ/.test(event.content)) {
+			retry_max = 4;
+		}
 	}
 	if (/ゲーミング|光|虹|明|🌈/.test(event.content)) {
 		isGaming = true;
