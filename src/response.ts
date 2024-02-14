@@ -295,13 +295,13 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		c = [x, y];
 	}
 	//レンダリング
-	const x_min = Math.min(...save.map(e => e[0]));
-	const x_max = Math.max(...save.map(e => e[0]));
 	const y_min = Math.min(...save.map(e => e[1]));
 	const y_max = Math.max(...save.map(e => e[1]));
+	const x_min = Math.min(...save.map(e => e[0]));
 	const lines = [];
 	for (let y = y_max; y >= y_min; y--) {
 		let line = '';
+		const x_max = Math.max(...save.filter(e => e[1] === y).map(e => e[0]));
 		for (let x = x_min; x <= x_max; x++) {
 			if (save.some(e => e[0] === x && e[1] === y)) {
 				let s = arrow.get(`${x},${y}`);
