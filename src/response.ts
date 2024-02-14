@@ -212,7 +212,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const LIMIT_WIDTH = 10;
-	const LIMIT_HIGHT = 30;
+	const LIMIT_HEIGHT = 30;
 	let retry_max = 1;
 	let isGaming = false;
 	if (/みじかい|短い/.test(event.content)) {
@@ -263,16 +263,16 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 				break;
 		}
 		let bs = '';//どっちから動いてきた？
-		if (c[0] - b[0] === 1) {
+		if (c[0] - b[0] > 0) {
 			bs = '←';
 		}
-		else if (c[0] - b[0] === -1) {
+		else if (c[0] - b[0] < 0) {
 			bs = '→';
 		}
-		else if (c[1] - b[1] === 1) {
+		else if (c[1] - b[1] > 0) {
 			bs = '↓';
 		}
-		else if (c[1] - b[1] === -1) {
+		else if (c[1] - b[1] < 0) {
 			bs = '↑';
 		}
 		const x_min = Math.min(...save.map(e => e[0]), x);
@@ -280,20 +280,34 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		const y_min = Math.min(...save.map(e => e[1]), y);
 		const y_max = Math.max(...save.map(e => e[1]), y);
 		//体にぶつかるか、境界にぶつかるかしたら終わり
-		if (save.some(e => e[0] === x && e[1] === y) || Math.abs(x_max - x_min) >= LIMIT_WIDTH || Math.abs(y_max - y_min) >= LIMIT_HIGHT) {
-			if (retry) {
-				retry--;
-				[x, y] = c;//元の状態に戻してリトライ
-				continue;
+		if (save.some(e => e[0] === x && e[1] === y) || Math.abs(x_max - x_min) >= LIMIT_WIDTH || Math.abs(y_max - y_min) >= LIMIT_HEIGHT) {
+			//クロス(貫通)可能ならクロスする
+			const next_arrow = arrow.get(`${x},${y}`) ?? '';
+			if (cs === '→' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x + 1 && e[1] === y) && Math.max(...save.map(e => e[0]), x + 1) - x_min < LIMIT_WIDTH) {
+				x++;
 			}
-			arrow.set(`${c[0]},${c[1]}`, bs + '■');
-			break;
+			else if (cs === '←' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x - 1 && e[1] === y) && x_max - Math.min(...save.map(e => e[0]), x - 1) < LIMIT_WIDTH) {
+				x--;
+			}
+			else if (cs === '↑' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x && e[1] === y + 1) && Math.max(...save.map(e => e[1]), y + 1) - y_min < LIMIT_HEIGHT) {
+				y++;
+			}
+			else if (cs === '↓' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x && e[1] === y - 1) && y_max - Math.min(...save.map(e => e[1]), y - 1) < LIMIT_HEIGHT) {
+				y--;
+			}
+			else {
+				if (retry) {
+					retry--;
+					[x, y] = c;//元の状態に戻してリトライ
+					continue;
+				}
+				arrow.set(`${c[0]},${c[1]}`, bs + '■');
+				break;
+			}
 		}
-		else {
-			save.push([x, y]);//体の座標をマッピング
-			arrow.set(`${c[0]},${c[1]}`, bs + cs);//この座標はどっちから動いてきてどっちに動いた？
-			retry = retry_max;
-		}
+		save.push([x, y]);//体の座標をマッピング
+		arrow.set(`${c[0]},${c[1]}`, bs + cs);//この座標はどっちから動いてきてどっちに動いた？
+		retry = retry_max;
 		b = c;
 		c = [x, y];
 	}
@@ -303,7 +317,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const y_min = Math.min(...save.map(e => e[1]));
 	const y_max = Math.max(...save.map(e => e[1]));
 	const exist_limit_width = (x_max - x_min) === (LIMIT_WIDTH - 1);
-	const exist_limit_height = (y_max - y_min) === (LIMIT_HIGHT - 1);
+	const exist_limit_height = (y_max - y_min) === (LIMIT_HEIGHT - 1);
 	let lines = [];
 	for (let y = y_max; y >= y_min; y--) {
 		let line = '';
