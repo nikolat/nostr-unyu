@@ -382,7 +382,8 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		lines.push(line);
 	}
 	if (exist_limit_height) {
-		lines = [':seigen_seigen:'.repeat(x_max - x_min + 1), ...lines, ':seigen_seigen:'.repeat(x_max - x_min + 1)];
+		const rep = exist_limit_width ? x_max - x_min + 3 : x_max - x_min + 1
+		lines = [':seigen_seigen:'.repeat(rep), ...lines, ':seigen_seigen:'.repeat(rep)];
 		emoji_seigen.add('seigen_seigen');
 	}
 	content = lines.join('\n');
