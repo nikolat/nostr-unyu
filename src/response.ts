@@ -221,7 +221,9 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	else if (/ながい|長い/.test(event.content)) {
 		retry_max = 2;
 		if (/ちょう|超|めっ?ちゃ|クソ/.test(event.content)) {
-			retry_max = 4;
+			retry_max = 3;
+			const count = (event.content.match(/超/g) || []).length;
+			retry_max += count;
 		}
 	}
 	if (/ゲーミング|光|虹|明|🌈/.test(event.content)) {
