@@ -303,79 +303,53 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		for (let x = x_min; x <= x_max; x++) {
 			if (save.some(e => e[0] === x && e[1] === y)) {
 				let s = arrow.get(`${x},${y}`);
+				let k;
 				switch (s) {
 					case '←→':
 					case '→←':
-						s = ':kubipaca_kubi_yoko:';
-						emoji.add('kubipaca_kubi_yoko');
+						k = 'kubipaca_kubi_yoko';
 						break;
 					case '↑↓':
 					case '↓↑':
-						s = ':kubipaca_kubi:';
-						emoji.add('kubipaca_kubi');
+						k = 'kubipaca_kubi';
 						break;
 					case '↑→':
 					case '→↑':
-						s = ':kubipaca_kubi_uemigi:';
-						emoji.add('kubipaca_kubi_uemigi');
+						k = 'kubipaca_kubi_uemigi';
 						break;
 					case '↑←':
 					case '←↑':
-						s = ':kubipaca_kubi_uehidari:';
-						emoji.add('kubipaca_kubi_uehidari');
+						k = 'kubipaca_kubi_uehidari';
 						break;
 					case '→↓':
 					case '↓→':
-						s = ':kubipaca_kubi_migisita:';
-						emoji.add('kubipaca_kubi_migisita');
+						k = 'kubipaca_kubi_migisita';
 						break;
 					case '←↓':
 					case '↓←':
-						s = ':kubipaca_kubi_hidarisita:';
-						emoji.add('kubipaca_kubi_hidarisita');
+						k = 'kubipaca_kubi_hidarisita';
 						break;
 					case '↓■':
-						if (isGaming) {
-							s = ':kubipaka_kao_gaming:';
-							emoji.add('kubipaka_kao_gaming');
-						}
-						else {
-							s = ':kubipaca_kao:';
-							emoji.add('kubipaca_kao');
-						}
+						k = 'kubipaka_kao';
 						break;
 					case '←■':
-						if (isGaming) {
-							s = ':kubipaka_kao_migi_gaming:';
-							emoji.add('kubipaka_kao_migi_gaming');
-						}
-						else {
-							s = ':kubipaca_kao_migi:';
-							emoji.add('kubipaca_kao_migi');
-						}
+						k = 'kubipaka_kao_migi_gaming';
 						break;
 					case '→■':
-						if (isGaming) {
-							s = ':kubipaka_kao_hidari_gaming:';
-							emoji.add('kubipaka_kao_hidari_gaming');
-						}
-						else {
-							s = ':kubipaca_kao_hidari:';
-							emoji.add('kubipaca_kao_hidari');
-						}
+						s = 'kubipaca_kao_hidari';
 						break;
 					case '↑■':
-						if (isGaming) {
-							s = ':kubipaka_kao_sakasa_gaming:';
-							emoji.add('kubipaka_kao_sakasa_gaming');
-						}
-						else {
-							s = ':kubipaca_kao_sakasa:';
-							emoji.add('kubipaca_kao_sakasa');
-						}
+						s = 'kubipaka_kao_sakasa';
 						break;
 					default:
 						break;
+				}
+				if (k) {
+					if (isGaming) {
+						k = `${k}_gaming`;
+					}
+					emoji.add(k);
+					s = `:${k}:`;
 				}
 				content += s;
 			}
