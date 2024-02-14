@@ -222,7 +222,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		retry_max = 2;
 		if (/ちょう|超|めっ?ちゃ|クソ/.test(event.content)) {
 			retry_max = 3;
-			const count = (event.content.match(/超/g) || []).length;
+			const count = Math.min((event.content.match(/超/g) || []).length, 17);
 			retry_max += count;
 		}
 	}
