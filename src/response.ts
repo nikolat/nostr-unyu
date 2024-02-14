@@ -211,8 +211,8 @@ const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
-	const LIMIT_WIDTH = 13;
-	const LIMIT_HIGHT = 50;
+	const LIMIT_WIDTH = 10;
+	const LIMIT_HIGHT = 30;
 	let retry_max = 1;
 	let isGaming = false;
 	if (/みじかい|短い/.test(event.content)) {
@@ -236,6 +236,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let c = [x, y];//1つ前の座標を覚えておく
 	const arrow = new Map([['0,0', 'body'], ['1,0', '']]);
 	const emoji = new Set<string>();
+	const emoji_seigen = new Set<string>();
 	let retry = retry_max;
 	//頭を上下左右にとりあえず動かしてみる
 	while (true) {
@@ -297,10 +298,13 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		c = [x, y];
 	}
 	//レンダリング
+	const x_min = Math.min(...save.map(e => e[0]));
+	const x_max = Math.max(...save.map(e => e[0]));
 	const y_min = Math.min(...save.map(e => e[1]));
 	const y_max = Math.max(...save.map(e => e[1]));
-	const x_min = Math.min(...save.map(e => e[0]));
-	const lines = [];
+	const exist_limit_width = (x_max - x_min) === (LIMIT_WIDTH - 1);
+	const exist_limit_height = (y_max - y_min) === (LIMIT_HIGHT - 1);
+	let lines = [];
 	for (let y = y_max; y >= y_min; y--) {
 		let line = '';
 		const x_max = Math.max(...save.filter(e => e[1] === y).map(e => e[0]));
@@ -365,12 +369,21 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 				emoji.add('kubipaca_null');
 			}
 		}
+		if (exist_limit_width) {
+			line = `:seigen_seigen:${line}:seigen_seigen:`;
+			emoji_seigen.add('seigen_seigen');
+		}
 		lines.push(line);
+	}
+	if (exist_limit_height) {
+		lines = [':seigen_seigen:'.repeat(x_max - x_min + 1), ...lines, ':seigen_seigen:'.repeat(x_max - x_min + 1)];
+		emoji_seigen.add('seigen_seigen');
 	}
 	content = lines.join('\n');
 	tags = [
 		...getTagsReply(event),
-		...Array.from(emoji).map(s => ['emoji', s, `https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/${s}.webp`])
+		...Array.from(emoji).map(s => ['emoji', s, `https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/${s}.webp`]),
+		...Array.from(emoji_seigen).map(s => ['emoji', s, `https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/${s}.png`]),
 	];
 	return [content, tags];
 }
