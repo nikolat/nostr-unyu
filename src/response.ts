@@ -307,7 +307,13 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let lines = [];
 	for (let y = y_max; y >= y_min; y--) {
 		let line = '';
-		const x_max = Math.max(...save.filter(e => e[1] === y).map(e => e[0]));
+		let x_max;
+		if (exist_limit_width) {
+			x_max = Math.max(...save.map(e => e[0]));
+		}
+		else {
+			x_max = Math.max(...save.filter(e => e[1] === y).map(e => e[0]));
+		}
 		for (let x = x_min; x <= x_max; x++) {
 			if (save.some(e => e[0] === x && e[1] === y)) {
 				let s = arrow.get(`${x},${y}`);
