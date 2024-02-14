@@ -213,9 +213,6 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let tags: string[][];
 	const LIMIT_WIDTH = 13;
 	const LIMIT_HIGHT = 50;
-	let [x, y] = [0, 1];
-	let b = [0, 0];
-	let c = [x, y];
 	let retry_max = 1;
 	let isGaming = false;
 	if (/みじかい|短い/.test(event.content)) {
@@ -230,23 +227,18 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (/ゲーミング|光|虹|明|🌈/.test(event.content)) {
 		isGaming = true;
 	}
-	const save: number[][] = [[0, 0], [1, 0], [0, 1]];
-	const arrow = new Map();
+	const startpoint = [0, 1];
+	const save: number[][] = [[0, 0], [1, 0], startpoint];
+	let [x, y] = startpoint;
+	let b = [0, 0];//2つ前の座標を覚えておく
+	let c = [x, y];//1つ前の座標を覚えておく
+	const arrow = new Map([['0,0', 'body'], ['1,0', '']]);
 	const emoji = new Set<string>();
-	if (isGaming) {
-		arrow.set('0,0', ':kubipaca_karada_gaming:');
-		arrow.set('1,0', '');
-		emoji.add('kubipaca_karada_gaming');
-	}
-	else {
-		arrow.set('0,0', ':kubipaca_karada:');
-		arrow.set('1,0', '');
-		emoji.add('kubipaca_karada');
-	}
 	let retry = retry_max;
+	//頭を上下左右にとりあえず動かしてみる
 	while (true) {
 		const n = Math.floor(Math.random() * 4);
-		let cs = '';
+		let cs = '';//どっちに動く？
 		switch (n) {
 			case 0:
 				x++;
@@ -267,7 +259,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			default:
 				break;
 		}
-		let bs = '??';
+		let bs = '';//どっちから動いてきた？
 		if (c[0] - b[0] === 1) {
 			bs = '←';
 		}
@@ -284,29 +276,32 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		const x_max = Math.max(...save.map(e => e[0]), x);
 		const y_min = Math.min(...save.map(e => e[1]), y);
 		const y_max = Math.max(...save.map(e => e[1]), y);
+		//体にぶつかるか、境界にぶつかるかしたら終わり
 		if (save.some(e => e[0] === x && e[1] === y) || Math.abs(x_max - x_min) >= LIMIT_WIDTH || Math.abs(y_max - y_min) >= LIMIT_HIGHT) {
 			if (retry) {
 				retry--;
-				[x, y] = c;
+				[x, y] = c;//元の状態に戻してリトライ
 				continue;
 			}
 			arrow.set(`${c[0]},${c[1]}`, bs + '■');
 			break;
 		}
 		else {
-			save.push([x, y]);
-			arrow.set(`${c[0]},${c[1]}`, bs + cs);
+			save.push([x, y]);//体の座標をマッピング
+			arrow.set(`${c[0]},${c[1]}`, bs + cs);//この座標はどっちから動いてきてどっちに動いた？
 			retry = retry_max;
 		}
 		b = c;
 		c = [x, y];
 	}
+	//レンダリング
 	const x_min = Math.min(...save.map(e => e[0]));
 	const x_max = Math.max(...save.map(e => e[0]));
 	const y_min = Math.min(...save.map(e => e[1]));
 	const y_max = Math.max(...save.map(e => e[1]));
-	content = '';
+	const lines = [];
 	for (let y = y_max; y >= y_min; y--) {
+		let line = '';
 		for (let x = x_min; x <= x_max; x++) {
 			if (save.some(e => e[0] === x && e[1] === y)) {
 				let s = arrow.get(`${x},${y}`);
@@ -348,6 +343,9 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 					case '↑■':
 						k = 'kubipaca_kao_sakasa';
 						break;
+					case 'body':
+						k = 'kubipaca_karada';
+						break;
 					default:
 						break;
 				}
@@ -358,15 +356,16 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 					emoji.add(k);
 					s = `:${k}:`;
 				}
-				content += s;
+				line += s;
 			}
 			else {
-				content += ':kubipaca_null:';
+				line += ':kubipaca_null:';
 				emoji.add('kubipaca_null');
 			}
 		}
-		content += '\n';
+		lines.push(line);
 	}
+	content = lines.join('\n');
 	tags = [
 		...getTagsReply(event),
 		...Array.from(emoji).map(s => ['emoji', s, `https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/${s}.webp`])
