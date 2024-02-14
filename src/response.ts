@@ -337,16 +337,16 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 						k = 'kubipaca_kubi_hidarisita';
 						break;
 					case '↓■':
-						k = 'kubipaka_kao';
+						k = 'kubipaca_kao';
 						break;
 					case '←■':
-						k = 'kubipaka_kao_migi_gaming';
+						k = 'kubipaca_kao_migi_gaming';
 						break;
 					case '→■':
 						k = 'kubipaca_kao_hidari';
 						break;
 					case '↑■':
-						k = 'kubipaka_kao_sakasa';
+						k = 'kubipaca_kao_sakasa';
 						break;
 					default:
 						break;
