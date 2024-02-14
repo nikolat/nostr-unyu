@@ -233,9 +233,16 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const save: number[][] = [[0, 0], [1, 0], [0, 1]];
 	const arrow = new Map();
 	const emoji = new Set<string>();
-	arrow.set('0,0', ':kubipaca_karada:');
-	arrow.set('1,0', '');
-	emoji.add('kubipaca_karada');
+	if (isGaming) {
+		arrow.set('0,0', ':kubipaca_karada_gaming:');
+		arrow.set('1,0', '');
+		emoji.add('kubipaca_karada_gaming');
+	}
+	else {
+		arrow.set('0,0', ':kubipaca_karada:');
+		arrow.set('1,0', '');
+		emoji.add('kubipaca_karada');
+	}
 	let retry = retry_max;
 	while (true) {
 		const n = Math.floor(Math.random() * 4);
