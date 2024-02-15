@@ -230,6 +230,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (/ゲーミング|光|虹|明|🌈/.test(event.content)) {
 		isGaming = true;
 	}
+	n = Math.min((event.content.match(/アルパカ|🦙/g) || []).length, 3);
 	if (/\d+[匹体]/.test(event.content)) {
 		const m = event.content.match(/(\d+)[匹体]/) ?? '';
 		n = Math.min(parseInt(m[0]), 3);
