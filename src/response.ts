@@ -209,6 +209,9 @@ const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 };
 
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
+	if (event.kind === 1) {
+		return ['パブチャでやれ', getTagsReply(event)];
+	}
 	let content: string;
 	let tags: string[][];
 	const LIMIT_WIDTH = 10;
