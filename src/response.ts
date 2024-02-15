@@ -210,13 +210,15 @@ const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (event.kind === 1) {
-		return ['パブチャでやれ', getTagsReply(event)];
+		const nevent = 'nevent1qvzqqqqq9qqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejtksjfnx';//カスタム絵文字の川
+		const content = `パブチャでやれ\nnostr:${nevent}`;
+		const tags = [...getTagsReply(event), ['e', nip19.decode(nevent).data.id, '', 'mention']];
+		return [content, tags];
 	}
 	let content: string;
 	let tags: string[][];
 	const LIMIT_WIDTH = 10;
 	const LIMIT_HEIGHT = 30;
-	let n = 1;
 	let retry_max = 1;
 	let isGaming = false;
 	if (/みじかい|短い/.test(event.content)) {
@@ -233,7 +235,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (/ゲーミング|光|虹|明|🌈/.test(event.content)) {
 		isGaming = true;
 	}
-	n = Math.min((event.content.match(/アルパカ|🦙/g) || []).length, 3);
+	let n = Math.min((event.content.match(/アルパカ|🦙/g) || []).length, 3);
 	if (/\d+[匹体]/.test(event.content)) {
 		const m = event.content.match(/(\d+)[匹体]/) ?? '';
 		n = Math.min(parseInt(m[0]), 3);
@@ -256,8 +258,8 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		c.push([0 + 2 * i, 1]);
 		arrow.set(`${0 + 2 * i},0`, 'body');
 		arrow.set(`${1 + 2 * i},0`, '');
-		finished[i] = false;
-		retry[i] = retry_max;
+		finished.push(false);
+		retry.push(retry_max);
 	}
 	const emoji = new Set<string>();
 	const emoji_seigen = new Set<string>();
