@@ -213,6 +213,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let tags: string[][];
 	const LIMIT_WIDTH = 10;
 	const LIMIT_HEIGHT = 30;
+	let n = 1;
 	let retry_max = 1;
 	let isGaming = false;
 	if (/みじかい|短い/.test(event.content)) {
@@ -229,87 +230,115 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (/ゲーミング|光|虹|明|🌈/.test(event.content)) {
 		isGaming = true;
 	}
-	const startpoint = [0, 1];
-	const save: number[][] = [[0, 0], [1, 0], startpoint];
-	let [x, y] = startpoint;
-	let b = [0, 0];//2つ前の座標を覚えておく
-	let c = [x, y];//1つ前の座標を覚えておく
+	if (/\d+[匹体]/.test(event.content)) {
+		const m = event.content.match(/(\d+)[匹体]/) ?? '';
+		n = Math.min(parseInt(m[0]), 3);
+	}
+	const startpoint = [];
+	const save: number[][] = [];
+	const x: number[] = [];
+	const y: number[] = [];
+	const b: number[][] = [];//2つ前の座標を覚えておく
+	const c: number[][] = [];//1つ前の座標を覚えておく
 	const arrow = new Map([['0,0', 'body'], ['1,0', '']]);
+	const finished: boolean[] = [];
+	const retry: number[] = [];
+	for (let i = 0; i < n; i++) {
+		startpoint.push([0 + 2 * i, 1]);
+		save.push([0 + 2 * i, 0], [1 + 2 * i, 0], [0 + 2 * i, 1]);
+		x.push(0 + 2 * i);
+		y.push(1);
+		b.push([0 + 2 * i, 0]);
+		c.push([0 + 2 * i, 1]);
+		arrow.set(`${0 + 2 * i},0`, 'body');
+		arrow.set(`${1 + 2 * i},0`, '');
+		finished[i] = false;
+		retry[i] = retry_max;
+	}
 	const emoji = new Set<string>();
 	const emoji_seigen = new Set<string>();
-	let retry = retry_max;
 	//頭を上下左右にとりあえず動かしてみる
 	while (true) {
-		const n = Math.floor(Math.random() * 4);
-		let cs = '';//どっちに動く？
-		switch (n) {
-			case 0:
-				x++;
-				cs = '→';
-				break;
-			case 1:
-				x--;
-				cs = '←';
-				break;
-			case 2:
-				y++;
-				cs = '↑';
-				break;
-			case 3:
-				y--;
-				cs = '↓';
-				break;
-			default:
-				break;
-		}
-		let bs = '';//どっちから動いてきた？
-		if (c[0] - b[0] > 0) {
-			bs = '←';
-		}
-		else if (c[0] - b[0] < 0) {
-			bs = '→';
-		}
-		else if (c[1] - b[1] > 0) {
-			bs = '↓';
-		}
-		else if (c[1] - b[1] < 0) {
-			bs = '↑';
-		}
-		const x_min = Math.min(...save.map(e => e[0]), x);
-		const x_max = Math.max(...save.map(e => e[0]), x);
-		const y_min = Math.min(...save.map(e => e[1]), y);
-		const y_max = Math.max(...save.map(e => e[1]), y);
-		//体にぶつかるか、境界にぶつかるかしたら終わり
-		if (save.some(e => e[0] === x && e[1] === y) || Math.abs(x_max - x_min) >= LIMIT_WIDTH || Math.abs(y_max - y_min) >= LIMIT_HEIGHT) {
-			//クロス(貫通)可能ならクロスする
-			const next_arrow = arrow.get(`${x},${y}`) ?? '';
-			if (cs === '→' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x + 1 && e[1] === y) && Math.max(...save.map(e => e[0]), x + 1) - x_min < LIMIT_WIDTH) {
-				x++;
+		for (let i = 0; i < n; i++) {
+			if (finished[i]) {
+				continue;
 			}
-			else if (cs === '←' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x - 1 && e[1] === y) && x_max - Math.min(...save.map(e => e[0]), x - 1) < LIMIT_WIDTH) {
-				x--;
+			const r = Math.floor(Math.random() * 4);
+			let cs = '';//どっちに動く？
+			switch (r) {
+				case 0:
+					x[i]++;
+					cs = '→';
+					break;
+				case 1:
+					x[i]--;
+					cs = '←';
+					break;
+				case 2:
+					y[i]++;
+					cs = '↑';
+					break;
+				case 3:
+					y[i]--;
+					cs = '↓';
+					break;
+				default:
+					break;
 			}
-			else if (cs === '↑' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x && e[1] === y + 1) && Math.max(...save.map(e => e[1]), y + 1) - y_min < LIMIT_HEIGHT) {
-				y++;
+			let bs = '';//どっちから動いてきた？
+			if (c[i][0] - b[i][0] > 0) {
+				bs = '←';
 			}
-			else if (cs === '↓' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x && e[1] === y - 1) && y_max - Math.min(...save.map(e => e[1]), y - 1) < LIMIT_HEIGHT) {
-				y--;
+			else if (c[i][0] - b[i][0] < 0) {
+				bs = '→';
 			}
-			else {
-				if (retry) {
-					retry--;
-					[x, y] = c;//元の状態に戻してリトライ
-					continue;
+			else if (c[i][1] - b[i][1] > 0) {
+				bs = '↓';
+			}
+			else if (c[i][1] - b[i][1] < 0) {
+				bs = '↑';
+			}
+			const x_min = Math.min(...save.map(e => e[0]), ...x);
+			const x_max = Math.max(...save.map(e => e[0]), ...x);
+			const y_min = Math.min(...save.map(e => e[1]), ...y);
+			const y_max = Math.max(...save.map(e => e[1]), ...y);
+			//体にぶつかるか、境界にぶつかるかしたら終わり
+			if (save.some(e => e[0] === x[i] && e[1] === y[i]) || Math.abs(x_max - x_min) >= LIMIT_WIDTH || Math.abs(y_max - y_min) >= LIMIT_HEIGHT) {
+				//クロス(貫通)可能ならクロスする
+				const next_arrow = arrow.get(`${x},${y}`) ?? '';
+				if (cs === '→' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x[i] + 1 && e[1] === y[i]) && Math.max(...save.map(e => e[0]), x[i] + 1) - x_min < LIMIT_WIDTH) {
+					x[i]++;
 				}
-				arrow.set(`${c[0]},${c[1]}`, bs + '■');
-				break;
+				else if (cs === '←' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x[i] - 1 && e[1] === y[i]) && x_max - Math.min(...save.map(e => e[0]), x[i] - 1) < LIMIT_WIDTH) {
+					x[i]--;
+				}
+				else if (cs === '↑' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x[i] && e[1] === y[i] + 1) && Math.max(...save.map(e => e[1]), y[i] + 1) - y_min < LIMIT_HEIGHT) {
+					y[i]++;
+				}
+				else if (cs === '↓' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x[i] && e[1] === y[i] - 1) && y_max - Math.min(...save.map(e => e[1]), y[i] - 1) < LIMIT_HEIGHT) {
+					y[i]--;
+				}
+				else {
+					if (retry[i] > 0) {
+						retry[i]--;
+						[x[i], y[i]] = c[i];//元の状態に戻してリトライ
+						i--;
+						continue;
+					}
+					arrow.set(`${c[i][0]},${c[i][1]}`, bs + '■');
+					finished[i] = true;
+					break;
+				}
 			}
+			save.push([x[i], y[i]]);//体の座標をマッピング
+			arrow.set(`${c[i][0]},${c[i][1]}`, bs + cs);//この座標はどっちから動いてきてどっちに動いた？
+			retry[i] = retry_max;
+			b[i] = c[i];
+			c[i] = [x[i], y[i]];
 		}
-		save.push([x, y]);//体の座標をマッピング
-		arrow.set(`${c[0]},${c[1]}`, bs + cs);//この座標はどっちから動いてきてどっちに動いた？
-		retry = retry_max;
-		b = c;
-		c = [x, y];
+		if (finished.every(f => f)) {
+			break;
+		}
 	}
 	//レンダリング
 	const x_min = Math.min(...save.map(e => e[0]));
