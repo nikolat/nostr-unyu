@@ -306,7 +306,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			//体にぶつかるか、境界にぶつかるかしたら終わり
 			if (save.some(e => e[0] === x[i] && e[1] === y[i]) || Math.abs(x_max - x_min) >= LIMIT_WIDTH || Math.abs(y_max - y_min) >= LIMIT_HEIGHT) {
 				//クロス(貫通)可能ならクロスする
-				const next_arrow = arrow.get(`${x},${y}`) ?? '';
+				const next_arrow = arrow.get(`${x[i]},${y[i]}`) ?? '';
 				if (cs === '→' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x[i] + 1 && e[1] === y[i]) && Math.max(...save.map(e => e[0]), x[i] + 1) - x_min < LIMIT_WIDTH) {
 					x[i]++;
 				}
