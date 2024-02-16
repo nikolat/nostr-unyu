@@ -256,11 +256,11 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		y.push(1);
 		b.push([0 + 2 * i, 0]);
 		c.push([0 + 2 * i, 1]);
-		arrow.set(`${0 + 2 * i},0`, 'body');
-		arrow.set(`${1 + 2 * i},0`, '');
 		finished.push(false);
 		retry.push(retry_max);
 		gaming[i] = i < g;
+		arrow.set(`${0 + 2 * i},0`, 'body' + (gaming[i] ? 'g' : ''));
+		arrow.set(`${1 + 2 * i},0`, '');
 	}
 	const emoji = new Set<string>();
 	const emoji_seigen = new Set<string>();
@@ -342,7 +342,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 						i--;
 						continue;
 					}
-					arrow.set(`${c[i][0]},${c[i][1]}`, bs + '■');
+					arrow.set(`${c[i][0]},${c[i][1]}`, bs + '■' + (gaming[i] ? 'g' : ''));
 					finished[i] = true;
 					break;
 				}
