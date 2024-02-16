@@ -221,7 +221,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let tags: string[][];
 	const LIMIT_WIDTH = 10;
 	const LIMIT_HEIGHT = 30;
-	const LIMIT_BODY = 3;
+	const LIMIT_BODY = 5;
 	let retry_max = 1;
 	if (/みじかい|短い/.test(event.content)) {
 		retry_max = 0;
