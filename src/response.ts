@@ -221,6 +221,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	let tags: string[][];
 	const LIMIT_WIDTH = 10;
 	const LIMIT_HEIGHT = 30;
+	const LIMIT_BODY = 3;
 	let retry_max = 1;
 	if (/みじかい|短い/.test(event.content)) {
 		retry_max = 0;
@@ -233,11 +234,10 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			retry_max += count;
 		}
 	}
-	let n = Math.min((event.content.match(/アルパカ|🦙/g) || []).length, 3);
-	let g = Math.min((event.content.match(/(ゲーミング|光|虹|明|🌈)(アルパカ|🦙)/g) || []).length, 3);
+	let n = Math.min((event.content.match(/アルパカ|🦙/g) || []).length, LIMIT_BODY);
 	if (/\d+[匹体]/.test(event.content)) {
 		const m = event.content.match(/(\d+)[匹体]/) ?? '';
-		n = Math.min(parseInt(m[0]), 3);
+		n = Math.min(parseInt(m[0]), LIMIT_BODY);
 	}
 	const startpoint = [];
 	const save: number[][] = [];
@@ -249,6 +249,18 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const finished: boolean[] = [];
 	const retry: number[] = [];
 	const gaming: boolean[] = [];
+	const matchesIterator = event.content.matchAll(/((ゲーミング|光|虹|明|🌈)?(アルパカ|🦙))/g);
+	for (const match of matchesIterator) {
+		if (/(ゲーミング|光|虹|明|🌈)(アルパカ|🦙)/.test(match[0])) {
+			gaming.push(true);
+		}
+		else {
+			gaming.push(false);
+		}
+		if (gaming.length >= LIMIT_BODY) {
+			break;
+		}
+	}
 	for (let i = 0; i < n; i++) {
 		startpoint.push([0 + 2 * i, 1]);
 		save.push([0 + 2 * i, 0], [1 + 2 * i, 0], [0 + 2 * i, 1]);
@@ -258,7 +270,8 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		c.push([0 + 2 * i, 1]);
 		finished.push(false);
 		retry.push(retry_max);
-		gaming[i] = i < g;
+		if (gaming[i] === undefined)
+			gaming.push(false);
 		arrow.set(`${0 + 2 * i},0`, 'body' + (gaming[i] ? 'g' : ''));
 		arrow.set(`${1 + 2 * i},0`, '');
 	}
