@@ -313,16 +313,26 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			if (save.some(e => e[0] === x[i] && e[1] === y[i]) || Math.abs(x_max - x_min) >= LIMIT_WIDTH || Math.abs(y_max - y_min) >= LIMIT_HEIGHT) {
 				//クロス(貫通)可能ならクロスする
 				const next_arrow = arrow.get(`${x[i]},${y[i]}`) ?? '';
+				//上を跨ぐか下を潜るか
+				const r = Math.floor(Math.random() * 2);
 				if (cs === '→' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x[i] + 1 && e[1] === y[i]) && Math.max(...save.map(e => e[0]), x[i] + 1) - x_min < LIMIT_WIDTH) {
+					if (r)
+						arrow.set(`${x[i]},${y[i]}`, '←→');
 					x[i]++;
 				}
 				else if (cs === '←' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x[i] - 1 && e[1] === y[i]) && x_max - Math.min(...save.map(e => e[0]), x[i] - 1) < LIMIT_WIDTH) {
+					if (r)
+						arrow.set(`${x[i]},${y[i]}`, '←→');
 					x[i]--;
 				}
 				else if (cs === '↑' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x[i] && e[1] === y[i] + 1) && Math.max(...save.map(e => e[1]), y[i] + 1) - y_min < LIMIT_HEIGHT) {
+					if (r)
+						arrow.set(`${x[i]},${y[i]}`, '↑↓');
 					y[i]++;
 				}
 				else if (cs === '↓' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x[i] && e[1] === y[i] - 1) && y_max - Math.min(...save.map(e => e[1]), y[i] - 1) < LIMIT_HEIGHT) {
+					if (r)
+						arrow.set(`${x[i]},${y[i]}`, '↑↓');
 					y[i]--;
 				}
 				else {
@@ -432,7 +442,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		lines.push(line);
 	}
 	if (exist_limit_height) {
-		const rep = exist_limit_width ? x_max - x_min + 3 : x_max - x_min + 1
+		const rep = exist_limit_width ? x_max - x_min + 3 : x_max - x_min + 1;
 		lines = [':seigen_seigen:'.repeat(rep), ...lines, ':seigen_seigen:'.repeat(rep)];
 		emoji_seigen.add('seigen_seigen');
 	}
