@@ -271,7 +271,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		finished.push(false);
 		retry.push(retry_max);
 		if (gaming[i] === undefined)
-			gaming.push(false);
+			gaming.push(gaming[i - 1]);
 		arrow.set(`${0 + 2 * i},0`, 'body' + (gaming[i] ? 'g' : ''));
 		arrow.set(`${1 + 2 * i},0`, '');
 	}
