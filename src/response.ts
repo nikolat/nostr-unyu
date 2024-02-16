@@ -222,7 +222,6 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const LIMIT_WIDTH = 10;
 	const LIMIT_HEIGHT = 30;
 	let retry_max = 1;
-	let isGaming = false;
 	if (/みじかい|短い/.test(event.content)) {
 		retry_max = 0;
 	}
@@ -234,10 +233,8 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			retry_max += count;
 		}
 	}
-	if (/ゲーミング|光|虹|明|🌈/.test(event.content)) {
-		isGaming = true;
-	}
 	let n = Math.min((event.content.match(/アルパカ|🦙/g) || []).length, 3);
+	let g = Math.min((event.content.match(/(ゲーミング|光|虹|明|🌈)(アルパカ|🦙)/g) || []).length, 3);
 	if (/\d+[匹体]/.test(event.content)) {
 		const m = event.content.match(/(\d+)[匹体]/) ?? '';
 		n = Math.min(parseInt(m[0]), 3);
@@ -248,9 +245,10 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const y: number[] = [];
 	const b: number[][] = [];//2つ前の座標を覚えておく
 	const c: number[][] = [];//1つ前の座標を覚えておく
-	const arrow = new Map([['0,0', 'body'], ['1,0', '']]);
+	const arrow = new Map();
 	const finished: boolean[] = [];
 	const retry: number[] = [];
+	const gaming: boolean[] = [];
 	for (let i = 0; i < n; i++) {
 		startpoint.push([0 + 2 * i, 1]);
 		save.push([0 + 2 * i, 0], [1 + 2 * i, 0], [0 + 2 * i, 1]);
@@ -262,6 +260,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		arrow.set(`${1 + 2 * i},0`, '');
 		finished.push(false);
 		retry.push(retry_max);
+		gaming[i] = i < g;
 	}
 	const emoji = new Set<string>();
 	const emoji_seigen = new Set<string>();
@@ -318,22 +317,22 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 				const r = Math.floor(Math.random() * 2);
 				if (cs === '→' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x[i] + 1 && e[1] === y[i]) && Math.max(...save.map(e => e[0]), x[i] + 1) - x_min < LIMIT_WIDTH) {
 					if (r)
-						arrow.set(`${x[i]},${y[i]}`, '←→');
+						arrow.set(`${x[i]},${y[i]}`, '←→' + (gaming[i] ? 'g' : ''));
 					x[i]++;
 				}
 				else if (cs === '←' && ['↑↓', '↓↑'].includes(next_arrow) && !save.some(e => e[0] === x[i] - 1 && e[1] === y[i]) && x_max - Math.min(...save.map(e => e[0]), x[i] - 1) < LIMIT_WIDTH) {
 					if (r)
-						arrow.set(`${x[i]},${y[i]}`, '←→');
+						arrow.set(`${x[i]},${y[i]}`, '←→' + (gaming[i] ? 'g' : ''));
 					x[i]--;
 				}
 				else if (cs === '↑' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x[i] && e[1] === y[i] + 1) && Math.max(...save.map(e => e[1]), y[i] + 1) - y_min < LIMIT_HEIGHT) {
 					if (r)
-						arrow.set(`${x[i]},${y[i]}`, '↑↓');
+						arrow.set(`${x[i]},${y[i]}`, '↑↓' + (gaming[i] ? 'g' : ''));
 					y[i]++;
 				}
 				else if (cs === '↓' && ['←→', '→←'].includes(next_arrow) && !save.some(e => e[0] === x[i] && e[1] === y[i] - 1) && y_max - Math.min(...save.map(e => e[1]), y[i] - 1) < LIMIT_HEIGHT) {
 					if (r)
-						arrow.set(`${x[i]},${y[i]}`, '↑↓');
+						arrow.set(`${x[i]},${y[i]}`, '↑↓' + (gaming[i] ? 'g' : ''));
 					y[i]--;
 				}
 				else {
@@ -349,7 +348,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 				}
 			}
 			save.push([x[i], y[i]]);//体の座標をマッピング
-			arrow.set(`${c[i][0]},${c[i][1]}`, bs + cs);//この座標はどっちから動いてきてどっちに動いた？
+			arrow.set(`${c[i][0]},${c[i][1]}`, bs + cs + (gaming[i] ? 'g' : ''));//この座標はどっちから動いてきてどっちに動いた？
 			retry[i] = retry_max;
 			b[i] = c[i];
 			c[i] = [x[i], y[i]];
@@ -379,7 +378,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			if (save.some(e => e[0] === x && e[1] === y)) {
 				let s = arrow.get(`${x},${y}`);
 				let k;
-				switch (s) {
+				switch (s.slice(0, 2)) {
 					case '←→':
 					case '→←':
 						k = 'kubipaca_kubi_yoko';
@@ -416,14 +415,14 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 					case '↑■':
 						k = 'kubipaca_kao_sakasa';
 						break;
-					case 'body':
+					case 'bo':
 						k = 'kubipaca_karada';
 						break;
 					default:
 						break;
 				}
 				if (k) {
-					if (isGaming) {
+					if (s.at(-1) === 'g') {
 						k = `${k}_gaming`;
 					}
 					emoji.add(k);
