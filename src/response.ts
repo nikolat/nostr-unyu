@@ -357,7 +357,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 					}
 					arrow.set(`${c[i][0]},${c[i][1]}`, bs + '■' + (gaming[i] ? 'g' : ''));
 					finished[i] = true;
-					break;
+					continue;
 				}
 			}
 			save.push([x[i], y[i]]);//体の座標をマッピング
