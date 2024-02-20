@@ -235,9 +235,10 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		}
 	}
 	let n = Math.min((event.content.match(/アルパカ|🦙/g) || []).length, LIMIT_BODY);
-	if (/\d+[匹体]/.test(event.content)) {
-		const m = event.content.match(/(\d+)[匹体]/) ?? '';
+	if (/-?\d+[匹体]/.test(event.content)) {
+		const m = event.content.match(/(-?\d+)[匹体]/) ?? '';
 		n = Math.min(parseInt(m[0]), LIMIT_BODY);
+		n = Math.max(1, n);
 	}
 	const startpoint = [];
 	const save: number[][] = [];
