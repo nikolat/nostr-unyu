@@ -118,6 +118,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/絵文字.*(を?呼んで|どこ).?$/ui, res_emoji],
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
+		[/伺か/, res_ukagaka],
 		[/[呼よ](んだだけ|んでみた)|(何|なん)でもない/, res_yondadake],
 		[/ヘルプ|へるぷ|help|(助|たす)けて|(教|おし)えて|手伝って/i, res_help],
 		[/すき|好き|愛してる|あいしてる/, res_suki],
@@ -851,6 +852,22 @@ const res_saikidou = (event: NostrEvent): [string, string[][]] => {
 
 const res_enii = (event: NostrEvent): [string, string[][]] => {
 	return [any(['ほい、えんいー', 'ほな、またな', 'おつかれ']), getTagsReply(event)];
+};
+
+const res_ukagaka = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url1 = 'https://ssp.shillest.net/';
+	const url2 = 'https://keshiki.nobody.jp/';
+	const url3 = 'https://buynowforsale.shillest.net/ghosts/';
+	const url4 = 'https://ssp.shillest.net/ukadoc/manual/';
+	const account1 = 'nostr:npub1gcs9jtw8k0r7z0c5zaaepzwm9m7ezqskqjn56swgylye78u39r7q2w0tzq';
+	const account2 = 'nostr:npub1feed6x4yft54j7rwzcap34wxkf7rzpd50ps0vcnp04df3vjs7a5sc2vcgx';
+	content = `独立伺か研究施設 ばぐとら研究所\n${url1}\nゴーストの使い方 - SSP\n${url2}\n`
+		+ `ゴーストキャプターさくら（GCさくら） - 何か/伺かゴースト更新フィード\n${url3}\nUKADOC(伺か仕様書)\n${url4}\n`
+		+ `ゴーストキャプターさくら(RSS bot)\n${account1}\nうかフィード(RSS bot)\n${account2}`;
+	tags = [...getTagsReply(event), ['r', url1], ['r', url2], ['r', url3], ['r', url4]];
+	return [content, tags];
 };
 
 const res_yondadake = (event: NostrEvent): [string, string[][]] => {
