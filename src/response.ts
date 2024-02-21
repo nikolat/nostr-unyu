@@ -1094,19 +1094,19 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 	const text = match[2].trim();
 	const emoji_tags = event.tags.filter(tag => tag.length >= 3 && tag[0] === 'emoji');
 	tags = [...getTags(event, mode), ...emoji_tags];
-	if (/(潰して|縮めて)[^るた]?$/us.test(event.content)) {
+	if (/(潰して|縮めて)[^るた]?$/u.test(event.content)) {
 		content = `🫸${text.replace(/[^\S\n\r]/gu, '')}🫷`;
 	}
-	else if (/伸ばして[^るた]?$/us.test(event.content)) {
+	else if (/伸ばして[^るた]?$/u.test(event.content)) {
 		content = `${Array.from(text).join(' ')}`;
 	}
-	else if (/ど[突つ]いて[^るた]?$/us.test(event.content)) {
+	else if (/ど[突つ]いて[^るた]?$/u.test(event.content)) {
 		content = `🤜${text}🤛`;
 	}
-	else if (/[踊躍]らせて[^るた]?$/us.test(event.content)) {
+	else if (/[踊躍]らせて[^るた]?$/u.test(event.content)) {
 		content = `₍₍⁽⁽${text}₎₎⁾⁾`;
 	}
-	else if (/導いて?$/us.test(event.content)) {
+	else if (/導いて[^るた]?$/u.test(event.content)) {
 		content = `:tenshi_wing1:${text}:tenshi_wing2:`;
 		tags = [
 			...tags,
@@ -1114,11 +1114,11 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			['emoji', 'tenshi_wing2', 'https://lokuyow.github.io/images/nostr/emoji/tenshi_wing2.webp'],
 		];
 	}
-	else if (/出して[^るた]?$/us.test(event.content)) {
+	else if (/出して[^るた]?$/u.test(event.content)) {
 		content = `:te:${text}`;
 		tags = [...tags, ['emoji', 'te', 'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/te.webp']];
 	}
-	else if (/積んで[^るた]?$/us.test(event.content)) {
+	else if (/積んで[^るた]?$/u.test(event.content)) {
 		content = `${text}\n`.repeat(3);
 	}
 	else {
