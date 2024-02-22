@@ -72,6 +72,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/いいの?か?(？|\?)$/, res_iiyo],
 		[/\\e$/, res_enyee],
 		[/^うにゅう画像$/, res_unyupic],
+		[/^うにゅう漫画$/, res_unyucomic],
 		[/^ちくわ大明神$/, res_chikuwa],
 		[/(ほめて|褒めて|のでえらい|えらいので).?$|^えらいので/u, res_igyo],
 		[/[行い]っ?てきます.?$/u, res_itera],
@@ -985,6 +986,27 @@ const res_unyupic = (event: NostrEvent): [string, string[][]] => {
 	tags = getTagsReply(event);
 	tags.push(['e', dr.data, '', 'mention']);
 	tags.push(['t', 'うにゅう画像']);
+	return [content, tags];
+};
+
+const res_unyucomic = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const note1 = 'note169q6kh00fhqqzswn4rmarethw92chh7age8ahm70mefshc2ad4cq866me4';
+	const note2 = 'note1y5td2lata7hr52dm5lf9ltwx0k6hljyl7awevrd74kdv2j2rt5kqun8k33';
+	const dr1 = nip19.decode(note1);
+	if (dr1.type !== 'note') {
+		throw new TypeError(`${note1} is not note`);
+	}
+	const dr2 = nip19.decode(note2);
+	if (dr2.type !== 'note') {
+		throw new TypeError(`${note2} is not note`);
+	}
+	content = `#うにゅう漫画\nnostr:${note1}\nnostr:${note2}`;
+	tags = getTagsReply(event);
+	tags.push(['e', dr1.data, '', 'mention']);
+	tags.push(['e', dr2.data, '', 'mention']);
+	tags.push(['t', 'うにゅう漫画']);
 	return [content, tags];
 };
 
