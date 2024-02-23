@@ -117,6 +117,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/(カレンダー|アドカレ)(を?呼んで|どこ).?$/u, res_adokare],
 		[/DM.*(を?呼んで|どこ).?$/ui, res_dm],
 		[/絵文字.*(を?呼んで|どこ).?$/ui, res_emoji],
+		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
 		[/伺か/, res_ukagaka],
@@ -844,6 +845,30 @@ const res_emoji = (event: NostrEvent): [string, string[][]] => {
 	const url2 = 'https://emojito.meme/';
 	content = `絵文字コネコネ\n${url1}\nEmojito\n${url2}`;
 	tags = [...getTagsReply(event), ['r', url1], ['r', url2]];
+	return [content, tags];
+};
+
+const res_ukagakamin = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	//[登録基準]
+	//ゴーストを公開している、容易に入手できる状態にある
+	//日本語圏リレーにkind0が存在する
+	const npubs = [
+		'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz',//@nikolat
+		'npub1yu64g5htwg2xwcht7axas2ukc8y6mx3ctn7wlh3jevtg4mj0vwcqheq0gf',//@ponapalt
+//		'npub10hqkwugj7p027j250qr9gwcuqpkwxftj0rjjk8y6hlmryu8dwp8s2runf2',//invertedtriangle358.github.io
+//		'npub1m2mn8k45482th56rsxs3ke6pt8jcnwsvydhpzufcf6k9l5f6w5lsnssk99',//@Aheahead
+//		'npub1jqk4aaxvwkd09pmyzflh4rk2n6lu8skl29aqq33gf2fg0x7dfxyscm6r8w',//@suikyo
+		'npub1r6pu39ezuf0kwrhsw4ts700t0dcn96umldwvl5qdgslu5ula382qgdvam8',//@Tatakinov
+		'npub18rj2gle8unwgsd63gn639nhre4kpltdrtzwkede4k9mqdaqn6jgs5ekqcd',//@tukinami_seika
+		'npub1fzud9283ljrcfcpfrxsefnya9ayc54445249j3mdmu2dwmh9xmxqqwejyn',//@netai98
+		'npub18zpnffsh3j9cer83p3mhxu75a9288hqdfxewph8zxvl62usjj03qf36xhl',//@apxxxxxxe
+		'npub1l2zcm58lwd3mz3rt964t8e3fhyr2z5w89vzn0m2u6rh7ugq9x2tsu7eek0',//@kmy_m
+		'npub1nrzk3myz2rwss03ltjk7cp44kmeyew7qx5w9ms00p6qtnzzh4dmsanykhn',//@narazaka
+	];
+	content = npubs.map(npub => `nostr:${npub}`).join('\n');
+	tags = getTagsReply(event);
 	return [content, tags];
 };
 
