@@ -97,6 +97,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/ありが(と|て)|(たす|助)か(る|った)/, res_arigato],
 		[/ごめん|すまん/, res_gomen],
 		[/かわいい|可愛い|すごい|かっこいい|えらい|偉い|かしこい|賢い|最高/, res_kawaii],
+		[/月が(綺麗|きれい|キレイ)/, res_tsukikirei],
 		[/あかんの?か/, res_akan],
 		[/お(かえ|帰)り/, res_okaeri],
 		[/人の心/, res_hitonokokoro],
@@ -708,6 +709,10 @@ const res_gomen = (event: NostrEvent): [string, string[][]] => {
 
 const res_kawaii = (event: NostrEvent): [string, string[][]] => {
 	return [any(['わかっとるで', 'おだててもなんもあらへんで', 'せやろ？']), getTagsReply(event)];
+};
+
+const res_tsukikirei = (event: NostrEvent): [string, string[][]] => {
+	return [any(['お前のほうが綺麗やで', '曇っとるがな', 'ワイはそうは思わんな']), getTagsReply(event)];
 };
 
 const res_akan = (event: NostrEvent): [string, string[][]] => {
