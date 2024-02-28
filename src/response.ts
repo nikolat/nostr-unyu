@@ -218,7 +218,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (event.kind === 1) {
 		const nevent = 'nevent1qvzqqqqq9qqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejtksjfnx';//カスタム絵文字の川
 		const content = `パブチャでやれ\nnostr:${nevent}`;
-		const tags = [...getTagsReply(event), ['e', nip19.decode(nevent).data.id, '', 'mention']];
+		const tags = [...getTagsReply(event), ['q', nip19.decode(nevent).data.id]];
 		return [content, tags];
 	}
 	let content: string;
@@ -819,7 +819,8 @@ const res_maguro = (event: NostrEvent): [string, string[][]] => {
 	let tags: string[][];
 	const note = 'note14pcdgkgz2teu2q9zd8nvlfayqa7awl07tejp6zpvgtum5jayc2hsfvzwpf';
 	content = `nostr:${note}`;
-	tags = [...getTagsReply(event), ['e', nip19.decode(note).data, '', 'mention']];
+	const quoteTag = event.kind === 1 ? ['q', nip19.decode(note).data] : ['e', nip19.decode(note).data, '', 'mention'];
+	tags = [...getTagsReply(event), quoteTag];
 	return [content, tags];
 };
 
@@ -898,7 +899,7 @@ const res_ukagaka = (event: NostrEvent): [string, string[][]] => {
 	content = `独立伺か研究施設 ばぐとら研究所\n${url1}\nゴーストの使い方 - SSP\n${url2}\n`
 		+ `UKADOC(伺か公式仕様書)\n${url3}\nうかどん(Mastodon)\n${url4}\n伺か Advent Calendar 2023\n${url5}\n`
 		+ `ゴーストキャプターさくら(RSS bot)\n${account1}\nうかフィード(RSS bot)\n${account2}`;
-	tags = [...getTagsReply(event), ['r', url1], ['r', url2], ['r', url3], ['r', url4]];
+	tags = [...getTagsReply(event), ['r', url1], ['r', url2], ['r', url3], ['r', url4], ['r', url5]];
 	return [content, tags];
 };
 
@@ -1013,8 +1014,9 @@ const res_unyupic = (event: NostrEvent): [string, string[][]] => {
 		throw new TypeError(`${note} is not note`);
 	}
 	content = `#うにゅう画像\nnostr:${note}`;
+	const quoteTag = event.kind === 1 ? ['q', dr.data] : ['e', dr.data, '', 'mention'];
 	tags = getTagsReply(event);
-	tags.push(['e', dr.data, '', 'mention']);
+	tags.push(quoteTag);
 	tags.push(['t', 'うにゅう画像']);
 	return [content, tags];
 };
@@ -1033,9 +1035,11 @@ const res_unyucomic = (event: NostrEvent): [string, string[][]] => {
 		throw new TypeError(`${note2} is not note`);
 	}
 	content = `#うにゅう漫画\nnostr:${note1}\nnostr:${note2}`;
+	const quoteTag1 = event.kind === 1 ? ['q', dr1.data] : ['e', dr1.data, '', 'mention'];
+	const quoteTag2 = event.kind === 1 ? ['q', dr2.data] : ['e', dr2.data, '', 'mention'];
 	tags = getTagsReply(event);
-	tags.push(['e', dr1.data, '', 'mention']);
-	tags.push(['e', dr2.data, '', 'mention']);
+	tags.push(quoteTag1);
+	tags.push(quoteTag2);
 	tags.push(['t', 'うにゅう漫画']);
 	return [content, tags];
 };
