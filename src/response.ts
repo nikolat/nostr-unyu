@@ -218,7 +218,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (event.kind === 1) {
 		const nevent = 'nevent1qvzqqqqq9qqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejtksjfnx';//カスタム絵文字の川
 		const content = `パブチャでやれ\nnostr:${nevent}`;
-		const tags = [...getTagsReply(event), ['q', nip19.decode(nevent).data.id]];
+		const tags = [...getTagsReply(event), ['e', nip19.decode(nevent).data.id, '', 'mention']];
 		return [content, tags];
 	}
 	let content: string;
