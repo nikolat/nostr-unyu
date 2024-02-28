@@ -511,7 +511,7 @@ const res_tenki = async (event: NostrEvent, mode: Mode, regstr: RegExp): Promise
 	if (/の天気です！/.test(event.content)) {
 		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 		content = `${any(['ありがとさん', 'さすがやな', '助かったで'])}\nnostr:${quote}`;
-		tags = getTagsAirrep(event);
+		tags = getTagsQuote(event);
 		return [content, tags];
 	}
 	const url_area = 'http://www.jma.go.jp/bosai/common/const/area.json';
@@ -543,7 +543,7 @@ const res_tenki = async (event: NostrEvent, mode: Mode, regstr: RegExp): Promise
 			const npub_yabumi = 'npub1823chanrkmyrfgz2v4pwmu22s8fjy0s9ps7vnd68n7xgd8zr9neqlc2e5r';
 			const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 			content = `nostr:${npub_yabumi} ${text}の天気をご所望やで\nnostr:${quote}`;
-			tags = getTagsAirrep(event);
+			tags = getTagsQuote(event);
 			tags.push(['p', nip19.decode(npub_yabumi).data, '']);
 		}
 		else {
@@ -599,7 +599,7 @@ const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, str
 	const gift = match[3];
 	const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 	content = `nostr:${npub_reply} ${gift}三\nあちらのお客様からやで\nnostr:${quote}`;
-	tags = getTagsAirrep(event);
+	tags = getTagsQuote(event);
 	tags.push(['p', pubkey_reply, '']);
 	return [content, tags];
 }
@@ -671,7 +671,7 @@ const res_rogubo = (event: NostrEvent): [string, string[][]] => {
 		const npub_yabumi = 'npub1823chanrkmyrfgz2v4pwmu22s8fjy0s9ps7vnd68n7xgd8zr9neqlc2e5r';
 		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 		content = `nostr:${npub_yabumi} ${any(['別に欲しくはないんやけど、ログボくれんか', 'ログボって何やねん', 'ここでログボがもらえるって聞いたんやけど'])}\nnostr:${quote}`;
-		tags = getTagsAirrep(event);
+		tags = getTagsQuote(event);
 		tags.push(['p', nip19.decode(npub_yabumi).data, '']);
 	}
 	else {
@@ -691,7 +691,7 @@ const res_get_rogubo = (event: NostrEvent, mode: Mode, regstr: RegExp): [string,
 	const count = match[1];
 	const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 	content = any(['おおきに', 'まいど', `この${count}回分のログボって何に使えるんやろ`]) + `\nnostr:${quote}`;
-	tags = getTagsAirrep(event);
+	tags = getTagsQuote(event);
 	return [content, tags];
 };
 
@@ -810,7 +810,7 @@ const res_don = (event: NostrEvent): [string, string[][]] => {
 	const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
 	const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 	content = `nostr:${npub_don} 呼ばれとるで\nnostr:${quote}`;
-	tags = [...getTagsAirrep(event), ['p', nip19.decode(npub_don).data, '']];
+	tags = [...getTagsQuote(event), ['p', nip19.decode(npub_don).data, '']];
 	return [content, tags];
 };
 
@@ -1293,6 +1293,22 @@ const getTagsReply = (event: NostrEvent): string[][] => {
 	}
 	tagsReply.push(['p', event.pubkey, '']);
 	return tagsReply;
+};
+
+const getTagsQuote = (event: NostrEvent): string[][] => {
+	if (event.kind === 1) {
+		return [['q', event.id]];
+	}
+	else if (event.kind === 42) {
+		const tagRoot = event.tags.find(tag => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root');
+		if (tagRoot !== undefined) {
+			return [tagRoot, ['e', event.id, '', 'mention']];
+		}
+		else {
+			throw new TypeError('root is not found');
+		}
+	}
+	throw new TypeError(`kind ${event.kind} is not supported`);
 };
 
 const getTagsFav = (event: NostrEvent): string[][] => {
