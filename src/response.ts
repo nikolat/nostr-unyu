@@ -81,9 +81,10 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/^次は「(.)」から！$/u, res_shiritori],
 		[/^(うにゅう、|うにゅう[くさた]ん、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|縮めて|伸ばして|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って|祝って|呪って|鳴らして|詰めて|梱包して|囲んで|囲って|詰んで|漬けて|[踊躍]らせて|撃って|蒸して|上げて|アゲて|ageて|下げて|サゲて|sageて|導いて)[^るた]?$/us, res_fire],
 	];
-	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
+	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]] | null][] = [
 		[/アルパカ|🦙/, res_arupaka],
 		[/画像生成/, res_gazouseisei],
+		[/りとりん/, res_ritorin],
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
@@ -491,6 +492,24 @@ const res_gazouseisei = (event: NostrEvent): [string, string[][]] => {
 	const text = event.content.split('画像生成', 2)[1].trim();
 	content = `ぬるぽが 画像生成 ${text}`;
 	tags = getTagsAirrep(event);
+	return [content, tags];
+};
+
+const res_ritorin = (event: NostrEvent): [string, string[][]] | null => {
+	let content: string;
+	let tags: string[][];
+	if (/りとりんポイント$/.test(event.content)) {
+		content = '!point';
+		tags = [];
+	}
+	else if (/りとりんポイント獲得状況/.test(event.content)) {
+		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+		content = `${any(['これ何使えるんやろ', 'もっと頑張らなあかんな', 'こんなもんやな'])}\nnostr:${quote}`;
+		tags = getTagsQuote(event);
+	}
+	else {
+		return null;
+	}
 	return [content, tags];
 };
 
