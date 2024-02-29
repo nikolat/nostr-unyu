@@ -179,7 +179,18 @@ const mode_reply = async (event: NostrEvent): Promise<[string, number, string[][
 			return [content, event.kind, tags];
 		}
 	}
-	return ['えんいー', event.kind, getTagsAirrep(event)];
+	let content;
+	let tags;
+	if (event.tags.some(tag => tag[0] === 't' && tag[1] === 'ぬるぽが生成画像')) {
+		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+		content = `${any(['上手やな', '上手いやん', 'ワイの方が上手いな'])}\nnostr:${quote}`;
+		tags = getTagsQuote(event);
+	}
+	else {
+		content = 'えんいー';
+		tags = getTagsAirrep(event);
+	}
+	return [content, event.kind, tags];
 };
 
 const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
