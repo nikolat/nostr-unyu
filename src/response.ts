@@ -1093,6 +1093,9 @@ const res_nostrflu = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 };
 
 const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] | null => {
+	if (event.kind === 1) {
+		return null;
+	}
 	let content: string | undefined;
 	let tags: string[][];
 	const match = event.content.match(regstr);
@@ -1136,7 +1139,7 @@ const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, 
 	if (content === undefined) {
 		return null;
 	}
-	tags = getTagsAirrep(event);
+	tags = [];
 	return [content, tags];
 };
 
