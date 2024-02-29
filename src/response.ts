@@ -83,6 +83,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 	];
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]]][] = [
 		[/アルパカ|🦙/, res_arupaka],
+		[/画像生成/, res_gazouseisei],
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
@@ -471,7 +472,18 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		...Array.from(emoji_seigen).map(s => ['emoji', s, `https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/${s}.png`]),
 	];
 	return [content, tags];
-}
+};
+
+const res_gazouseisei = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const npub_nullpoga = 'npub1f6rvmwc76arl7sxx2vparlzx8cg2ajc3xpymqh7yx97znccue2hs5mkavc';
+	const text = event.content.split('画像生成', 2)[1].trim();
+	content = `nostr:${npub_nullpoga} 画像生成 ${text}`;
+	tags = getTagsAirrep(event);
+	tags.push(['p', nip19.decode(npub_nullpoga).data, '']);
+	return [content, tags];
+};
 
 const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
 	let content: string;
