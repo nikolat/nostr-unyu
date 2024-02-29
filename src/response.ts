@@ -1093,7 +1093,7 @@ const res_nostrflu = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 };
 
 const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] | null => {
-	if (event.kind === 1) {
+	if (event.kind !== 1) {
 		return null;
 	}
 	let content: string | undefined;
