@@ -1096,6 +1096,9 @@ const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, 
 	if (event.kind !== 1) {
 		return null;
 	}
+	if (Math.floor(Math.random() * 10) > 0) {
+		return null;
+	}
 	let content: string | undefined;
 	let tags: string[][];
 	const match = event.content.match(regstr);
