@@ -84,7 +84,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]] | null][] = [
 		[/アルパカ|🦙/, res_arupaka],
 		[/画像生成/, res_gazouseisei],
-		[/りとりん/, res_ritorin],
+		[/りとりん|つぎはなにから？/, res_ritorin],
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
@@ -500,6 +500,10 @@ const res_ritorin = (event: NostrEvent): [string, string[][]] | null => {
 	let tags: string[][];
 	if (/りとりんポイント$/.test(event.content)) {
 		content = any(['r!point', '🦊❗🅿️']);
+		tags = [];
+	}
+	else if (/つぎはなにから？$/.test(event.content)) {
+		content = any(['r!next', '🦊❗🔜']);
 		tags = [];
 	}
 	else if (/りとりんポイント獲得状況/.test(event.content)) {
