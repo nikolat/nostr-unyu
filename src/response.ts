@@ -499,7 +499,7 @@ const res_ritorin = (event: NostrEvent): [string, string[][]] | null => {
 	let content: string;
 	let tags: string[][];
 	if (/りとりんポイント$/.test(event.content)) {
-		content = 'r!point';
+		content = any(['r!point', '🦊❗🅿️']);
 		tags = [];
 	}
 	else if (/りとりんポイント獲得状況/.test(event.content)) {
