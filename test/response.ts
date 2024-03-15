@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import { it } from 'mocha';
-import chai from 'chai';
+import { assert } from 'chai';
 import { generateSecretKey, getPublicKey, type Event as NostrEvent } from 'nostr-tools';
 import { Mode, Signer } from '../src/utils.ts';
 import { getResponseEvent } from '../src/response.ts';
@@ -20,11 +20,11 @@ it('get response with JSON file', async() => {
 		contents: ['ええで', 'ええんやで', 'あかんに決まっとるやろ'],
 		tags: [...event.tags.filter(tag => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root'), ['e', event.id, '', 'mention']],
 	};
-	chai.assert.isNotNull(actual);
+	assert.isNotNull(actual);
 	if (actual === null) throw new Error();
-	chai.assert.strictEqual(actual.kind, expected.kind);
-	chai.assert.strictEqual(actual.pubkey, expected.pubkey);
-	chai.assert.strictEqual(actual.created_at, expected.created_at);
-	chai.assert.deepEqual(actual.tags, expected.tags);
-	chai.assert.include(expected.contents, actual.content);
+	assert.strictEqual(actual.kind, expected.kind);
+	assert.strictEqual(actual.pubkey, expected.pubkey);
+	assert.strictEqual(actual.created_at, expected.created_at);
+	assert.deepEqual(actual.tags, expected.tags);
+	assert.include(expected.contents, actual.content);
 });

@@ -4,26 +4,26 @@
 	"description": "",
 	"main": "main.ts",
 	"scripts": {
-		"dev": "ts-node main.ts",
-		"test": "ts-mocha test/**/*.ts"
+		"dev": "npx tsx main.ts",
+		"test": "mocha -r ts-node/register 'test/**/*.ts'"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "CC0-1.0",
 	"dependencies": {
-		"@types/node": "^20.10.5",
-		"@vercel/node": "^3.0.13",
-		"nostr-tools": "^2.1.1",
+		"@types/node": "^20.11.27",
+		"@vercel/node": "^3.0.23",
+		"nostr-tools": "^2.3.1",
 		"rss-parser": "^3.13.0",
-		"typescript": "^5.3.3"
+		"typescript": "^5.4.2"
 	},
 	"devDependencies": {
-		"@types/chai": "^4.3.11",
+		"@types/chai": "^4.3.12",
 		"@types/mocha": "^10.0.6",
-		"chai": "^4.3.10",
-		"mocha": "^10.2.0",
-		"ts-mocha": "^10.0.0",
-		"ts-node": "^10.9.2"
+		"chai": "^5.1.0",
+		"mocha": "^10.3.0",
+		"ts-node": "^10.9.2",
+		"tsx": "^4.7.1"
 	},
 	"type": "module"
 }
