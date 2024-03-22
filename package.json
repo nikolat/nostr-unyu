@@ -11,14 +11,14 @@
 	"author": "",
 	"license": "CC0-1.0",
 	"dependencies": {
-		"@types/node": "^20.11.27",
-		"@vercel/node": "^3.0.23",
-		"nostr-tools": "^2.3.1",
+		"@types/node": "^20.11.30",
+		"@vercel/node": "^3.0.24",
+		"nostr-tools": "^2.3.2",
 		"rss-parser": "^3.13.0",
-		"typescript": "^5.4.2"
+		"typescript": "^5.4.3"
 	},
 	"devDependencies": {
-		"@types/chai": "^4.3.12",
+		"@types/chai": "^4.3.14",
 		"@types/mocha": "^10.0.6",
 		"chai": "^5.1.0",
 		"mocha": "^10.3.0",
