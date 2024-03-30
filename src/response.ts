@@ -1,14 +1,25 @@
-import { type EventTemplate, type VerifiedEvent, type Event as NostrEvent, nip19 } from 'nostr-tools';
+import { type EventTemplate, type VerifiedEvent, type Event as NostrEvent, type Filter, nip19, nip47, nip57, SimplePool } from 'nostr-tools';
+import { hexToBytes } from '@noble/hashes/utils';
 import mb_strwidth from './mb_strwidth.js';
 import Parser from 'rss-parser';
 import { Mode, Signer } from './utils.js';
+import { useWebSocketImplementation, Relay } from 'nostr-tools/relay';
+import WebSocket from 'ws';
+useWebSocketImplementation(WebSocket);
+
+const defaultRelays = [
+	'wss://relay-jp.nostr.wirednet.jp',
+	'wss://relay.nostr.wirednet.jp',
+	'wss://yabu.me',
+	'wss://nostr-relay.nokotaro.com',
+];
 
 export const getResponseEvent = async (requestEvent: NostrEvent, signer: Signer, mode: Mode): Promise<VerifiedEvent | null> => {
 	if (requestEvent.pubkey === signer.getPublicKey()) {
 		//自分自身の投稿には反応しない
 		return null;
 	}
-	const res = await selectResponse(requestEvent, mode);
+	const res = await selectResponse(requestEvent, mode, signer);
 	if (res === null) {
 		//反応しないことを選択
 		return null;
@@ -16,17 +27,17 @@ export const getResponseEvent = async (requestEvent: NostrEvent, signer: Signer,
 	return signer.finishEvent(res);
 };
 
-const selectResponse = async (event: NostrEvent, mode: Mode): Promise<EventTemplate | null> => {
+const selectResponse = async (event: NostrEvent, mode: Mode, signer: Signer): Promise<EventTemplate | null> => {
 	if (!isAllowedToPost(event)) {
 		return null;
 	}
 	let res;
 	switch (mode) {
 		case Mode.Normal:
-			res = await mode_normal(event);
+			res = await mode_normal(event, signer);
 			break;
 		case Mode.Reply:
-			res = await mode_reply(event);
+			res = await mode_reply(event, signer);
 			break;
 		case Mode.Fav:
 			res = mode_fav(event);
@@ -67,7 +78,7 @@ const isAllowedToPost = (event: NostrEvent) => {
 	throw new TypeError(`kind ${event.kind} is not supported`);
 };
 
-const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]] | null> | [string, string[][]] | null][] => {
+const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer) => Promise<[string, string[][]] | null> | [string, string[][]] | null][] => {
 	const resmapNormal: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => [string, string[][]] | null][] = [
 		[/いいの?か?(？|\?)$/, res_iiyo],
 		[/\\e$/, res_enyee],
@@ -81,7 +92,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/^次は「(.)」から！$/u, res_shiritori],
 		[/^(うにゅう、|うにゅう[くさた]ん、|うにゅうちゃん、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|溶かして|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|縮めて|伸ばして|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って|祝って|呪って|鳴らして|詰めて|梱包して|囲んで|囲って|詰んで|漬けて|[踊躍]らせて|撃って|蒸して|上げて|アゲて|ageて|下げて|サゲて|sageて|導いて)[^るた]?$/us, res_fire],
 	];
-	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => Promise<[string, string[][]]> | [string, string[][]] | null][] = [
+	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer) => Promise<[string, string[][]]> | [string, string[][]] | null][] = [
 		[/アルパカ|🦙/, res_arupaka],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
@@ -144,7 +155,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 	}
 };
 
-const mode_normal = async (event: NostrEvent): Promise<[string, number, string[][]] | null> => {
+const mode_normal = async (event: NostrEvent, signer: Signer): Promise<[string, number, string[][]] | null> => {
 	//自分への話しかけはreplyで対応する
 	//自分以外に話しかけている場合は割り込まない
 	if (event.tags.some(tag => tag.length >= 2 && (tag[0] === 'p'))) {
@@ -157,7 +168,7 @@ const mode_normal = async (event: NostrEvent): Promise<[string, number, string[]
 	const resmap = getResmap(Mode.Normal);
 	for (const [reg, func] of resmap) {
 		if (reg.test(event.content)) {
-			const res = await func(event, Mode.Normal, reg);
+			const res = await func(event, Mode.Normal, reg, signer);
 			if (res === null) {
 				return null;
 			}
@@ -168,11 +179,11 @@ const mode_normal = async (event: NostrEvent): Promise<[string, number, string[]
 	return null;
 };
 
-const mode_reply = async (event: NostrEvent): Promise<[string, number, string[][]] | null> => {
+const mode_reply = async (event: NostrEvent, signer: Signer): Promise<[string, number, string[][]] | null> => {
 	const resmap = getResmap(Mode.Reply);
 	for (const [reg, func] of resmap) {
 		if (reg.test(event.content)) {
-			const res = await func(event, Mode.Reply, reg);
+			const res = await func(event, Mode.Reply, reg, signer);
 			if (res === null) {
 				return null;
 			}
@@ -775,10 +786,126 @@ const res_powa = (event: NostrEvent): [string, string[][]] => {
 	return ['ぽわ〜', getTagsReply(event)];
 };
 
-const res_ohayo = (event: NostrEvent): [string, string[][]] => {
-	const date = new Date();
-	date.setHours(date.getHours() + 9);//JST
-	return [any(['おはようやで', 'ほい、おはよう', `もう${date.getHours()}時か、おはよう`]), getTagsReply(event)];
+const res_ohayo = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer): Promise<[string, string[][]]> => {
+	const h = ((new Date()).getHours() + 9) % 24;
+	if (5 <= h && h < 8) {
+		await zapByNIP47(event, signer, 3, any(['早起きのご褒美やで', '健康的でええな', 'みんなには内緒やで']));
+	}
+	return [any(['おはようやで', 'ほい、おはよう', `もう${h}時か、おはよう`]), getTagsReply(event)];
+};
+
+const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapComment: string): Promise<void> => {
+	const wc = process.env.NOSTR_WALLET_CONNECT;
+	if (wc === undefined) {
+		throw Error('NOSTR_WALLET_CONNECT is undefined');
+	}
+	const { pathname, hostname, searchParams } = new URL(wc);
+	const walletPubkey = pathname || hostname;
+	const walletRelay = searchParams.get('relay');
+	const walletSeckey = searchParams.get('secret');
+	if (walletPubkey.length === 0 || walletRelay === null || walletSeckey === null) {
+		return;
+	}
+	const evKind0 = await getKind0(event.pubkey);
+	if (evKind0 === undefined) {
+		return;
+	}
+	const zapEndpoint = await nip57.getZapEndpoint(evKind0);
+	if (zapEndpoint === null) {
+		return;
+	}
+
+	const lastZap = await getLastZap(event.pubkey);
+	if (lastZap !== undefined && Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10) {//10分以内に誰かからZapをもらっている
+		const evKind9734 = JSON.parse(lastZap.tags.find(tag => tag[0] === 'description')?.at(1) ?? '{}');
+		if (evKind9734.pubkey === signer.getPublicKey()) {//自分からのZap
+			return;
+		}
+	}
+
+	const amount = sats * 1000;
+	const zapRequest = nip57.makeZapRequest({
+		profile: event.pubkey,
+		event: event.id,
+		amount,
+		comment: zapComment,
+		relays: defaultRelays,
+	});
+	const zapRequestEvent = signer.finishEvent(zapRequest);
+	const encoded = encodeURI(JSON.stringify(zapRequestEvent));
+
+	const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
+
+	const response = await fetch(url);
+	if (!response.ok) {
+		return;
+	}
+	const { pr: invoice } = await response.json();
+
+	const ev = await nip47.makeNwcRequestEvent(walletPubkey, hexToBytes(walletSeckey), invoice);
+	const wRelay = await Relay.connect(walletRelay);
+	try {
+		await wRelay.publish(ev);
+	} catch (error) {
+		console.warn(error);
+	}
+	wRelay.close();
+};
+
+const getKind0 = async (pubkey: string): Promise<NostrEvent | undefined> => {
+	return new Promise(async (resolve) => {
+		const relays = defaultRelays;
+		const pool = new SimplePool();
+		let r: NostrEvent | undefined;
+		const filters = [
+			{
+				kinds: [0],
+				authors: [pubkey],
+			}
+		];
+		const onevent = async (ev: NostrEvent) => {
+			if (r === undefined || r.created_at < ev.created_at) {
+				r = ev;
+			}
+		};
+		const oneose = async () => {
+			sub.close();
+			pool.close(relays);
+			resolve(r);
+		};
+		const sub = pool.subscribeMany(
+			relays,
+			filters,
+			{ onevent, oneose }
+		);
+	});
+};
+
+const getLastZap = async (targetPubkey: string): Promise<NostrEvent | undefined> => {
+	return new Promise(async (resolve) => {
+		const relayURL = 'wss://relay.nostr.band';
+		const relay = await Relay.connect(relayURL);
+		let r: NostrEvent | undefined;
+		const filters: Filter[] = [
+			{
+				kinds: [9735],
+				'#p': [targetPubkey],
+				limit: 1
+			}
+		];
+		const onevent = async (ev: NostrEvent) => {
+			r = ev;
+		};
+		const oneose = async () => {
+			sub.close();
+			relay.close();
+			resolve(r);
+		};
+		const sub = relay.subscribe(
+			filters,
+			{ onevent, oneose }
+		);
+	});
 };
 
 const res_akeome = (event: NostrEvent): [string, string[][]] => {
