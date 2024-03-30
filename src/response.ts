@@ -1,4 +1,4 @@
-import { type EventTemplate, type VerifiedEvent, type Event as NostrEvent, type Filter, nip19, nip47, nip57, SimplePool } from 'nostr-tools';
+import { type EventTemplate, type VerifiedEvent, type Event as NostrEvent, type Filter, nip19, nip47, nip57 } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
 import mb_strwidth from './mb_strwidth.js';
 import Parser from 'rss-parser';
@@ -852,51 +852,35 @@ const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapCo
 	wRelay.close();
 };
 
-const getKind0 = async (pubkey: string): Promise<NostrEvent | undefined> => {
+const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
+	return getEvent('wss://relay.nostr.band', [
+		{
+			kinds: [0],
+			authors: [pubkey],
+		}
+	]);
+};
+
+const getLastZap = (pubkey: string): Promise<NostrEvent | undefined> => {
+	return getEvent('wss://relay.nostr.band', [
+		{
+			kinds: [9735],
+			'#p': [pubkey],
+			limit: 1
+		}
+	]);
+};
+
+const getEvent = (relayURL: string, filters: Filter[]): Promise<NostrEvent | undefined> => {
 	return new Promise(async (resolve) => {
-		const relays = defaultRelays;
-		const pool = new SimplePool();
+		const relay = await Relay.connect(relayURL);
 		let r: NostrEvent | undefined;
-		const filters = [
-			{
-				kinds: [0],
-				authors: [pubkey],
-			}
-		];
-		const onevent = async (ev: NostrEvent) => {
+		const onevent = (ev: NostrEvent) => {
 			if (r === undefined || r.created_at < ev.created_at) {
 				r = ev;
 			}
 		};
-		const oneose = async () => {
-			sub.close();
-			pool.close(relays);
-			resolve(r);
-		};
-		const sub = pool.subscribeMany(
-			relays,
-			filters,
-			{ onevent, oneose }
-		);
-	});
-};
-
-const getLastZap = async (targetPubkey: string): Promise<NostrEvent | undefined> => {
-	return new Promise(async (resolve) => {
-		const relayURL = 'wss://relay.nostr.band';
-		const relay = await Relay.connect(relayURL);
-		let r: NostrEvent | undefined;
-		const filters: Filter[] = [
-			{
-				kinds: [9735],
-				'#p': [targetPubkey],
-				limit: 1
-			}
-		];
-		const onevent = async (ev: NostrEvent) => {
-			r = ev;
-		};
-		const oneose = async () => {
+		const oneose = () => {
 			sub.close();
 			relay.close();
 			resolve(r);
