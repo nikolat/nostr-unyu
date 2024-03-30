@@ -787,11 +787,32 @@ const res_powa = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_ohayo = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer): Promise<[string, string[][]]> => {
-	const h = ((new Date()).getHours() + 9) % 24;
-	if (5 <= h && h < 8) {
-		await zapByNIP47(event, signer, 3, any(['早起きのご褒美やで', '健康的でええな', 'みんなには内緒やで']));
+	const date = new Date();
+	date.setHours(date.getHours() + 9);//JST
+	const [year, month, day, hour, minutes, seconds, week] = [
+		date.getFullYear(),
+		date.getMonth() + 1,
+		date.getDate(),
+		date.getHours(),
+		date.getMinutes(),
+		date.getSeconds(),
+		'日月火水木金土'.at(date.getDay()),
+	];
+	if (5 <= hour && hour < 8) {
+		await zapByNIP47(event, signer, 3, any([
+			'早起きのご褒美やで',
+			'健康的でええな',
+			'みんなには内緒やで',
+			'二度寝したらあかんで',
+			'明日も早起きするんやで',
+			`${week}曜日の朝や、今日も元気にいくで`,
+			'朝ご飯はしっかり食べるんやで',
+			'夜ふかししたんと違うやろな？',
+			'継続は力やで',
+			'今日はきっといいことあるで',
+		]));
 	}
-	return [any(['おはようやで', 'ほい、おはよう', `もう${h}時か、おはよう`]), getTagsReply(event)];
+	return [any(['おはようやで', 'ほい、おはよう', `もう${hour}時か、おはよう`]), getTagsReply(event)];
 };
 
 const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapComment: string): Promise<void> => {
