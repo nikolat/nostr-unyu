@@ -1,6 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { nip19, nip57 } from 'nostr-tools';
+import { type NostrEvent, SimplePool, nip19, nip57, useWebSocketImplementation } from 'nostr-tools';
 import { Signer } from '../src/utils.js';
+import WebSocket from 'ws';
+useWebSocketImplementation(WebSocket);
 
 const defaultRelays = [
 	'wss://relay-jp.nostr.wirednet.jp',
@@ -36,12 +38,10 @@ export default async function (request: VercelRequest, response: VercelResponse)
 	}
 
 	//kind0からZapエンドポイントを取得
-	const restapiurl = `https://api.yabu.me/v0/profiles/${pubkey}`;
-	const resAPI = await fetch(restapiurl);
-	if (!resAPI.ok) {
-		return response.status(503).json({ error: `Failed to fetch ${restapiurl}` });
-	}
-	const evKind0 = await resAPI.json();
+	const pool = new SimplePool();
+	const relays = defaultRelays;
+	const evKind0 = await getKind0(pool, relays, pubkey);
+	pool.close(defaultRelays);
 	const zapEndpoint = await nip57.getZapEndpoint(evKind0);
 	if (zapEndpoint === null) {
 		return response.status(403).json({ error: 'Zap endpoint is null' });
@@ -68,4 +68,30 @@ export default async function (request: VercelRequest, response: VercelResponse)
 	const { pr: invoice } = await resZap.json();
 
 	return response.status(200).send(invoice);
+};
+
+const getKind0 = async (pool: SimplePool, relays: string[], pubkey: string): Promise<NostrEvent> => {
+	return new Promise(async (resolve) => {
+		let r: NostrEvent;
+		const filters = [
+			{
+				kinds: [0],
+				authors: [pubkey],
+			}
+		];
+		const onevent = async (ev: NostrEvent) => {
+			if (r === undefined || r.created_at < ev.created_at) {
+				r = ev;
+			}
+		};
+		const oneose = async () => {
+			sub.close();
+			resolve(r);
+		};
+		const sub = pool.subscribeMany(
+			relays,
+			filters,
+			{ onevent, oneose }
+		);
+	});
 };
