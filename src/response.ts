@@ -105,6 +105,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
 		[/誕生日/, res_tanjobi],
+		[/どんぐり/, res_donguri],
 		[/時刻|時報|日時|何時/, res_jihou],
 		[/ログボ|ログインボーナス/, res_rogubo],
 		[/あなたの合計ログイン回数は(\d+)回です。/, res_get_rogubo],
@@ -835,6 +836,10 @@ const res_nakami = (event: NostrEvent): [string, string[][]] => {
 
 const res_tanjobi = (event: NostrEvent): [string, string[][]] => {
 	return [any(['何か欲しいもんでもあるんか？', '先月も誕生日言うてへんかったか？', '何歳になっても誕生日はめでたいもんやな']), getTagsReply(event)];
+};
+
+const res_donguri = (event: NostrEvent): [string, string[][]] => {
+	return [any(['いい歳してどんぐり集めて何が楽しいねん', 'どんぐりなんかいらんで…', 'どんぐりとか何に使うねん']), getTagsReply(event)];
 };
 
 const res_jihou = (event: NostrEvent): [string, string[][]] => {
