@@ -93,6 +93,8 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/^(うにゅう、|うにゅう[くさた]ん、|うにゅうちゃん、)?(.{1,300})[をに]([燃萌も]やして|焼いて|煮て|炊いて|沸か[せし]て|溶かして|凍らせて|冷やして|通報して|火を[付つ]けて|磨いて|爆破して|注射して|打って|駐車して|停めて|潰して|縮めて|伸ばして|ど[突つ]いて|[踏ふ]んで|捌いて|裁いて|出して|積んで|握って|触って|祝って|呪って|鳴らして|詰めて|梱包して|囲んで|囲って|詰んで|漬けて|[踊躍]らせて|撃って|蒸して|上げて|アゲて|ageて|下げて|サゲて|sageて|導いて)[^るた]?$/us, res_fire],
 	];
 	const resmapReply: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer) => Promise<[string, string[][]]> | [string, string[][]] | null][] = [
+		[/zapテスト$/i, res_zaptest],
+		[/おはよ/, res_ohayo],
 		[/アルパカ|🦙/, res_arupaka],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
@@ -115,7 +117,6 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/お(かえ|帰)り/, res_okaeri],
 		[/人の心/, res_hitonokokoro],
 		[/ぽわ/, res_powa],
-		[/おはよ/, res_ohayo],
 		[/あけおめ|あけまして|ことよろ/, res_akeome],
 		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
@@ -236,6 +237,142 @@ const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 		}
 	}
 	return null;
+};
+
+const res_zaptest = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer): Promise<[string, string[][]]> => {
+	const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
+	if (event.pubkey !== nip19.decode(npub_don).data) {
+		return ['イタズラしたらあかんで', getTagsReply(event)];
+	}
+	await zapByNIP47(event, signer, 1, 'Zapのテストやで');
+	return ['1sat届いたはずやで', getTagsReply(event)];
+};
+
+const res_ohayo = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer): Promise<[string, string[][]]> => {
+	const date = new Date();
+	date.setHours(date.getHours() + 9);//JST
+	const [year, month, day, hour, minutes, seconds, week] = [
+		date.getFullYear(),
+		date.getMonth() + 1,
+		date.getDate(),
+		date.getHours(),
+		date.getMinutes(),
+		date.getSeconds(),
+		'日月火水木金土'.at(date.getDay()),
+	];
+	if (5 <= hour && hour < 8) {
+		await zapByNIP47(event, signer, 3, any([
+			'早起きのご褒美やで',
+			'健康的でええな',
+			'みんなには内緒やで',
+			'二度寝したらあかんで',
+			'明日も早起きするんやで',
+			`${week}曜日の朝や、今日も元気にいくで`,
+			'朝ご飯はしっかり食べるんやで',
+			'夜ふかししたんと違うやろな？',
+			'継続は力やで',
+			'今日はきっといいことあるで',
+		]));
+	}
+	return [any(['おはようやで', 'ほい、おはよう', `もう${hour}時か、おはよう`]), getTagsReply(event)];
+};
+
+const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapComment: string): Promise<void> => {
+	const wc = process.env.NOSTR_WALLET_CONNECT;
+	if (wc === undefined) {
+		throw Error('NOSTR_WALLET_CONNECT is undefined');
+	}
+	const { pathname, hostname, searchParams } = new URL(wc);
+	const walletPubkey = pathname || hostname;
+	const walletRelay = searchParams.get('relay');
+	const walletSeckey = searchParams.get('secret');
+	if (walletPubkey.length === 0 || walletRelay === null || walletSeckey === null) {
+		return;
+	}
+	const evKind0 = await getKind0(event.pubkey);
+	if (evKind0 === undefined) {
+		return;
+	}
+	const zapEndpoint = await nip57.getZapEndpoint(evKind0);
+	if (zapEndpoint === null) {
+		return;
+	}
+
+	const lastZap = await getLastZap(event.pubkey);
+	if (lastZap !== undefined && Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10) {//10分以内に誰かからZapをもらっている
+		const evKind9734 = JSON.parse(lastZap.tags.find(tag => tag[0] === 'description')?.at(1) ?? '{}');
+		if (evKind9734.pubkey === signer.getPublicKey()) {//自分からのZap
+			return;
+		}
+	}
+
+	const amount = sats * 1000;
+	const zapRequest = nip57.makeZapRequest({
+		profile: event.pubkey,
+		event: event.id,
+		amount,
+		comment: zapComment,
+		relays: defaultRelays,
+	});
+	const zapRequestEvent = signer.finishEvent(zapRequest);
+	const encoded = encodeURI(JSON.stringify(zapRequestEvent));
+
+	const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
+
+	const response = await fetch(url);
+	if (!response.ok) {
+		return;
+	}
+	const { pr: invoice } = await response.json();
+
+	const ev = await nip47.makeNwcRequestEvent(walletPubkey, hexToBytes(walletSeckey), invoice);
+	const wRelay = await Relay.connect(walletRelay);
+	try {
+		await wRelay.publish(ev);
+	} catch (error) {
+		console.warn(error);
+	}
+	wRelay.close();
+};
+
+const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
+	return getEvent('wss://relay.nostr.band', [
+		{
+			kinds: [0],
+			authors: [pubkey],
+		}
+	]);
+};
+
+const getLastZap = (pubkey: string): Promise<NostrEvent | undefined> => {
+	return getEvent('wss://relay.nostr.band', [
+		{
+			kinds: [9735],
+			'#p': [pubkey],
+			limit: 1
+		}
+	]);
+};
+
+const getEvent = (relayURL: string, filters: Filter[]): Promise<NostrEvent | undefined> => {
+	return new Promise(async (resolve) => {
+		const relay = await Relay.connect(relayURL);
+		let r: NostrEvent | undefined;
+		const onevent = (ev: NostrEvent) => {
+			if (r === undefined || r.created_at < ev.created_at) {
+				r = ev;
+			}
+		};
+		const oneose = () => {
+			sub.close();
+			relay.close();
+			resolve(r);
+		};
+		const sub = relay.subscribe(
+			filters,
+			{ onevent, oneose }
+		);
+	});
 };
 
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
@@ -784,133 +921,6 @@ const res_hitonokokoro = (event: NostrEvent): [string, string[][]] => {
 
 const res_powa = (event: NostrEvent): [string, string[][]] => {
 	return ['ぽわ〜', getTagsReply(event)];
-};
-
-const res_ohayo = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer): Promise<[string, string[][]]> => {
-	const date = new Date();
-	date.setHours(date.getHours() + 9);//JST
-	const [year, month, day, hour, minutes, seconds, week] = [
-		date.getFullYear(),
-		date.getMonth() + 1,
-		date.getDate(),
-		date.getHours(),
-		date.getMinutes(),
-		date.getSeconds(),
-		'日月火水木金土'.at(date.getDay()),
-	];
-	if (5 <= hour && hour < 8) {
-		await zapByNIP47(event, signer, 3, any([
-			'早起きのご褒美やで',
-			'健康的でええな',
-			'みんなには内緒やで',
-			'二度寝したらあかんで',
-			'明日も早起きするんやで',
-			`${week}曜日の朝や、今日も元気にいくで`,
-			'朝ご飯はしっかり食べるんやで',
-			'夜ふかししたんと違うやろな？',
-			'継続は力やで',
-			'今日はきっといいことあるで',
-		]));
-	}
-	return [any(['おはようやで', 'ほい、おはよう', `もう${hour}時か、おはよう`]), getTagsReply(event)];
-};
-
-const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapComment: string): Promise<void> => {
-	const wc = process.env.NOSTR_WALLET_CONNECT;
-	if (wc === undefined) {
-		throw Error('NOSTR_WALLET_CONNECT is undefined');
-	}
-	const { pathname, hostname, searchParams } = new URL(wc);
-	const walletPubkey = pathname || hostname;
-	const walletRelay = searchParams.get('relay');
-	const walletSeckey = searchParams.get('secret');
-	if (walletPubkey.length === 0 || walletRelay === null || walletSeckey === null) {
-		return;
-	}
-	const evKind0 = await getKind0(event.pubkey);
-	if (evKind0 === undefined) {
-		return;
-	}
-	const zapEndpoint = await nip57.getZapEndpoint(evKind0);
-	if (zapEndpoint === null) {
-		return;
-	}
-
-	const lastZap = await getLastZap(event.pubkey);
-	if (lastZap !== undefined && Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10) {//10分以内に誰かからZapをもらっている
-		const evKind9734 = JSON.parse(lastZap.tags.find(tag => tag[0] === 'description')?.at(1) ?? '{}');
-		if (evKind9734.pubkey === signer.getPublicKey()) {//自分からのZap
-			return;
-		}
-	}
-
-	const amount = sats * 1000;
-	const zapRequest = nip57.makeZapRequest({
-		profile: event.pubkey,
-		event: event.id,
-		amount,
-		comment: zapComment,
-		relays: defaultRelays,
-	});
-	const zapRequestEvent = signer.finishEvent(zapRequest);
-	const encoded = encodeURI(JSON.stringify(zapRequestEvent));
-
-	const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
-
-	const response = await fetch(url);
-	if (!response.ok) {
-		return;
-	}
-	const { pr: invoice } = await response.json();
-
-	const ev = await nip47.makeNwcRequestEvent(walletPubkey, hexToBytes(walletSeckey), invoice);
-	const wRelay = await Relay.connect(walletRelay);
-	try {
-		await wRelay.publish(ev);
-	} catch (error) {
-		console.warn(error);
-	}
-	wRelay.close();
-};
-
-const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
-	return getEvent('wss://relay.nostr.band', [
-		{
-			kinds: [0],
-			authors: [pubkey],
-		}
-	]);
-};
-
-const getLastZap = (pubkey: string): Promise<NostrEvent | undefined> => {
-	return getEvent('wss://relay.nostr.band', [
-		{
-			kinds: [9735],
-			'#p': [pubkey],
-			limit: 1
-		}
-	]);
-};
-
-const getEvent = (relayURL: string, filters: Filter[]): Promise<NostrEvent | undefined> => {
-	return new Promise(async (resolve) => {
-		const relay = await Relay.connect(relayURL);
-		let r: NostrEvent | undefined;
-		const onevent = (ev: NostrEvent) => {
-			if (r === undefined || r.created_at < ev.created_at) {
-				r = ev;
-			}
-		};
-		const oneose = () => {
-			sub.close();
-			relay.close();
-			resolve(r);
-		};
-		const sub = relay.subscribe(
-			filters,
-			{ onevent, oneose }
-		);
-	});
 };
 
 const res_akeome = (event: NostrEvent): [string, string[][]] => {
