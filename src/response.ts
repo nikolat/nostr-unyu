@@ -261,7 +261,7 @@ const res_ohayo = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: 
 		date.getSeconds(),
 		'日月火水木金土'.at(date.getDay()),
 	];
-	if (5 <= hour && hour < 8) {
+	if (4 <= hour && hour < 8) {
 		await zapByNIP47(event, signer, 3, any([
 			'早起きのご褒美やで',
 			'健康的でええな',
