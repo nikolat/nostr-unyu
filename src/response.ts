@@ -306,11 +306,11 @@ const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapCo
 	}
 	const evKind0 = await getKind0(event.pubkey);
 	if (evKind0 === undefined) {
-		return;
+		throw Error('Cannot get kind 0 event');
 	}
 	const zapEndpoint = await nip57.getZapEndpoint(evKind0);
 	if (zapEndpoint === null) {
-		return;
+		throw Error('Cannot get zap endpoint');
 	}
 
 	const lastZap = await getLastZap(event.pubkey);
@@ -336,7 +336,7 @@ const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapCo
 
 	const response = await fetch(url);
 	if (!response.ok) {
-		return;
+		throw Error('Cannot get invoice');
 	}
 	const { pr: invoice } = await response.json();
 
