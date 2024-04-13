@@ -245,7 +245,11 @@ const res_zaptest = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer
 	if (event.pubkey !== nip19.decode(npub_don).data) {
 		return ['イタズラしたらあかんで', getTagsReply(event)];
 	}
-	await zapByNIP47(event, signer, 1, 'Zapのテストやで');
+	try {
+		await zapByNIP47(event, signer, 1, 'Zapのテストやで');
+	} catch (error) {
+		return ['何か失敗したみたいやで', getTagsReply(event)];
+	}
 	return ['1sat届いたはずやで', getTagsReply(event)];
 };
 
@@ -262,7 +266,7 @@ const res_ohayo = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: 
 		'日月火水木金土'.at(date.getDay()),
 	];
 	if (4 <= hour && hour < 8) {
-		await zapByNIP47(event, signer, 3, any([
+		const mes = any([
 			'早起きのご褒美やで',
 			'健康的でええな',
 			'みんなには内緒やで',
@@ -273,7 +277,12 @@ const res_ohayo = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: 
 			'夜ふかししたんと違うやろな？',
 			'継続は力やで',
 			'今日はきっといいことあるで',
-		]));
+		]);
+		try {
+			await zapByNIP47(event, signer, 3, mes);
+		} catch (error) {
+			return [any(['zzz...', 'まだ寝ときや', 'もう朝やて？ワイは信じへんで']), getTagsReply(event)];
+		}
 	}
 	return [any(['おはようやで', 'ほい、おはよう', `もう${hour}時か、おはよう`]), getTagsReply(event)];
 };
@@ -356,8 +365,14 @@ const getLastZap = (pubkey: string): Promise<NostrEvent | undefined> => {
 };
 
 const getEvent = (relayURL: string, filters: Filter[]): Promise<NostrEvent | undefined> => {
-	return new Promise(async (resolve) => {
-		const relay = await Relay.connect(relayURL);
+	return new Promise(async (resolve, reject) => {
+		let relay;
+		try {
+			relay = await Relay.connect(relayURL);
+		} catch (error) {
+			reject(error);
+			return;
+		}
 		let r: NostrEvent | undefined;
 		const onevent = (ev: NostrEvent) => {
 			if (r === undefined || r.created_at < ev.created_at) {
