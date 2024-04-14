@@ -13,11 +13,7 @@ const defaultRelays = [
 	'wss://yabu.me',
 	'wss://nostr-relay.nokotaro.com',
 ];
-const zapRelays = [
-	'wss://relay.nostr.band',
-	'wss://relay.damus.io',
-	'wss://nos.lol',
-];
+const zapRelay = 'wss://nos.lol';
 
 export const getResponseEvent = async (requestEvent: NostrEvent, signer: Signer, mode: Mode): Promise<VerifiedEvent | null> => {
 	if (requestEvent.pubkey === signer.getPublicKey()) {
@@ -347,7 +343,7 @@ const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapCo
 };
 
 const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
-	return getEvent(zapRelays, [
+	return getEvent(zapRelay, [
 		{
 			kinds: [0],
 			authors: [pubkey],
@@ -356,7 +352,7 @@ const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
 };
 
 const getLastZap = (pubkey: string): Promise<NostrEvent | undefined> => {
-	return getEvent(zapRelays, [
+	return getEvent(zapRelay, [
 		{
 			kinds: [9735],
 			'#p': [pubkey],
@@ -365,9 +361,15 @@ const getLastZap = (pubkey: string): Promise<NostrEvent | undefined> => {
 	]);
 };
 
-const getEvent = (relays: string[], filters: Filter[]): Promise<NostrEvent | undefined> => {
-	return new Promise(async (resolve) => {
-		const pool = new SimplePool();
+const getEvent = (relayUrl: string, filters: Filter[]): Promise<NostrEvent | undefined> => {
+	return new Promise(async (resolve, reject) => {
+		let relay;
+		try {
+			relay = await Relay.connect(relayUrl);
+		} catch (error) {
+			reject(error);
+			return;
+		}
 		let r: NostrEvent | undefined;
 		const onevent = (ev: NostrEvent) => {
 			if (r === undefined || r.created_at < ev.created_at) {
@@ -376,11 +378,10 @@ const getEvent = (relays: string[], filters: Filter[]): Promise<NostrEvent | und
 		};
 		const oneose = () => {
 			sub.close();
-			pool.close(relays);
+			relay.close();
 			resolve(r);
 		};
-		const sub = pool.subscribeMany(
-			relays,
+		const sub = relay.subscribe(
 			filters,
 			{ onevent, oneose }
 		);
