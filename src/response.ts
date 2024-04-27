@@ -1,4 +1,4 @@
-import { type EventTemplate, type VerifiedEvent, type Event as NostrEvent, type Filter, nip19, nip47, nip57, SimplePool } from 'nostr-tools';
+import { type EventTemplate, type VerifiedEvent, type Event as NostrEvent, type Filter, nip19, nip47, nip57 } from 'nostr-tools';
 import { hexToBytes } from '@noble/hashes/utils';
 import mb_strwidth from './mb_strwidth.js';
 import Parser from 'rss-parser';
