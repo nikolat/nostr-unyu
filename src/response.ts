@@ -59,6 +59,7 @@ const isAllowedToPost = (event: NostrEvent) => {
 		'be8e52c0c70ec5390779202b27d9d6fc7286d0e9a2bc91c001d6838d40bafa4a',//Nostr伺か部
 		'8206e76969256cd33277eeb00a45e445504dfb321788b5c3cc5d23b561765a74',//うにゅうハウス開発
 		'330fc57e48e39427dd5ea555b0741a3f715a55e10f8bb6616c27ec92ebc5e64b',//カスタム絵文字の川
+		'c8d5c2709a5670d6f621ac8020ac3e4fc3057a4961a15319f7c0818309407723',//Nostr麻雀開発部
 	];
 	const disallowedTags = ['content-warning', 'proxy'];
 	if (event.tags.some(tag => tag.length >= 1 && disallowedTags.includes(tag[0]))) {
