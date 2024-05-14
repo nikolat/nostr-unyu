@@ -130,6 +130,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
 		[/検索(を?呼んで|どこ).?$/u, res_kensaku],
+		[/麻雀(を?呼んで|どこ).?$/u, res_mahojng],
 		[/(パブ|ぱぶ)(リック)?(チャ|ちゃ|茶)(ット)?(を?呼んで|どこ).?$/u, res_pabucha],
 		[/(じゃんけん|ジャンケン|淀川(さん)?)(を?呼んで|どこ).?$/u, res_janken],
 		[/(しりとり|しりとリレー)(を?呼んで|どこ).?$/u, res_shiritoridoko],
@@ -971,6 +972,13 @@ const res_kensaku = (event: NostrEvent): [string, string[][]] => {
 	];
 	content = `nostr:${npub_search}\n${urls.join('\n')}`;
 	tags = [...getTagsReply(event), ...urls.map(url => ['r', url])];
+	return [content, tags];
+};
+
+const res_mahojng = (event: NostrEvent): [string, string[][]] => {
+	const nevent = 'nevent1qvzqqqqq9qqzpjx4cfcf54ns6mmzrtyqyzkrun7rq4ayjcdp2vvl0sypsvy5qaerqcwu9c';//Nostr麻雀開発部
+	const content = `nostr:${nevent}`;
+	const tags = [...getTagsReply(event), ['e', nip19.decode(nevent).data.id, '', 'mention']];
 	return [content, tags];
 };
 
