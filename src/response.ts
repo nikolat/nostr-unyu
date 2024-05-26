@@ -884,7 +884,7 @@ const res_jihou = (event: NostrEvent): [string, string[][]] => {
 const res_rogubo = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
-	if (/うにゅうの|自分|[引ひ]いて|もらって/.test(event.content)) {
+	if (/うにゅうの|自分|[引ひ]いて|(もら|貰)って/.test(event.content)) {
 		const npub_yabumi = 'npub1823chanrkmyrfgz2v4pwmu22s8fjy0s9ps7vnd68n7xgd8zr9neqlc2e5r';
 		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 		content = `nostr:${npub_yabumi} ${any(['別に欲しくはないんやけど、ログボくれんか', 'ログボって何やねん', 'ここでログボがもらえるって聞いたんやけど'])}\nnostr:${quote}`;
