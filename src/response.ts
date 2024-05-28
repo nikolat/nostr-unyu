@@ -118,6 +118,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/ログボ|ログインボーナス/, res_rogubo],
 		[/あなたの合計ログイン回数は(\d+)回です。/, res_get_rogubo],
 		[/(もらって|あげる|どうぞ).?$/u, res_ageru],
+		[/([飛と]んで|[飛と]べ).?$/u, res_tonde],
 		[/ありが(と|て)|(たす|助)か(る|った)/, res_arigato],
 		[/ごめん|すまん/, res_gomen],
 		[/かわいい|可愛い|すごい|かっこいい|えらい|偉い|かしこい|賢い|最高/, res_kawaii],
@@ -914,6 +915,10 @@ const res_get_rogubo = (event: NostrEvent, mode: Mode, regstr: RegExp): [string,
 
 const res_ageru = (event: NostrEvent): [string, string[][]] => {
 	return [any(['別に要らんで', '気持ちだけもらっておくで', 'いらんがな']), getTagsReply(event)];
+};
+
+const res_tonde = (event: NostrEvent): [string, string[][]] => {
+	return [any(['今日は飛ばへん', 'また明日飛ぶわ', '昨日飛んだからええわ']), getTagsReply(event)];
 };
 
 const res_arigato = (event: NostrEvent): [string, string[][]] => {
