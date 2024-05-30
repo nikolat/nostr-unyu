@@ -17,7 +17,7 @@ const defaultRelays = [
 	'wss://yabu.me',
 	'wss://nostr-relay.nokotaro.com',
 ];
-const zapRelay = 'wss://nos.lol';
+const zapRelay = 'wss://yabu.me';
 
 export const getResponseEvent = async (requestEvent: NostrEvent, signer: Signer, mode: Mode): Promise<VerifiedEvent | null> => {
 	if (requestEvent.pubkey === signer.getPublicKey()) {
