@@ -3,7 +3,7 @@ import mb_strwidth from './mb_strwidth.js';
 import Parser from 'rss-parser';
 import { hexToBytes } from '@noble/hashes/utils';
 import type { Filter } from 'nostr-tools/filter';
-import type { EventTemplate, NostrEvent, VerifiedEvent } from 'nostr-tools/core';
+import type { EventTemplate, NostrEvent, VerifiedEvent } from 'nostr-tools';
 import * as nip19 from 'nostr-tools/nip19';
 import { nip47 } from 'nostr-tools';
 import * as nip57 from 'nostr-tools/nip57';
