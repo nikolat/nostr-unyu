@@ -146,6 +146,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/(マグロ|ﾏｸﾞﾛ)の?元ネタ(を?呼んで|どこ).?$/u, res_maguro],
 		[/(カレンダー|アドカレ)(を?呼んで|どこ).?$/u, res_adokare],
 		[/DM.*(を?呼んで|どこ).?$/ui, res_dm],
+		[/Zap.*(を?呼んで|どこ).?$/ui, res_zap],
 		[/絵文字.*(を?呼んで|どこ).?$/ui, res_emoji],
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/再起動/, res_saikidou],
@@ -1068,6 +1069,15 @@ const res_dm = (event: NostrEvent): [string, string[][]] => {
 	const url2 = 'https://rain8128.github.io/nostr-dmviewer/';
 	content = `${url1}\n${url2}`;
 	tags = [...getTagsReply(event), ['r', url1], ['r', url2]];
+	return [content, tags];
+};
+
+const res_zap = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url1 = 'https://tiltpapa.github.io/zapline-jp/';
+	content = url1;
+	tags = [...getTagsReply(event), ['r', url1]];
 	return [content, tags];
 };
 
