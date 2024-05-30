@@ -1,5 +1,7 @@
 import type { VercelResponse } from '@vercel/node';
-import { type VerifiedEvent, type Event as NostrEvent, nip19, validateEvent, verifyEvent } from 'nostr-tools';
+import { type NostrEvent, type VerifiedEvent, validateEvent } from 'nostr-tools/core';
+import { verifyEvent } from 'nostr-tools/pure';
+import * as nip19 from 'nostr-tools/nip19';
 import { Mode, Signer } from './utils.js';
 import { getResponseEvent } from './response.js';
 

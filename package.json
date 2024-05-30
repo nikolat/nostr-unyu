@@ -11,21 +11,21 @@
 	"author": "",
 	"license": "CC0-1.0",
 	"dependencies": {
-		"@types/node": "^20.12.7",
-		"@vercel/node": "^3.0.27",
-		"nostr-tools": "^2.5.1",
+		"@types/node": "^20.12.13",
+		"@vercel/node": "^3.1.5",
+		"nostr-tools": "^2.7.0",
 		"rss-parser": "^3.13.0",
 		"typescript": "^5.4.5",
-		"ws": "^8.16.0"
+		"ws": "^8.17.0"
 	},
 	"devDependencies": {
-		"@types/chai": "^4.3.14",
+		"@types/chai": "^4.3.16",
 		"@types/mocha": "^10.0.6",
 		"@types/ws": "^8.5.10",
-		"chai": "^5.1.0",
+		"chai": "^5.1.1",
 		"mocha": "^10.4.0",
 		"ts-node": "^10.9.2",
-		"tsx": "^4.7.3"
+		"tsx": "^4.11.0"
 	},
 	"type": "module"
 }

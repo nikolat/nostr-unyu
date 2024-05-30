@@ -1,6 +1,7 @@
 import type { Readable } from 'node:stream';
 import { Buffer } from 'node:buffer';
-import { type EventTemplate, finalizeEvent, getPublicKey } from 'nostr-tools';
+import type { EventTemplate } from 'nostr-tools/core';
+import { finalizeEvent, getPublicKey } from 'nostr-tools/pure';
 
 export const enum Mode {
 	Normal,
