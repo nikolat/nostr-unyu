@@ -149,6 +149,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/Zap.*(を?呼んで|どこ).?$/ui, res_zap],
 		[/絵文字.*(を?呼んで|どこ).?$/ui, res_emoji],
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
+		[/(今|いま)どんな(感|かん)じ.?$/u, res_imadonnakanji],
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
 		[/伺か/, res_ukagaka],
@@ -1112,6 +1113,15 @@ const res_ukagakamin = (event: NostrEvent): [string, string[][]] => {
 	];
 	content = npubs.map(npub => `nostr:${npub}`).join('\n');
 	tags = getTagsReply(event);
+	return [content, tags];
+};
+
+const res_imadonnakanji = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url1 = 'https://sns.uwith.net/';
+	content = url1;
+	tags = [...getTagsReply(event), ['r', url1]];
 	return [content, tags];
 };
 
