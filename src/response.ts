@@ -147,6 +147,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/(カレンダー|アドカレ)(を?呼んで|どこ).?$/u, res_adokare],
 		[/DM.*(を?呼んで|どこ).?$/ui, res_dm],
 		[/Zap.*(を?呼んで|どこ).?$/ui, res_zap],
+		[/ここは?(どこ|ドコ).?$/ui, res_kokodoko],
 		[/絵文字.*(を?呼んで|どこ).?$/ui, res_emoji],
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/(今|いま)どんな(感|かん)じ.?$/u, res_imadonnakanji],
@@ -1077,6 +1078,15 @@ const res_zap = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const url1 = 'https://tiltpapa.github.io/zapline-jp/';
+	content = url1;
+	tags = [...getTagsReply(event), ['r', url1]];
+	return [content, tags];
+};
+
+const res_kokodoko = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url1 = `https://koteitan.github.io/nostr-post-checker/?hideform&eid=${nip19.neventEncode(event)}&kind=${event.kind}`;
 	content = url1;
 	tags = [...getTagsReply(event), ['r', url1]];
 	return [content, tags];
