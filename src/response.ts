@@ -151,7 +151,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/絵文字.*(を?呼んで|どこ).?$/ui, res_emoji],
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/(今|いま)どんな(感|かん)じ.?$/u, res_imadonnakanji],
-		[/スクラップボックス|Scrapbox/i, res_scrapbox],
+		[/スクラップボックス|Scrapbox|wikiみたいな/i, res_scrapbox],
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
 		[/伺か/, res_ukagaka],
