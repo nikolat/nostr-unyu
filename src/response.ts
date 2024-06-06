@@ -151,6 +151,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/絵文字.*(を?呼んで|どこ).?$/ui, res_emoji],
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/(今|いま)どんな(感|かん)じ.?$/u, res_imadonnakanji],
+		[/スクラップボックス|Scrapbox/i, res_scrapbox],
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
 		[/伺か/, res_ukagaka],
@@ -1133,6 +1134,10 @@ const res_imadonnakanji = (event: NostrEvent): [string, string[][]] => {
 	content = url1;
 	tags = [...getTagsReply(event), ['r', url1]];
 	return [content, tags];
+};
+
+const res_scrapbox = (event: NostrEvent): [string, string[][]] => {
+	return ['Helpfeel Cosense（ヘルプフィール コセンス）', getTagsReply(event)];
 };
 
 const res_saikidou = (event: NostrEvent): [string, string[][]] => {
