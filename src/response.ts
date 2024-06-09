@@ -113,6 +113,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅうちゃん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
+		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅうちゃん、)?(.+)を絵文字にして$/u, res_emojinishite],
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/us, res_okutte],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
@@ -805,6 +806,137 @@ const res_aura = (event: NostrEvent): [string, string[][]] => {
 	return ['ありえへん……このワイが……', getTagsReply(event)];
 };
 
+const res_emojinishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const text = match[3];
+	const table = [
+		['あ', 'https://tac-lan.net/.well-known/hiragana/hira_001_a.png'],
+		['い', 'https://tac-lan.net/.well-known/hiragana/hira_002_i.png'],
+		['う', 'https://tac-lan.net/.well-known/hiragana/hira_003_u.png'],
+		['え', 'https://tac-lan.net/.well-known/hiragana/hira_004_e.png'],
+		['お', 'https://tac-lan.net/.well-known/hiragana/hira_005_o.png'],
+		['か', 'https://tac-lan.net/.well-known/hiragana/hira_006_ka.png'],
+		['き', 'https://tac-lan.net/.well-known/hiragana/hira_007_ki.png'],
+		['く', 'https://tac-lan.net/.well-known/hiragana/hira_008_ku.png'],
+		['け', 'https://tac-lan.net/.well-known/hiragana/hira_009_ke.png'],
+		['こ', 'https://tac-lan.net/.well-known/hiragana/hira_010_ko.png'],
+		['さ', 'https://tac-lan.net/.well-known/hiragana/hira_011_sa.png'],
+		['し', 'https://tac-lan.net/.well-known/hiragana/hira_012_si.png'],
+		['す', 'https://tac-lan.net/.well-known/hiragana/hira_013_su.png'],
+		['せ', 'https://tac-lan.net/.well-known/hiragana/hira_014_se.png'],
+		['そ', 'https://tac-lan.net/.well-known/hiragana/hira_015_so.png'],
+		['た', 'https://tac-lan.net/.well-known/hiragana/hira_016_ta.png'],
+		['ち', 'https://tac-lan.net/.well-known/hiragana/hira_017_ti.png'],
+		['つ', 'https://tac-lan.net/.well-known/hiragana/hira_018_tu.png'],
+		['て', 'https://tac-lan.net/.well-known/hiragana/hira_019_te.png'],
+		['と', 'https://tac-lan.net/.well-known/hiragana/hira_020_to.png'],
+		['な', 'https://tac-lan.net/.well-known/hiragana/hira_021_na.png'],
+		['に', 'https://tac-lan.net/.well-known/hiragana/hira_022_ni.png'],
+		['ぬ', 'https://tac-lan.net/.well-known/hiragana/hira_023_nu.png'],
+		['ね', 'https://tac-lan.net/.well-known/hiragana/hira_024_ne.png'],
+		['の', 'https://tac-lan.net/.well-known/hiragana/hira_025_no.png'],
+		['は', 'https://tac-lan.net/.well-known/hiragana/hira_026_ha.png'],
+		['ひ', 'https://tac-lan.net/.well-known/hiragana/hira_027_hi.png'],
+		['ふ', 'https://tac-lan.net/.well-known/hiragana/hira_028_hu.png'],
+		['へ', 'https://tac-lan.net/.well-known/hiragana/hira_029_he.png'],
+		['ほ', 'https://tac-lan.net/.well-known/hiragana/hira_030_ho.png'],
+		['ま', 'https://tac-lan.net/.well-known/hiragana/hira_031_ma.png'],
+		['み', 'https://tac-lan.net/.well-known/hiragana/hira_032_mi.png'],
+		['む', 'https://tac-lan.net/.well-known/hiragana/hira_033_mu.png'],
+		['め', 'https://tac-lan.net/.well-known/hiragana/hira_034_me.png'],
+		['も', 'https://tac-lan.net/.well-known/hiragana/hira_035_mo.png'],
+		['や', 'https://tac-lan.net/.well-known/hiragana/hira_036_ya.png'],
+		['ゆ', 'https://tac-lan.net/.well-known/hiragana/hira_038_yu.png'],
+		['よ', 'https://tac-lan.net/.well-known/hiragana/hira_040_yo.png'],
+		['ら', 'https://tac-lan.net/.well-known/hiragana/hira_041_ra.png'],
+		['り', 'https://tac-lan.net/.well-known/hiragana/hira_042_ri.png'],
+		['る', 'https://tac-lan.net/.well-known/hiragana/hira_043_ru.png'],
+		['れ', 'https://tac-lan.net/.well-known/hiragana/hira_044_re.png'],
+		['ろ', 'https://tac-lan.net/.well-known/hiragana/hira_045_ro.png'],
+		['わ', 'https://tac-lan.net/.well-known/hiragana/hira_046_wa.png'],
+		['ゐ', 'https://tac-lan.net/.well-known/hiragana/hira_047_wi.png'],
+		['ゑ', 'https://tac-lan.net/.well-known/hiragana/hira_049_we.png'],
+		['を', 'https://tac-lan.net/.well-known/hiragana/hira_050_wo.png'],
+		['ん', 'https://tac-lan.net/.well-known/hiragana/hira_051_n.png'],
+		['ゔ', 'https://tac-lan.net/.well-known/hiragana/hira_103_vu.png'],
+		['が', 'https://tac-lan.net/.well-known/hiragana/hira_106_ga.png'],
+		['ぎ', 'https://tac-lan.net/.well-known/hiragana/hira_107_gi.png'],
+		['ぐ', 'https://tac-lan.net/.well-known/hiragana/hira_108_gu.png'],
+		['げ', 'https://tac-lan.net/.well-known/hiragana/hira_109_ge.png'],
+		['ご', 'https://tac-lan.net/.well-known/hiragana/hira_110_go.png'],
+		['ざ', 'https://tac-lan.net/.well-known/hiragana/hira_111_za.png'],
+		['じ', 'https://tac-lan.net/.well-known/hiragana/hira_112_zi.png'],
+		['ず', 'https://tac-lan.net/.well-known/hiragana/hira_113_zu.png'],
+		['ぜ', 'https://tac-lan.net/.well-known/hiragana/hira_114_ze.png'],
+		['ぞ', 'https://tac-lan.net/.well-known/hiragana/hira_115_zo.png'],
+		['だ', 'https://tac-lan.net/.well-known/hiragana/hira_116_da.png'],
+		['ぢ', 'https://tac-lan.net/.well-known/hiragana/hira_117_di.png'],
+		['づ', 'https://tac-lan.net/.well-known/hiragana/hira_118_du.png'],
+		['で', 'https://tac-lan.net/.well-known/hiragana/hira_119_de.png'],
+		['ど', 'https://tac-lan.net/.well-known/hiragana/hira_120_do.png'],
+		['ば', 'https://tac-lan.net/.well-known/hiragana/hira_126_ba.png'],
+		['び', 'https://tac-lan.net/.well-known/hiragana/hira_127_bi.png'],
+		['ぶ', 'https://tac-lan.net/.well-known/hiragana/hira_128_bu.png'],
+		['べ', 'https://tac-lan.net/.well-known/hiragana/hira_129_be.png'],
+		['ぼ', 'https://tac-lan.net/.well-known/hiragana/hira_130_bo.png'],
+		['ぱ', 'https://tac-lan.net/.well-known/hiragana/hira_226_pa.png'],
+		['ぴ', 'https://tac-lan.net/.well-known/hiragana/hira_227_pi.png'],
+		['ぷ', 'https://tac-lan.net/.well-known/hiragana/hira_228_pu.png'],
+		['ぺ', 'https://tac-lan.net/.well-known/hiragana/hira_229_pe.png'],
+		['ぽ', 'https://tac-lan.net/.well-known/hiragana/hira_230_po.png'],
+		['ぁ', 'https://tac-lan.net/.well-known/hiragana/hira_301_la.png'],
+		['ぃ', 'https://tac-lan.net/.well-known/hiragana/hira_302_li.png'],
+		['ぅ', 'https://tac-lan.net/.well-known/hiragana/hira_303_lu.png'],
+		['ぇ', 'https://tac-lan.net/.well-known/hiragana/hira_304_le.png'],
+		['ぉ', 'https://tac-lan.net/.well-known/hiragana/hira_305_lo.png'],
+		['っ', 'https://tac-lan.net/.well-known/hiragana/hira_318_ltu.png'],
+		['ゃ', 'https://tac-lan.net/.well-known/hiragana/hira_336_lya.png'],
+		['ゅ', 'https://tac-lan.net/.well-known/hiragana/hira_338_lyu.png'],
+		['ょ', 'https://tac-lan.net/.well-known/hiragana/hira_340_lyo.png'],
+		['0', 'https://tac-lan.net/.well-known/hiragana/hira_400_0.png'],
+		['1', 'https://tac-lan.net/.well-known/hiragana/hira_401_1.png'],
+		['2', 'https://tac-lan.net/.well-known/hiragana/hira_402_2.png'],
+		['3', 'https://tac-lan.net/.well-known/hiragana/hira_403_3.png'],
+		['4', 'https://tac-lan.net/.well-known/hiragana/hira_404_4.png'],
+		['5', 'https://tac-lan.net/.well-known/hiragana/hira_405_5.png'],
+		['6', 'https://tac-lan.net/.well-known/hiragana/hira_406_6.png'],
+		['7', 'https://tac-lan.net/.well-known/hiragana/hira_407_7.png'],
+		['8', 'https://tac-lan.net/.well-known/hiragana/hira_408_8.png'],
+		['9', 'https://tac-lan.net/.well-known/hiragana/hira_409_9.png'],
+		['!', 'https://tac-lan.net/.well-known/hiragana/hira_410_excl.png'],
+		['&', 'https://tac-lan.net/.well-known/hiragana/hira_411_and.png'],
+		['-', 'https://tac-lan.net/.well-known/hiragana/hira_412_hyph.png'],
+		['?', 'https://tac-lan.net/.well-known/hiragana/hira_413_ques.png'],
+		['、', 'https://tac-lan.net/.well-known/hiragana/hira_420_ten.png'],
+		['。', 'https://tac-lan.net/.well-known/hiragana/hira_421_maru.png'],
+		['・', 'https://tac-lan.net/.well-known/hiragana/hira_422_naka.png'],
+		['～', 'https://tac-lan.net/.well-known/hiragana/hira_423_kara.png'],
+	];
+	let content: string = '';
+	const emojitaglist = new Map<string, string>();
+	for (const w of text) {
+		let addword = w;
+		for (const [word, url] of table) {
+			if (w === word) {
+				const m = url.match(/https:\/\/tac-lan\.net\/\.well-known\/hiragana\/(.+)\.png/);
+				const tagword = m?.at(1) ?? '';
+				addword = `:${tagword}:`;
+				emojitaglist.set(tagword, url);
+				break;
+			}
+		}
+		content += addword;
+	}
+	const emoji_tags: string[][] = [];
+	for (const [k, v] of emojitaglist) {
+		emoji_tags.push(['emoji', k, v]);
+	}
+	return [content, [...getTagsReply(event), ...emoji_tags]];
+};
+
 const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
@@ -824,7 +956,7 @@ const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, str
 	tags = getTagsQuote(event);
 	tags.push(['p', pubkey_reply, '']);
 	return [content, tags];
-}
+};
 
 const res_news = async (event: NostrEvent): Promise<[string, string[][]]> => {
 	let content: string;
