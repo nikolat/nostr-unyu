@@ -77,8 +77,8 @@ export default async function (request: VercelRequest, response: VercelResponse)
 	const newEvent: VerifiedEvent = signer.finishEvent(baseEvent);
 	const url = 'https://nostr-webhook.compile-error.net/post';
 	const res = await fetch(url, {
+		method: 'POST',
 		headers: {
-			method: 'POST',
 			Authorization: 'Basic ' + btoa(auth),
 			'Content-Type': 'application/json',
 		},
