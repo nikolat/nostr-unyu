@@ -1,5 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { type NostrEvent, SimplePool, nip19, nip57, useWebSocketImplementation } from 'nostr-tools';
+import type { NostrEvent } from 'nostr-tools/pure';
+import { SimplePool, useWebSocketImplementation } from 'nostr-tools/pool';
+import * as nip19 from 'nostr-tools/nip19';
+import * as nip57 from 'nostr-tools/nip57';
 import { Signer } from '../src/utils.js';
 import WebSocket from 'ws';
 useWebSocketImplementation(WebSocket);
