@@ -1,7 +1,17 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { EventTemplate, VerifiedEvent } from 'nostr-tools/pure';
+import { SimplePool, useWebSocketImplementation } from 'nostr-tools/pool';
 import * as nip19 from 'nostr-tools/nip19';
 import { Signer } from '../src/utils.js';
+import WebSocket from 'ws';
+useWebSocketImplementation(WebSocket);
+
+const defaultRelays = [
+	'wss://relay-jp.nostr.wirednet.jp',
+	'wss://relay.nostr.wirednet.jp',
+	'wss://yabu.me',
+	'wss://nostr-relay.nokotaro.com',
+];
 
 export default async function (request: VercelRequest, response: VercelResponse) {
 	if (request.method !== 'GET') {
@@ -75,14 +85,8 @@ export default async function (request: VercelRequest, response: VercelResponse)
 		content,
 	};
 	const newEvent: VerifiedEvent = signer.finishEvent(baseEvent);
-	const url = 'https://nostr-webhook.compile-error.net/post';
-	const res = await fetch(url, {
-		method: 'POST',
-		headers: {
-			Authorization: 'Basic ' + btoa(auth),
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(newEvent),
-	})
-	return response.status(200).send(await res.text());
+	const pool = new SimplePool();
+	await Promise.any(pool.publish(defaultRelays, newEvent));
+
+	return response.status(204).send('');
 };
