@@ -28,11 +28,6 @@ export default async function (request: VercelRequest, response: VercelResponse)
 	}
 	const seckey = dr.data;
 	const signer = new Signer(seckey);
-	//リレー送信用認証パス
-	const auth = process.env.NOSTR_WEBHOOK_AUTH;
-	if (auth === undefined) {
-		return response.status(500).json({ error: 'NOSTR_WEBHOOK_AUTH is undefined' });
-	}
 
 	//クエリを解析
 	const { id = null, note = null, nevent = null, pubkey = null, npub = null, kind = null, content = '⭐' } = request.query;
