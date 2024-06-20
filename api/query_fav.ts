@@ -14,8 +14,8 @@ const defaultRelays = [
 ];
 
 export default async function (request: VercelRequest, response: VercelResponse) {
-	if (request.method !== 'GET') {
-		return response.status(405).setHeader('Allow', 'GET').end('Method Not Allowed');
+	if (request.method !== 'POST') {
+		return response.status(405).setHeader('Allow', 'POST').end('Method Not Allowed');
 	}
 	//署名用インスタンスを準備
 	const nsec = process.env.NOSTR_PRIVATE_KEY;
