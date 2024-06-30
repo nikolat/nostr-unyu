@@ -1179,7 +1179,7 @@ const res_don = (event: NostrEvent): [string, string[][]] => {
 const res_maguro = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
-	const note = 'note14pcdgkgz2teu2q9zd8nvlfayqa7awl07tejp6zpvgtum5jayc2hsfvzwpf';
+	const note = 'note19ajxhqjvhqmvh56n6c6jdlwavrq5zhc84u6ffg06p4lu0glhem3sptg80h';
 	content = `nostr:${note}`;
 	const quoteTag = event.kind === 1 ? ['q', nip19.decode(note).data] : ['e', nip19.decode(note).data, '', 'mention'];
 	tags = [...getTagsReply(event), quoteTag];
