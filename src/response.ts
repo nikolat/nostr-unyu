@@ -1261,9 +1261,10 @@ const res_ukagakamin = (event: NostrEvent): [string, string[][]] => {
 const res_imadonnakanji = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
+	const npub_wordcloud = 'npub14htwadwsnle0d227mptfy6r7pcwl7scs3dhwvnmagd8u7s5rg6vslde86r';
 	const url1 = 'https://sns.uwith.net/';
-	content = url1;
-	tags = [...getTagsReply(event), ['r', url1]];
+	content = `nostr:${npub_wordcloud} どんな感じや？\n${url1}`;
+	tags = [...getTagsReply(event), ['p', nip19.decode(npub_wordcloud).data, ''], ['r', url1]];
 	return [content, tags];
 };
 
