@@ -230,6 +230,7 @@ const mode_reply = async (event: NostrEvent, signer: Signer): Promise<[string, n
 const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 	const reactionmap: [RegExp, string][] = [
 		[/虚無/, ''],
+		[/マイナス|まいなす|dislike|downvote/i, '-'],
 		[/さくら/, ':uka_sakurah00:'],
 		[/ぎゅうにゅう|とうにゅう/, '🥛'],
 		[/こうにゅう/, '💸'],
