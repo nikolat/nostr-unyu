@@ -135,6 +135,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/あけおめ|あけまして|ことよろ/, res_akeome],
 		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
+		[/(るみるみ|ルミルミ|lumilumi|もの(さん)?のクライアント)(を?呼んで|どこ).?$/ui, res_lumilumi],
 		[/検索(を?呼んで|どこ).?$/u, res_kensaku],
 		[/麻雀(を?呼んで|どこ).?$/u, res_mahojng],
 		[/(パブ|ぱぶ)(リック)?(チャ|ちゃ|茶)(ット)?(を?呼んで|どこ).?$/u, res_pabucha],
@@ -1102,6 +1103,15 @@ const res_otoshidama = (event: NostrEvent): [string, string[][]] => {
 
 const res_gyunyu = (event: NostrEvent): [string, string[][]] => {
 	return [any(['牛乳は健康にええで🥛', 'カルシウム補給せぇ🥛', 'ワイの奢りや🥛']), getTagsReply(event)];
+};
+
+const res_lumilumi = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://lumilumi.vercel.app/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
 };
 
 const res_kensaku = (event: NostrEvent): [string, string[][]] => {
