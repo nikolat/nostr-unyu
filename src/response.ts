@@ -141,6 +141,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/(パブ|ぱぶ)(リック)?(チャ|ちゃ|茶)(ット)?(を?呼んで|どこ).?$/u, res_pabucha],
 		[/(じゃんけん|ジャンケン|淀川(さん)?)(を?呼んで|どこ).?$/u, res_janken],
 		[/(しりとり|しりとリレー)(を?呼んで|どこ).?$/u, res_shiritoridoko],
+		[/(status|ステータス).*(を?呼んで|どこ).?$/ui, res_status],
 		[/やぶみ(ちゃ)?ん?(を?呼んで|どこ).?$/u, res_yabumin],
 		[/ぬるぽが?(を?呼んで|どこ).?$/u, res_nurupoga],
 		[/うにゅう(を?呼んで|どこ).?$/u, res_unyu],
@@ -1160,6 +1161,15 @@ const res_shiritoridoko = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const url = 'https://srtrelay.c-stellar.net/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
+};
+
+const res_status = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://nostatus.vercel.app/';
 	content = url;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
