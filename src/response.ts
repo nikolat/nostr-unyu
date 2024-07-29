@@ -36,7 +36,7 @@ const selectResponse = async (event: NostrEvent, mode: Mode, signer: Signer): Pr
 	if (!isAllowedToPost(event)) {
 		return null;
 	}
-	let res;
+	let res: EventTemplate | null;
 	switch (mode) {
 		case Mode.Normal:
 			res = await mode_normal(event, signer);
@@ -50,19 +50,7 @@ const selectResponse = async (event: NostrEvent, mode: Mode, signer: Signer): Pr
 		default:
 			throw new TypeError(`unknown mode: ${mode}`);
 	}
-	if (res === null) {
-		return null;
-	}
-	let created_at_res = event.created_at + 1
-	if (/未来/.test(event.content)) {
-		const match = event.content.match(/\d+/);
-		if (match !== null) {
-			created_at_res = event.created_at + parseInt(match[0]);
-		}
-	}
-	const [content, kind, tags, created_at] = [...res, created_at_res];
-	const unsignedEvent: EventTemplate = { kind, tags, content, created_at };
-	return unsignedEvent;
+	return res;
 };
 
 const isAllowedToPost = (event: NostrEvent) => {
@@ -165,7 +153,6 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
 		[/伺か/, res_ukagaka],
-		[/未来/, res_mirai],
 		[/[呼よ](んだだけ|んでみた)|(何|なん)でもない/, res_yondadake],
 		[/ヘルプ|へるぷ|help|(助|たす)けて|(教|おし)えて|手伝って/i, res_help],
 		[/すき|好き|愛してる|あいしてる/, res_suki],
@@ -186,7 +173,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 	}
 };
 
-const mode_normal = async (event: NostrEvent, signer: Signer): Promise<[string, number, string[][]] | null> => {
+const mode_normal = async (event: NostrEvent, signer: Signer): Promise<EventTemplate | null> => {
 	//自分への話しかけはreplyで対応する
 	//自分以外に話しかけている場合は割り込まない
 	if (event.tags.some(tag => tag.length >= 2 && (tag[0] === 'p'))) {
@@ -204,13 +191,13 @@ const mode_normal = async (event: NostrEvent, signer: Signer): Promise<[string, 
 				return null;
 			}
 			const [content, tags] = res;
-			return [content, event.kind, tags];
+			return {content, kind: event.kind, tags, created_at: event.created_at + 1};
 		}
 	}
 	return null;
 };
 
-const mode_reply = async (event: NostrEvent, signer: Signer): Promise<[string, number, string[][]] | null> => {
+const mode_reply = async (event: NostrEvent, signer: Signer): Promise<EventTemplate | null> => {
 	const resmap = getResmap(Mode.Reply);
 	for (const [reg, func] of resmap) {
 		if (reg.test(event.content)) {
@@ -219,24 +206,37 @@ const mode_reply = async (event: NostrEvent, signer: Signer): Promise<[string, n
 				return null;
 			}
 			const [content, tags] = res;
-			return [content, event.kind, tags];
+			return {content, kind: event.kind, tags, created_at: event.created_at + 1};
 		}
 	}
 	let content;
 	let tags;
+	let created_at_res = event.created_at + 1
 	if (event.tags.some(tag => tag[0] === 't' && tag[1] === 'ぬるぽが生成画像')) {
 		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 		content = `${any(['上手やな', '上手いやん', 'ワイの方が上手いな'])}\nnostr:${quote}`;
 		tags = getTagsQuote(event);
 	}
+	else if (/未来/.test(event.content)) {
+		const match = event.content.match(/\d+/);
+		if (match !== null) {
+			content = `${match[0]}秒後からのリプライやで`;
+			tags = getTagsReply(event);
+			created_at_res = event.created_at + parseInt(match[0]);
+		}
+		else {
+			content = '秒数を指定せえ';
+			tags = getTagsReply(event);
+		}
+	}
 	else {
 		content = 'えんいー';
 		tags = getTagsAirrep(event);
 	}
-	return [content, event.kind, tags];
+	return {content, kind: event.kind, tags, created_at: created_at_res};
 };
 
-const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
+const mode_fav = (event: NostrEvent): EventTemplate | null => {
 	const reactionmap: [RegExp, string][] = [
 		[/虚無/, ''],
 		[/マイナス|まいなす|dislike|downvote/i, '-'],
@@ -264,7 +264,7 @@ const mode_fav = (event: NostrEvent): [string, number, string[][]] | null => {
 			else if (content === ':uka_sakurah00:') {
 				tags.push(['emoji', 'uka_sakurah00', 'https://ukadon-cdn.de10.moe/system/custom_emojis/images/000/006/840/original/uka_sakurah00.png']);
 			}
-			return [content, kind, tags];
+			return {content, kind, tags, created_at: event.created_at + 1};
 		}
 	}
 	return null;
@@ -1323,16 +1323,6 @@ const res_ukagaka = (event: NostrEvent): [string, string[][]] => {
 		+ `UKADOC(伺か公式仕様書)\n${url3}\nうかどん(Mastodon)\n${url4}\n伺か Advent Calendar 2023\n${url5}\n`
 		+ `ゴーストキャプターさくら(RSS bot)\n${account1}\nうかフィード(RSS bot)\n${account2}`;
 	tags = [...getTagsReply(event), ['r', url1], ['r', url2], ['r', url3], ['r', url4], ['r', url5]];
-	return [content, tags];
-};
-
-const res_mirai = (event: NostrEvent): [string, string[][]] => {
-	const match = event.content.match(/\d+/);
-	if (match === null) {
-    return ['秒数を指定せえ', getTagsReply(event)];
-	}
-	const content = `${match[0]}秒後からのリプライやで`;
-	const tags = getTagsReply(event);
 	return [content, tags];
 };
 
