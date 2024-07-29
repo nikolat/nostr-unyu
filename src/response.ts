@@ -237,6 +237,10 @@ const mode_reply = async (event: NostrEvent, signer: Signer): Promise<EventTempl
 };
 
 const mode_fav = (event: NostrEvent): EventTemplate | null => {
+	const rTag = event.tags.find(tag => tag.length >= 2 && tag[0] === 'r' && URL.canParse(tag[1]));
+	if (rTag !== undefined) {
+		return {content: '⭐', kind: 17, tags: [rTag], created_at: event.created_at + 1};
+	}
 	const reactionmap: [RegExp, string][] = [
 		[/虚無/, ''],
 		[/マイナス|まいなす|dislike|downvote/i, '-'],
