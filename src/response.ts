@@ -53,7 +53,14 @@ const selectResponse = async (event: NostrEvent, mode: Mode, signer: Signer): Pr
 	if (res === null) {
 		return null;
 	}
-	const [content, kind, tags, created_at] = [...res, event.created_at + 1];
+	let created_at_res = event.created_at + 1
+	if (/未来/.test(event.content)) {
+		const match = event.content.match(/\d+/);
+		if (match !== null) {
+			created_at_res = event.created_at + parseInt(match[0]);
+		}
+	}
+	const [content, kind, tags, created_at] = [...res, created_at_res];
 	const unsignedEvent: EventTemplate = { kind, tags, content, created_at };
 	return unsignedEvent;
 };
@@ -158,6 +165,7 @@ const getResmap = (mode: Mode): [RegExp, (event: NostrEvent, mode: Mode, regstr:
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
 		[/伺か/, res_ukagaka],
+		[/未来/, res_mirai],
 		[/[呼よ](んだだけ|んでみた)|(何|なん)でもない/, res_yondadake],
 		[/ヘルプ|へるぷ|help|(助|たす)けて|(教|おし)えて|手伝って/i, res_help],
 		[/すき|好き|愛してる|あいしてる/, res_suki],
@@ -1315,6 +1323,16 @@ const res_ukagaka = (event: NostrEvent): [string, string[][]] => {
 		+ `UKADOC(伺か公式仕様書)\n${url3}\nうかどん(Mastodon)\n${url4}\n伺か Advent Calendar 2023\n${url5}\n`
 		+ `ゴーストキャプターさくら(RSS bot)\n${account1}\nうかフィード(RSS bot)\n${account2}`;
 	tags = [...getTagsReply(event), ['r', url1], ['r', url2], ['r', url3], ['r', url4], ['r', url5]];
+	return [content, tags];
+};
+
+const res_mirai = (event: NostrEvent): [string, string[][]] => {
+	const match = event.content.match(/\d+/);
+	if (match === null) {
+    return ['秒数を指定せえ', getTagsReply(event)];
+	}
+	const content = `${match[0]}秒後からのリプライやで`;
+	const tags = getTagsReply(event);
 	return [content, tags];
 };
 
