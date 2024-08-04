@@ -3,7 +3,7 @@ import mb_strwidth from './mb_strwidth.js';
 import Parser from 'rss-parser';
 import { hexToBytes } from '@noble/hashes/utils';
 import type { Filter } from 'nostr-tools/filter';
-import type { EventTemplate, NostrEvent, VerifiedEvent } from 'nostr-tools/pure';
+import { verifyEvent, type EventTemplate, type NostrEvent, type VerifiedEvent } from 'nostr-tools/pure';
 import * as nip19 from 'nostr-tools/nip19';
 import { nip47 } from 'nostr-tools';
 import * as nip57 from 'nostr-tools/nip57';
@@ -47,6 +47,9 @@ const selectResponse = async (event: NostrEvent, mode: Mode, signer: Signer): Pr
 		case Mode.Fav:
 			res = mode_fav(event);
 			break;
+		case Mode.Zap:
+			res = await mode_zap(event, signer);
+			break;
 		default:
 			throw new TypeError(`unknown mode: ${mode}`);
 	}
@@ -81,6 +84,9 @@ const isAllowedToPost = (event: NostrEvent) => {
 		else {
 			throw new TypeError('root is not found');
 		}
+	}
+	else if (event.kind === 9735) {
+		return true;
 	}
 	throw new TypeError(`kind ${event.kind} is not supported`);
 };
@@ -274,6 +280,62 @@ const mode_fav = (event: NostrEvent): EventTemplate | null => {
 	return null;
 };
 
+const mode_zap = async (event: NostrEvent, signer: Signer): Promise<EventTemplate | null> => {
+	//kind9734の検証
+	let event9734;
+	try {
+		event9734 = JSON.parse(event.tags.find(tag => tag.length >= 2 && tag[0] === 'description')?.at(1) ?? '{}');
+	} catch (error) {
+		return null;
+	}
+	if (!verifyEvent(event9734)) {
+		return null;
+	}
+	//kind9735の検証
+	const evKind0 = await getKind0(signer.getPublicKey());
+	if (evKind0 === undefined) {
+		throw Error('Cannot get kind 0 event');
+	}
+	const lud16: string = JSON.parse(evKind0.content).lud16;
+	const m = lud16.match(/^([^@]+)@([^@]+)$/);
+	if (m === null) {
+		return null;
+	}
+	const url = `https://${m[2]}/.well-known/lnurlp/${m[1]}`;
+	const response = await fetch(url);
+	const json: any = await response.json();
+	const nostrPubkey: string = json.nostrPubkey;
+	if (!nostrPubkey) {
+		return null;
+	}
+	if (event.pubkey !== nostrPubkey) {
+		return {
+			content: '偽物のZapが飛んできたみたいやね',
+			kind: 1,
+			tags: [],
+			created_at: event.created_at + 1
+		};
+	}
+	const amount = event9734.tags.find(tag => tag.length >= 2 && tag[0] === 'amount')?.at(1);
+	if (amount === undefined || !/^\d+$/.test(amount)) {
+		return null;
+	}
+	if (parseInt(amount) < 39 * 1000) {
+		return null;
+	}
+	try {
+		await zapByNIP47(event9734, signer, 39, 'ありがとさん');
+	} catch (error) {
+		return null;
+	}
+	return {
+		content: 'Zapありがとさん',
+		kind: 1,
+		tags: [],
+		created_at: event.created_at + 1
+	};
+};
+
 const res_zaptest = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer): Promise<[string, string[][]]> => {
 	const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
 	if (event.pubkey !== nip19.decode(npub_don).data) {
@@ -353,7 +415,7 @@ const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapCo
 	const amount = sats * 1000;
 	const zapRequest = nip57.makeZapRequest({
 		profile: event.pubkey,
-		event: event.id,
+		event: event.kind == 9734 ? null : event.id,
 		amount,
 		comment: zapComment,
 		relays: defaultRelays,

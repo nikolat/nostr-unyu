@@ -6,6 +6,7 @@ export const enum Mode {
 	Normal,
 	Reply,
 	Fav,
+	Zap,
 };
 
 export const buffer = async (readable: Readable) => {
