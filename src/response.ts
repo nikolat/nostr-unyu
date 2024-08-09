@@ -1498,6 +1498,7 @@ const res_unyupic = (event: NostrEvent): [string, string[][]] => {
 		'note1q6hv8lxjxt0kdynq6ncheg8q3qn77v4s5j9w6tp6ew2wncqtuz0su6jzla',
 		'note15plknvq2pfeg08gv3wprvry640xuejkd2e8vkgp9crkzpd45yuusgx4hvd',
 		'note1qx4sz2gzqu6l5tshngcfuqpvevckf8ycwcrwr32zltj457sjc96qdm7p0z',
+		'note19ydvh7wnaxcadec2xle8z4h9vzsgvnq2cncspzgwraz7uk5j8v3s739syz',
 	];
 	const note = any(notes);
 	const dr = nip19.decode(note);
