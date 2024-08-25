@@ -4,10 +4,10 @@ import { assert } from 'chai';
 import {
   generateSecretKey,
   getPublicKey,
-  type Event as NostrEvent,
-} from 'nostr-tools';
-import { Mode, Signer } from '../src/utils.ts';
-import { getResponseEvent } from '../src/response.ts';
+  type NostrEvent,
+} from 'nostr-tools/pure';
+import { Mode, Signer } from '../src/utils.js';
+import { getResponseEvent } from '../src/response.js';
 
 it('get response with JSON file', async () => {
   const sk = generateSecretKey();
@@ -26,7 +26,8 @@ it('get response with JSON file', async () => {
     contents: ['ええで', 'ええんやで', 'あかんに決まっとるやろ'],
     tags: [
       ...event.tags.filter(
-        (tag) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
+        (tag: string[]) =>
+          tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
       ),
       ['e', event.id, '', 'mention'],
     ],

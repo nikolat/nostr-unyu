@@ -85,7 +85,9 @@ const isAllowedToPost = (event: NostrEvent) => {
   }
   const disallowedTags = ['content-warning', 'proxy'];
   if (
-    event.tags.some((tag) => tag.length >= 1 && disallowedTags.includes(tag[0]))
+    event.tags.some(
+      (tag: string[]) => tag.length >= 1 && disallowedTags.includes(tag[0]),
+    )
   ) {
     return false;
   }
@@ -93,7 +95,7 @@ const isAllowedToPost = (event: NostrEvent) => {
     return true;
   } else if (event.kind === 42) {
     const tagRoot = event.tags.find(
-      (tag) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
+      (tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
     );
     if (tagRoot !== undefined) {
       return allowedChannel.includes(tagRoot[1]);
@@ -243,7 +245,7 @@ const mode_normal = async (
 ): Promise<EventTemplate | null> => {
   //自分への話しかけはreplyで対応する
   //自分以外に話しかけている場合は割り込まない
-  if (event.tags.some((tag) => tag.length >= 2 && tag[0] === 'p')) {
+  if (event.tags.some((tag: string[]) => tag.length >= 2 && tag[0] === 'p')) {
     return null;
   }
   //自分への話しかけはreplyで対応する
@@ -295,7 +297,9 @@ const mode_reply = async (
   let tags;
   let created_at_res = event.created_at + 1;
   if (
-    event.tags.some((tag) => tag[0] === 't' && tag[1] === 'ぬるぽが生成画像')
+    event.tags.some(
+      (tag: string[]) => tag[0] === 't' && tag[1] === 'ぬるぽが生成画像',
+    )
   ) {
     const quote =
       event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
@@ -320,7 +324,8 @@ const mode_reply = async (
 
 const mode_fav = (event: NostrEvent): EventTemplate | null => {
   const rTag = event.tags.find(
-    (tag) => tag.length >= 2 && tag[0] === 'r' && URL.canParse(tag[1]),
+    (tag: string[]) =>
+      tag.length >= 2 && tag[0] === 'r' && URL.canParse(tag[1]),
   );
   if (rTag !== undefined) {
     return {
@@ -379,7 +384,7 @@ const mode_zap = async (
   try {
     event9734 = JSON.parse(
       event.tags
-        .find((tag) => tag.length >= 2 && tag[0] === 'description')
+        .find((tag: string[]) => tag.length >= 2 && tag[0] === 'description')
         ?.at(1) ?? '{}',
     );
   } catch (error) {
@@ -414,7 +419,7 @@ const mode_zap = async (
     };
   }
   const amount = event9734.tags
-    .find((tag) => tag.length >= 2 && tag[0] === 'amount')
+    .find((tag: string[]) => tag.length >= 2 && tag[0] === 'amount')
     ?.at(1);
   if (amount === undefined || !/^\d+$/.test(amount)) {
     return null;
@@ -536,7 +541,8 @@ const zapByNIP47 = async (
   ) {
     //10分以内に誰かからZapをもらっている
     const evKind9734 = JSON.parse(
-      lastZap.tags.find((tag) => tag[0] === 'description')?.at(1) ?? '{}',
+      lastZap.tags.find((tag: string[]) => tag[0] === 'description')?.at(1) ??
+        '{}',
     );
     if (evKind9734.pubkey === signer.getPublicKey()) {
       //自分からのZap
@@ -1260,7 +1266,7 @@ const res_okutte = (
   if (dr.type !== 'npub') {
     throw new TypeError(`${npub_reply} is not npub`);
   }
-  const pubkey_reply = dr.data;
+  const pubkey_reply: string = dr.data;
   const gift = match[3];
   const quote =
     event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
@@ -2045,7 +2051,7 @@ const res_fire = (
   }
   const text = match[2].trim();
   const emoji_tags = event.tags.filter(
-    (tag) => tag.length >= 3 && tag[0] === 'emoji',
+    (tag: string[]) => tag.length >= 3 && tag[0] === 'emoji',
   );
   tags = [...getTags(event, mode), ...emoji_tags];
   if (/(潰して|縮めて)[^るた]?$/u.test(event.content)) {
@@ -2084,15 +2090,15 @@ const res_fire = (
   } else if (/積んで[^るた]?$/u.test(event.content)) {
     content = `${text}\n`.repeat(3);
   } else {
-    const emoji_words = emoji_tags.map((tag) => `:${tag[1]}:`);
+    const emoji_words = emoji_tags.map((tag: string[]) => `:${tag[1]}:`);
     const str = emoji_words.reduce(
-      (accumulator, currentValue) =>
+      (accumulator: string, currentValue: string) =>
         accumulator.replaceAll(currentValue, '_'.repeat(2)),
       text,
     );
     const lines_l = str.split(/\r\n|\r|\n/);
     const count = lines_l.reduce(
-      (accumulator, currentValue) =>
+      (accumulator: number, currentValue: string) =>
         Math.max(accumulator, mb_strwidth(currentValue)),
       0,
     );
@@ -2152,7 +2158,7 @@ const res_fire = (
       const lines = text.split(/\r\n|\r|\n/);
       for (const line of lines) {
         const str = emoji_words.reduce(
-          (accumulator, currentValue) =>
+          (accumulator: string, currentValue: string) =>
             accumulator.replaceAll(currentValue, '_'.repeat(2)),
           line,
         );
@@ -2165,7 +2171,7 @@ const res_fire = (
       const lines = text.split(/\r\n|\r|\n/);
       for (const line of lines) {
         const str = emoji_words.reduce(
-          (accumulator, currentValue) =>
+          (accumulator: string, currentValue: string) =>
             accumulator.replaceAll(currentValue, '_'.repeat(2)),
           line,
         );
@@ -2194,7 +2200,7 @@ const getTagsAirrep = (event: NostrEvent): string[][] => {
     return [['e', event.id, '', 'mention']];
   } else if (event.kind === 42) {
     const tagRoot = event.tags.find(
-      (tag) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
+      (tag: string[]) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
     );
     if (tagRoot !== undefined) {
       return [tagRoot, ['e', event.id, '', 'mention']];
@@ -2208,7 +2214,7 @@ const getTagsAirrep = (event: NostrEvent): string[][] => {
 const getTagsReply = (event: NostrEvent): string[][] => {
   const tagsReply: string[][] = [];
   const tagRoot = event.tags.find(
-    (tag) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
+    (tag: string[]) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
   );
   if (tagRoot !== undefined) {
     tagsReply.push(tagRoot);
@@ -2217,7 +2223,8 @@ const getTagsReply = (event: NostrEvent): string[][] => {
     tagsReply.push(['e', event.id, '', 'root']);
   }
   for (const tag of event.tags.filter(
-    (tag) => tag.length >= 2 && tag[0] === 'p' && tag[1] !== event.pubkey,
+    (tag: string[]) =>
+      tag.length >= 2 && tag[0] === 'p' && tag[1] !== event.pubkey,
   )) {
     tagsReply.push(tag);
   }
@@ -2230,7 +2237,7 @@ const getTagsQuote = (event: NostrEvent): string[][] => {
     return [['q', event.id]];
   } else if (event.kind === 42) {
     const tagRoot = event.tags.find(
-      (tag) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
+      (tag: string[]) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
     );
     if (tagRoot !== undefined) {
       return [tagRoot, ['e', event.id, '', 'mention']];
@@ -2244,7 +2251,7 @@ const getTagsQuote = (event: NostrEvent): string[][] => {
 const getTagsFav = (event: NostrEvent): string[][] => {
   const tagsFav: string[][] = [
     ...event.tags.filter(
-      (tag) =>
+      (tag: string[]) =>
         tag.length >= 2 &&
         (tag[0] === 'e' || (tag[0] === 'p' && tag[1] !== event.pubkey)),
     ),

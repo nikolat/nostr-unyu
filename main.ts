@@ -1,8 +1,8 @@
 //curl -X POST -H "Content-Type: application/json" -d @test/fixtures/input.json https://nostr-unyu.vercel.app/api/normal
 import * as fs from 'node:fs/promises';
-import { generateSecretKey, type NostrEvent } from 'nostr-tools';
-import { Mode, Signer } from './src/utils.ts';
-import { getResponseEvent } from './src/response.ts';
+import { generateSecretKey, type NostrEvent } from 'nostr-tools/pure';
+import { Mode, Signer } from './src/utils.js';
+import { getResponseEvent } from './src/response.js';
 
 const main = async () => {
   const text = await fs.readFile('./test/fixtures/input.json', {
