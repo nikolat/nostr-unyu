@@ -1520,10 +1520,12 @@ const res_kensaku = (event: NostrEvent): [string, string[][]] => {
 const res_mahojng = (event: NostrEvent): [string, string[][]] => {
   const nevent =
     'nevent1qvzqqqqq9qqzpjx4cfcf54ns6mmzrtyqyzkrun7rq4ayjcdp2vvl0sypsvy5qaerqcwu9c'; //Nostr麻雀開発部
-  const content = `nostr:${nevent}`;
+  const url_chiihou = 'https://nikolat.github.io/chiihou/';
+  const content = `nostr:${nevent}\n${url_chiihou}`;
   const tags = [
     ...getTagsReply(event),
     ['e', nip19.decode(nevent).data.id, '', 'mention'],
+    ['r', url_chiihou],
   ];
   return [content, tags];
 };
