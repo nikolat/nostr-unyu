@@ -250,7 +250,9 @@ const mode_normal = async (
   }
   //自分への話しかけはreplyで対応する
   if (
-    /^(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)/.test(event.content)
+    /^(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)/.test(
+      event.content,
+    )
   ) {
     return null;
   }
@@ -336,6 +338,7 @@ const mode_fav = (event: NostrEvent): EventTemplate | null => {
     };
   }
   const reactionmap: [RegExp, string][] = [
+    [/うにゅうも.*そう(思|おも)う/, any(['🙂‍↕', '🙂‍↔'])],
     [/虚無/, ''],
     [/マイナス|まいなす|dislike|downvote/i, '-'],
     [/さくら/, ':uka_sakurah00:'],
