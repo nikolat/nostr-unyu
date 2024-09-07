@@ -2205,7 +2205,7 @@ const getTagsAirrep = (event: NostrEvent): string[][] => {
     return [['e', event.id, '', 'mention']];
   } else if (event.kind === 42) {
     const tagRoot = event.tags.find(
-      (tag: string[]) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
+      (tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
     );
     if (tagRoot !== undefined) {
       return [tagRoot, ['e', event.id, '', 'mention']];
@@ -2219,7 +2219,7 @@ const getTagsAirrep = (event: NostrEvent): string[][] => {
 const getTagsReply = (event: NostrEvent): string[][] => {
   const tagsReply: string[][] = [];
   const tagRoot = event.tags.find(
-    (tag: string[]) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
+    (tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
   );
   if (tagRoot !== undefined) {
     tagsReply.push(tagRoot);
@@ -2242,7 +2242,7 @@ const getTagsQuote = (event: NostrEvent): string[][] => {
     return [['q', event.id]];
   } else if (event.kind === 42) {
     const tagRoot = event.tags.find(
-      (tag: string[]) => tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
+      (tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
     );
     if (tagRoot !== undefined) {
       return [tagRoot, ['e', event.id, '', 'mention']];
