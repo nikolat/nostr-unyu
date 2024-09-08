@@ -27,7 +27,7 @@ it('get response with JSON file', async () => {
     tags: [
       ...event.tags.filter(
         (tag: string[]) =>
-          tag.length >= 3 && tag[0] === 'e' && tag[3] === 'root',
+          tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
       ),
       ['e', event.id, '', 'mention'],
     ],
