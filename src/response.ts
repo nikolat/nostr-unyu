@@ -338,7 +338,7 @@ const mode_fav = (event: NostrEvent): EventTemplate | null => {
     };
   }
   const reactionmap: [RegExp, string][] = [
-    [/うにゅうも.*そう(思|おも)う/, any(['🙂‍↕', '🙂‍↔'])],
+    [/うにゅうも.*よ[なね]/, any(['🙂‍↕', '🙂‍↔'])],
     [/虚無/, ''],
     [/マイナス|まいなす|dislike|downvote/i, '-'],
     [/さくら/, ':uka_sakurah00:'],
