@@ -66,6 +66,14 @@ const selectResponse = async (
     default:
       throw new TypeError(`unknown mode: ${mode}`);
   }
+  if (res !== null && isNsecPost(event)) {
+    return {
+      content: 'お前……秘密鍵を漏らすのは……あかんに決まっとるやろ！！',
+      kind: event.kind,
+      tags: getTags(event, mode),
+      created_at: event.created_at + 1,
+    };
+  }
   return res;
 };
 
@@ -106,6 +114,10 @@ const isAllowedToPost = (event: NostrEvent) => {
     return true;
   }
   throw new TypeError(`kind ${event.kind} is not supported`);
+};
+
+const isNsecPost = (event: NostrEvent) => {
+  return /nsec1\w{5,58}/.test(event.content);
 };
 
 const getResmap = (
