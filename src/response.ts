@@ -63,6 +63,9 @@ const selectResponse = async (
     case Mode.Zap:
       res = await mode_zap(event, signer);
       break;
+    case Mode.Delete:
+      res = await mode_delete(event);
+      break;
     default:
       throw new TypeError(`unknown mode: ${mode}`);
   }
@@ -472,6 +475,23 @@ const res_zaptest = async (
     return ['何か失敗したみたいやで', getTagsReply(event)];
   }
   return ['1sat届いたはずやで', getTagsReply(event)];
+};
+
+const mode_delete = async (
+  event: NostrEvent,
+): Promise<EventTemplate | null> => {
+  const ids = event.tags
+    .filter((tag) => tag.length >= 2 && tag[0] === 'q')
+    .map((tag) => tag[1]);
+  if (ids.length === 0) {
+    return null;
+  }
+  return {
+    content: '',
+    kind: 5,
+    tags: [...ids.map((id) => ['e', id])],
+    created_at: event.created_at + 1,
+  };
 };
 
 const res_ohayo = async (

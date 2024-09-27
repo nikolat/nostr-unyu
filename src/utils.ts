@@ -11,6 +11,7 @@ export const enum Mode {
   Reply,
   Fav,
   Zap,
+  Delete,
 }
 
 export const buffer = async (readable: Readable) => {
