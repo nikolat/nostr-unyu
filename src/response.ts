@@ -168,7 +168,7 @@ const getResmap = (
   ][] = [
     [/zapテスト$/i, res_zaptest],
     [/おはよ/, res_ohayo],
-    [/アルパカ|🦙/, res_arupaka],
+    [/アルパカ|🦙|ものパカ|モノパカ/, res_arupaka],
     [/画像生成/, res_gazouseisei],
     [/りとりん|つぎはなにから？/, res_ritorin],
     [/占って|占い/, res_uranai],
@@ -677,6 +677,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
   const LIMIT_HEIGHT = 30;
   const LIMIT_BODY = 5;
   let retry_max = 1;
+  const isMonopaka = /ものパカ|モノパカ/.test(event.content);
   if (/みじかい|短い/.test(event.content)) {
     retry_max = 0;
   } else if (/ながい|長い/.test(event.content)) {
@@ -688,7 +689,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
     }
   }
   let n = Math.min(
-    (event.content.match(/アルパカ|🦙/g) || []).length,
+    (event.content.match(/アルパカ|🦙|ものパカ|モノパカ/g) || []).length,
     LIMIT_BODY,
   );
   if (/-?\d+[匹体]/.test(event.content)) {
@@ -734,6 +735,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
   }
   const emoji = new Set<string>();
   const emoji_seigen = new Set<string>();
+  const emoji_mono = new Set<string>();
   //頭を上下左右にとりあえず動かしてみる
   while (true) {
     for (let i = 0; i < n; i++) {
@@ -886,16 +888,36 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
             k = 'kubipaca_kubi_hidarisita';
             break;
           case '↓■':
-            k = 'kubipaca_kao';
+            if (isMonopaka) {
+              k = 'monopaka';
+              emoji_mono.add(k);
+            } else {
+              k = 'kubipaca_kao';
+            }
             break;
           case '←■':
-            k = 'kubipaca_kao_migi';
+            if (isMonopaka) {
+              k = 'monopaka_r';
+              emoji_mono.add(k);
+            } else {
+              k = 'kubipaca_kao_migi';
+            }
             break;
           case '→■':
-            k = 'kubipaca_kao_hidari';
+            if (isMonopaka) {
+              k = 'monopaka_l';
+              emoji_mono.add(k);
+            } else {
+              k = 'kubipaca_kao_hidari';
+            }
             break;
           case '↑■':
-            k = 'kubipaca_kao_sakasa';
+            if (isMonopaka) {
+              k = 'monopaka_gyaku';
+              emoji_mono.add(k);
+            } else {
+              k = 'kubipaca_kao_sakasa';
+            }
             break;
           case 'bo':
             k = 'kubipaca_karada';
@@ -943,6 +965,11 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
       'emoji',
       s,
       `https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/${s}.png`,
+    ]),
+    ...Array.from(emoji_mono).map((s) => [
+      'emoji',
+      s,
+      `https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/refs/heads/main/img/emoji/${s}.webp`,
     ]),
   ];
   return [content, tags];
