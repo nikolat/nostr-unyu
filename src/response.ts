@@ -926,7 +926,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
             break;
         }
         if (k) {
-          if (s.at(-1) === 'g') {
+          if (!k.startsWith('monopaka') && s.at(-1) === 'g') {
             k = `${k}_gaming`;
           }
           if (!k.startsWith('monopaka')) {
