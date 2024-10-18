@@ -969,7 +969,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
     ...Array.from(emoji_mono).map((s) => [
       'emoji',
       s,
-      `https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/refs/heads/main/img/emoji/${s}.webp`,
+      `https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/${s}.webp`,
     ]),
   ];
   return [content, tags];
