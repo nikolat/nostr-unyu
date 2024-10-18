@@ -929,7 +929,9 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
           if (s.at(-1) === 'g') {
             k = `${k}_gaming`;
           }
-          emoji.add(k);
+          if (!isMonopaka) {
+            emoji.add(k);
+          }
           s = `:${k}:`;
         }
         line += s;
