@@ -487,9 +487,15 @@ const mode_delete = async (
     return null;
   }
   return {
+    content: '削除テストやで',
+    kind: event.kind,
+    tags: getTagsReply(event),
+    created_at: event.created_at + 1,
+  };
+  return {
     content: '',
     kind: 5,
-    tags: [...ids.map((id) => ['e', id])],
+    tags: ids.map((id) => ['e', id]),
     created_at: event.created_at + 1,
   };
 };
