@@ -1910,7 +1910,7 @@ const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
   } else if (/(かっこ|カッコ|格好)いいの?か?(？|\?)$/.test(event.content)) {
     content = any(['かっこいいやん', 'ワイはかっこええと思うで', 'ダサいやろ']);
   } else if (
-    /何|なに|誰|だれ|どこ|いつ|どう|どんな|どの|どっち|どちら|どれ/.test(
+    /何|なに|誰|だれ|どこ|いつ|どう|どんな|どの|どっち|どちら|どれ|いくら/.test(
       event.content,
     )
   ) {
