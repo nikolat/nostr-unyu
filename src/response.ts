@@ -2127,7 +2127,11 @@ const res_fire = (
   if (/(潰して|縮めて)[^るた]?$/u.test(event.content)) {
     content = `🫸${text.replace(/[^\S\n\r]|[-ー]/gu, '')}🫷`;
   } else if (/(伸ばして|広げて)[^るた]?$/u.test(event.content)) {
-    content = `${Array.from(text).join(' ')}`;
+    if (/[-ー]/.test(text)) {
+      content = text.replace(/([-ー])/gu, '$1$1');
+    } else {
+      content = `${Array.from(text).join(' ')}`;
+    }
   } else if (/ど[突つ]いて[^るた]?$/u.test(event.content)) {
     content = `🤜${text}🤛`;
   } else if (/[踊躍]らせて[^るた]?$/u.test(event.content)) {
