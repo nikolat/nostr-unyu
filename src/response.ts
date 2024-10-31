@@ -2304,9 +2304,9 @@ const getTagsReply = (event: NostrEvent): string[][] => {
   );
   if (tagRoot !== undefined) {
     tagsReply.push(tagRoot);
-    tagsReply.push(['e', event.id, '', 'reply']);
+    tagsReply.push(['e', event.id, '', 'reply', event.pubkey]);
   } else {
-    tagsReply.push(['e', event.id, '', 'root']);
+    tagsReply.push(['e', event.id, '', 'root', event.pubkey]);
   }
   for (const tag of event.tags.filter(
     (tag: string[]) =>
@@ -2320,13 +2320,13 @@ const getTagsReply = (event: NostrEvent): string[][] => {
 
 const getTagsQuote = (event: NostrEvent): string[][] => {
   if (event.kind === 1) {
-    return [['q', event.id]];
+    return [['q', event.id, '', event.pubkey]];
   } else if (event.kind === 42) {
     const tagRoot = event.tags.find(
       (tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
     );
     if (tagRoot !== undefined) {
-      return [tagRoot, ['e', event.id, '', 'mention']];
+      return [tagRoot, ['q', event.id, '', event.pubkey]];
     } else {
       throw new TypeError('root is not found');
     }
