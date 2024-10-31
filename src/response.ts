@@ -2125,7 +2125,7 @@ const res_fire = (
   );
   tags = [...getTags(event, mode), ...emoji_tags];
   if (/(潰して|縮めて)[^るた]?$/u.test(event.content)) {
-    content = `🫸${text.replace(/[^\S\n\r\-ー]|[-ー]/gu, '')}🫷`;
+    content = `🫸${text.replace(/[^\S\n\r]|[-ー]/gu, '')}🫷`;
   } else if (/(伸ばして|広げて)[^るた]?$/u.test(event.content)) {
     content = `${Array.from(text).join(' ')}`;
   } else if (/ど[突つ]いて[^るた]?$/u.test(event.content)) {
