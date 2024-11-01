@@ -1681,7 +1681,7 @@ const res_adokare = (event: NostrEvent): [string, string[][]] => {
   let tags: string[][];
   //const url2023_1 = 'https://adventar.org/calendars/8794';
   //const url2023_2 = 'https://adventar.org/calendars/8880';
-  const url2024 = 'https://adventar.org/calendars/8880';
+  const url2024 = 'https://adventar.org/calendars/10004';
   content = `${url2024}`;
   tags = [...getTagsReply(event), ['r', url2024]];
   return [content, tags];
