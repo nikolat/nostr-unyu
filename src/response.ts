@@ -223,7 +223,10 @@ const getResmap = (
     [/うにゅう(を?呼んで|どこ).?$/u, res_unyu],
     [/Don(さん)?(を?呼んで|どこ).?$/iu, res_don],
     [/(マグロ|ﾏｸﾞﾛ)の?元ネタ(を?呼んで|どこ).?$/u, res_maguro],
-    [/(カレンダー|アドカレ)(を?呼んで|どこ).?$/u, res_adokare],
+    [
+      /(カレンダー|アドカレ|アドベントカレンダー)(を?呼んで|どこ).?$/u,
+      res_adokare,
+    ],
     [/DM.*(を?呼んで|どこ).?$/iu, res_dm],
     [/Zap.*(を?呼んで|どこ).?$/iu, res_zap],
     [/ここは?(どこ|ドコ).?$/iu, res_kokodoko],
@@ -1676,10 +1679,11 @@ const res_maguro = (event: NostrEvent): [string, string[][]] => {
 const res_adokare = (event: NostrEvent): [string, string[][]] => {
   let content: string;
   let tags: string[][];
-  const url1 = 'https://adventar.org/calendars/8794';
-  const url2 = 'https://adventar.org/calendars/8880';
-  content = `${url1}\n${url2}`;
-  tags = [...getTagsReply(event), ['r', url1], ['r', url2]];
+  //const url2023_1 = 'https://adventar.org/calendars/8794';
+  //const url2023_2 = 'https://adventar.org/calendars/8880';
+  const url2024 = 'https://adventar.org/calendars/8880';
+  content = `${url2024}`;
+  tags = [...getTagsReply(event), ['r', url2024]];
   return [content, tags];
 };
 
