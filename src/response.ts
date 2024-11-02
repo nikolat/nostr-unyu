@@ -217,6 +217,7 @@ const getResmap = (
     ],
     [/(じゃんけん|ジャンケン|淀川(さん)?)(を?呼んで|どこ).?$/u, res_janken],
     [/(しりとり|しりとリレー)(を?呼んで|どこ).?$/u, res_shiritoridoko],
+    [/削除.*(を?呼んで|どこ).?$/iu, res_deletion_tool],
     [/(status|ステータス).*(を?呼んで|どこ).?$/iu, res_status],
     [/やぶみ(ちゃ)?ん?(を?呼んで|どこ).?$/u, res_yabumin],
     [/ぬるぽが?(を?呼んで|どこ).?$/u, res_nurupoga],
@@ -1626,6 +1627,18 @@ const res_shiritoridoko = (event: NostrEvent): [string, string[][]] => {
   const url = 'https://srtrelay.c-stellar.net/';
   content = url;
   tags = [...getTagsReply(event), ['r', url]];
+  return [content, tags];
+};
+
+const res_deletion_tool = (event: NostrEvent): [string, string[][]] => {
+  let content: string;
+  let tags: string[][];
+  const urls = [
+    'https://delete.nostr.com/',
+    'https://nostr-delete.vercel.app/',
+  ];
+  content = urls.join('\n');
+  tags = [...getTagsReply(event), ...urls.map((url) => ['r', url])];
   return [content, tags];
 };
 
