@@ -38,7 +38,14 @@ export const getResponseEvent = async (
     //反応しないことを選択
     return null;
   }
-  return res.map((r) => signer.finishEvent(r));
+  const events = res.map((r) => signer.finishEvent(r));
+  //nostr-webhookが対応するまで暫定
+  if (events.length >= 2) {
+    const wRelay = await Relay.connect(zapRelay);
+    await wRelay.publish(events[0]);
+    wRelay.close();
+  }
+  return events;
 };
 
 const selectResponse = async (
