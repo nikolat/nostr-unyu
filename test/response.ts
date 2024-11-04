@@ -1,11 +1,7 @@
 import * as fs from 'node:fs/promises';
 import { it } from 'mocha';
 import { assert } from 'chai';
-import {
-  generateSecretKey,
-  getPublicKey,
-  type NostrEvent,
-} from 'nostr-tools/pure';
+import { generateSecretKey, getPublicKey, type NostrEvent } from 'nostr-tools/pure';
 import { Mode, Signer } from '../src/utils.js';
 import { getResponseEvent } from '../src/response.js';
 
@@ -24,13 +20,7 @@ it('get response with JSON file', async () => {
     pubkey: getPublicKey(sk),
     created_at: event.created_at + 1,
     contents: ['ええで', 'ええんやで', 'あかんに決まっとるやろ'],
-    tags: [
-      ...event.tags.filter(
-        (tag: string[]) =>
-          tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
-      ),
-      ['e', event.id, '', 'mention'],
-    ],
+    tags: [...event.tags.filter((tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root'), ['e', event.id, '', 'mention']],
   };
   assert.isNotNull(actual);
   if (actual === null) throw new Error();

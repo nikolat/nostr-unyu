@@ -1,10 +1,5 @@
 import type { VercelResponse } from '@vercel/node';
-import {
-  type NostrEvent,
-  type VerifiedEvent,
-  validateEvent,
-  verifyEvent,
-} from 'nostr-tools/pure';
+import { type NostrEvent, type VerifiedEvent, validateEvent, verifyEvent } from 'nostr-tools/pure';
 import * as nip19 from 'nostr-tools/nip19';
 import { Mode, Signer } from './utils.js';
 import { getResponseEvent } from './response.js';
@@ -12,23 +7,15 @@ import { getResponseEvent } from './response.js';
 //入力イベントを検証するかどうか(デバッグ時は無効化した方が楽)
 const verifyInputEvent = true;
 
-export const base = async (
-  rawBody: string,
-  response: VercelResponse,
-  mode: Mode,
-) => {
+export const base = async (rawBody: string, response: VercelResponse, mode: Mode) => {
   //署名用インスタンスを準備
   const nsec = process.env.NOSTR_PRIVATE_KEY;
   if (nsec === undefined) {
-    return response
-      .status(500)
-      .json({ error: 'NOSTR_PRIVATE_KEY is undefined' });
+    return response.status(500).json({ error: 'NOSTR_PRIVATE_KEY is undefined' });
   }
   const dr = nip19.decode(nsec);
   if (dr.type !== 'nsec') {
-    return response
-      .status(500)
-      .json({ error: 'NOSTR_PRIVATE_KEY is not `nsec`' });
+    return response.status(500).json({ error: 'NOSTR_PRIVATE_KEY is not `nsec`' });
   }
   const seckey = dr.data;
   const signer = new Signer(seckey);

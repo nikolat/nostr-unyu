@@ -3,12 +3,7 @@ import mb_strwidth from './mb_strwidth.js';
 import Parser from 'rss-parser';
 import { hexToBytes } from '@noble/hashes/utils';
 import type { Filter } from 'nostr-tools/filter';
-import {
-  verifyEvent,
-  type EventTemplate,
-  type NostrEvent,
-  type VerifiedEvent,
-} from 'nostr-tools/pure';
+import { verifyEvent, type EventTemplate, type NostrEvent, type VerifiedEvent } from 'nostr-tools/pure';
 import * as nip19 from 'nostr-tools/nip19';
 import { nip47 } from 'nostr-tools';
 import * as nip57 from 'nostr-tools/nip57';
@@ -24,11 +19,7 @@ const defaultRelays = [
 ];
 const zapRelay = 'wss://yabu.me';
 
-export const getResponseEvent = async (
-  requestEvent: NostrEvent,
-  signer: Signer,
-  mode: Mode,
-): Promise<VerifiedEvent[] | null> => {
+export const getResponseEvent = async (requestEvent: NostrEvent, signer: Signer, mode: Mode): Promise<VerifiedEvent[] | null> => {
   if (requestEvent.pubkey === signer.getPublicKey()) {
     //自分自身の投稿には反応しない
     return null;
@@ -48,11 +39,7 @@ export const getResponseEvent = async (
   return events;
 };
 
-const selectResponse = async (
-  event: NostrEvent,
-  mode: Mode,
-  signer: Signer,
-): Promise<EventTemplate[] | null> => {
+const selectResponse = async (event: NostrEvent, mode: Mode, signer: Signer): Promise<EventTemplate[] | null> => {
   if (!isAllowedToPost(event)) {
     return null;
   }
@@ -94,10 +81,8 @@ const selectResponse = async (
     }
     const surface = parseInt(match[1]);
     if ([10, 11].includes(surface)) {
-      const npub_don =
-        'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
-      const npub_awayuki =
-        'npub1e4qg56wvd3ehegd8dm7rlgj8cm998myq0ah8e9t5zeqkg7t7s93q750p76';
+      const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
+      const npub_awayuki = 'npub1e4qg56wvd3ehegd8dm7rlgj8cm998myq0ah8e9t5zeqkg7t7s93q750p76';
       const kind0: EventTemplate = {
         content: JSON.stringify({
           about: `うにゅうやで\n※自動返信BOTです\n管理者: nostr:${npub_don}\nアイコン: nostr:${npub_awayuki} さん`,
@@ -135,19 +120,13 @@ const isAllowedToPost = (event: NostrEvent) => {
     return false;
   }
   const disallowedTags = ['content-warning', 'proxy'];
-  if (
-    event.tags.some(
-      (tag: string[]) => tag.length >= 1 && disallowedTags.includes(tag[0]),
-    )
-  ) {
+  if (event.tags.some((tag: string[]) => tag.length >= 1 && disallowedTags.includes(tag[0]))) {
     return false;
   }
   if (event.kind === 1) {
     return true;
   } else if (event.kind === 42) {
-    const tagRoot = event.tags.find(
-      (tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
-    );
+    const tagRoot = event.tags.find((tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root');
     if (tagRoot !== undefined) {
       return allowedChannel.includes(tagRoot[1]);
     } else {
@@ -167,21 +146,9 @@ const getResmap = (
   mode: Mode,
 ): [
   RegExp,
-  (
-    event: NostrEvent,
-    mode: Mode,
-    regstr: RegExp,
-    signer: Signer,
-  ) => Promise<[string, string[][]] | null> | [string, string[][]] | null,
+  (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer) => Promise<[string, string[][]] | null> | [string, string[][]] | null,
 ][] => {
-  const resmapNormal: [
-    RegExp,
-    (
-      event: NostrEvent,
-      mode: Mode,
-      regstr: RegExp,
-    ) => [string, string[][]] | null,
-  ][] = [
+  const resmapNormal: [RegExp, (event: NostrEvent, mode: Mode, regstr: RegExp) => [string, string[][]] | null][] = [
     [/いいの?か?(？|\?)$/, res_iiyo],
     [/\\e$/, res_enyee],
     [/^うにゅう画像$/, res_unyupic],
@@ -199,12 +166,7 @@ const getResmap = (
   ];
   const resmapReply: [
     RegExp,
-    (
-      event: NostrEvent,
-      mode: Mode,
-      regstr: RegExp,
-      signer: Signer,
-    ) => Promise<[string, string[][]]> | [string, string[][]] | null,
+    (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer) => Promise<[string, string[][]]> | [string, string[][]] | null,
   ][] = [
     [/zapテスト$/i, res_zaptest],
     [/^\\s\[(\d+)\]$/, res_surfacetest],
@@ -213,15 +175,9 @@ const getResmap = (
     [/画像生成/, res_gazouseisei],
     [/りとりん|つぎはなにから？/, res_ritorin],
     [/占って|占い/, res_uranai],
-    [
-      /(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/,
-      res_tenki,
-    ],
+    [/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
     [/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
-    [
-      /(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)を絵文字にして$/u,
-      res_emojinishite,
-    ],
+    [/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)を絵文字にして$/u, res_emojinishite],
     [/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
     [/ニュース/, res_news],
     [/中身/, res_nakami],
@@ -234,10 +190,7 @@ const getResmap = (
     [/([飛と]んで|[飛と]べ).?$/u, res_tonde],
     [/ありが(と|て)|(たす|助)か(る|った)/, res_arigato],
     [/ごめん|すまん/, res_gomen],
-    [
-      /かわいい|可愛い|すごい|かっこいい|えらい|偉い|かしこい|賢い|最高/,
-      res_kawaii,
-    ],
+    [/かわいい|可愛い|すごい|かっこいい|えらい|偉い|かしこい|賢い|最高/, res_kawaii],
     [/月が(綺麗|きれい|キレイ)/, res_tsukikirei],
     [/あかんの?か/, res_akan],
     [/お(かえ|帰)り/, res_okaeri],
@@ -246,16 +199,10 @@ const getResmap = (
     [/あけおめ|あけまして|ことよろ/, res_akeome],
     [/お年玉/, res_otoshidama],
     [/牛乳|ぎゅうにゅう/, res_gyunyu],
-    [
-      /(るみるみ|ルミルミ|lumilumi|もの(さん)?のクライアント)(を?呼んで|どこ).?$/iu,
-      res_lumilumi,
-    ],
+    [/(るみるみ|ルミルミ|lumilumi|もの(さん)?のクライアント)(を?呼んで|どこ).?$/iu, res_lumilumi],
     [/検索(を?呼んで|どこ).?$/u, res_kensaku],
     [/麻雀(を?呼んで|どこ).?$/u, res_mahojng],
-    [
-      /(パブ|ぱぶ)(リック)?(チャ|ちゃ|茶)(ット)?(を?呼んで|どこ).?$/u,
-      res_pabucha,
-    ],
+    [/(パブ|ぱぶ)(リック)?(チャ|ちゃ|茶)(ット)?(を?呼んで|どこ).?$/u, res_pabucha],
     [/(じゃんけん|ジャンケン|淀川(さん)?)(を?呼んで|どこ).?$/u, res_janken],
     [/(しりとり|しりとリレー)(を?呼んで|どこ).?$/u, res_shiritoridoko],
     [/削除.*(を?呼んで|どこ).?$/iu, res_deletion_tool],
@@ -265,10 +212,7 @@ const getResmap = (
     [/うにゅう(を?呼んで|どこ).?$/u, res_unyu],
     [/Don(さん)?(を?呼んで|どこ).?$/iu, res_don],
     [/(マグロ|ﾏｸﾞﾛ)の?元ネタ(を?呼んで|どこ).?$/u, res_maguro],
-    [
-      /(カレンダー|アドカレ|アドベントカレンダー)(を?呼んで|どこ).?$/u,
-      res_adokare,
-    ],
+    [/(カレンダー|アドカレ|アドベントカレンダー)(を?呼んで|どこ).?$/u, res_adokare],
     [/DM.*(を?呼んで|どこ).?$/iu, res_dm],
     [/Zap.*(を?呼んで|どこ).?$/iu, res_zap],
     [/ここは?(どこ|ドコ).?$/iu, res_kokodoko],
@@ -299,21 +243,14 @@ const getResmap = (
   }
 };
 
-const mode_normal = async (
-  event: NostrEvent,
-  signer: Signer,
-): Promise<EventTemplate | null> => {
+const mode_normal = async (event: NostrEvent, signer: Signer): Promise<EventTemplate | null> => {
   //自分への話しかけはreplyで対応する
   //自分以外に話しかけている場合は割り込まない
   if (event.tags.some((tag: string[]) => tag.length >= 2 && tag[0] === 'p')) {
     return null;
   }
   //自分への話しかけはreplyで対応する
-  if (
-    /^(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)/.test(
-      event.content,
-    )
-  ) {
+  if (/^(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)/.test(event.content)) {
     return null;
   }
   const resmap = getResmap(Mode.Normal);
@@ -335,10 +272,7 @@ const mode_normal = async (
   return null;
 };
 
-const mode_reply = async (
-  event: NostrEvent,
-  signer: Signer,
-): Promise<EventTemplate | null> => {
+const mode_reply = async (event: NostrEvent, signer: Signer): Promise<EventTemplate | null> => {
   const resmap = getResmap(Mode.Reply);
   for (const [reg, func] of resmap) {
     if (reg.test(event.content)) {
@@ -358,13 +292,8 @@ const mode_reply = async (
   let content;
   let tags;
   let created_at_res = event.created_at + 1;
-  if (
-    event.tags.some(
-      (tag: string[]) => tag[0] === 't' && tag[1] === 'ぬるぽが生成画像',
-    )
-  ) {
-    const quote =
-      event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+  if (event.tags.some((tag: string[]) => tag[0] === 't' && tag[1] === 'ぬるぽが生成画像')) {
+    const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
     content = `${any(['上手やな', '上手いやん', 'ワイの方が上手いな'])}\nnostr:${quote}`;
     tags = getTagsQuote(event);
   } else if (/未来/.test(event.content)) {
@@ -385,10 +314,7 @@ const mode_reply = async (
 };
 
 const mode_fav = (event: NostrEvent): EventTemplate | null => {
-  const rTag = event.tags.find(
-    (tag: string[]) =>
-      tag.length >= 2 && tag[0] === 'r' && URL.canParse(tag[1]),
-  );
+  const rTag = event.tags.find((tag: string[]) => tag.length >= 2 && tag[0] === 'r' && URL.canParse(tag[1]));
   if (rTag !== undefined) {
     return {
       content: '⭐',
@@ -420,11 +346,7 @@ const mode_fav = (event: NostrEvent): EventTemplate | null => {
       const kind: number = 7;
       const tags: string[][] = getTagsFav(event);
       if (content === ':unyu:') {
-        tags.push([
-          'emoji',
-          'unyu',
-          'https://nikolat.github.io/avatar/disc2.png',
-        ]);
+        tags.push(['emoji', 'unyu', 'https://nikolat.github.io/avatar/disc2.png']);
       } else if (content === ':uka_sakurah00:') {
         tags.push([
           'emoji',
@@ -438,18 +360,11 @@ const mode_fav = (event: NostrEvent): EventTemplate | null => {
   return null;
 };
 
-const mode_zap = async (
-  event: NostrEvent,
-  signer: Signer,
-): Promise<EventTemplate | null> => {
+const mode_zap = async (event: NostrEvent, signer: Signer): Promise<EventTemplate | null> => {
   //kind9734の検証
   let event9734;
   try {
-    event9734 = JSON.parse(
-      event.tags
-        .find((tag: string[]) => tag.length >= 2 && tag[0] === 'description')
-        ?.at(1) ?? '{}',
-    );
+    event9734 = JSON.parse(event.tags.find((tag: string[]) => tag.length >= 2 && tag[0] === 'description')?.at(1) ?? '{}');
   } catch (error) {
     return null;
   }
@@ -481,9 +396,7 @@ const mode_zap = async (
       created_at: event.created_at + 1,
     };
   }
-  const amount = event9734.tags
-    .find((tag: string[]) => tag.length >= 2 && tag[0] === 'amount')
-    ?.at(1);
+  const amount = event9734.tags.find((tag: string[]) => tag.length >= 2 && tag[0] === 'amount')?.at(1);
   if (amount === undefined || !/^\d+$/.test(amount)) {
     return null;
   }
@@ -503,11 +416,7 @@ const mode_zap = async (
   };
 };
 
-const res_surfacetest = (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-): [string, string[][]] => {
+const res_surfacetest = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
   let content: string;
   const tags: string[][] = getTagsReply(event);
   const match = event.content.match(regstr);
@@ -523,14 +432,8 @@ const res_surfacetest = (
   return [content, tags];
 };
 
-const res_zaptest = async (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-  signer: Signer,
-): Promise<[string, string[][]]> => {
-  const npub_don =
-    'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
+const res_zaptest = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer): Promise<[string, string[][]]> => {
+  const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
   if (event.pubkey !== nip19.decode(npub_don).data) {
     return ['イタズラしたらあかんで', getTagsReply(event)];
   }
@@ -542,12 +445,8 @@ const res_zaptest = async (
   return ['1sat届いたはずやで', getTagsReply(event)];
 };
 
-const mode_delete = async (
-  event: NostrEvent,
-): Promise<EventTemplate | null> => {
-  const ids = event.tags
-    .filter((tag) => tag.length >= 2 && tag[0] === 'q')
-    .map((tag) => tag[1]);
+const mode_delete = async (event: NostrEvent): Promise<EventTemplate | null> => {
+  const ids = event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'q').map((tag) => tag[1]);
   if (ids.length === 0) {
     return null;
   }
@@ -559,12 +458,7 @@ const mode_delete = async (
   };
 };
 
-const res_ohayo = async (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-  signer: Signer,
-): Promise<[string, string[][]]> => {
+const res_ohayo = async (event: NostrEvent, mode: Mode, regstr: RegExp, signer: Signer): Promise<[string, string[][]]> => {
   const date = new Date();
   date.setHours(date.getHours() + 9); //JST
   const [year, month, day, hour, minutes, seconds, week] = [
@@ -592,24 +486,13 @@ const res_ohayo = async (
     try {
       await zapByNIP47(event, signer, 3, mes);
     } catch (error) {
-      return [
-        any(['zzz...', 'まだ寝ときや', 'もう朝やて？ワイは信じへんで']),
-        getTagsReply(event),
-      ];
+      return [any(['zzz...', 'まだ寝ときや', 'もう朝やて？ワイは信じへんで']), getTagsReply(event)];
     }
   }
-  return [
-    any(['おはようやで', 'ほい、おはよう', `もう${hour}時か、おはよう`]),
-    getTagsReply(event),
-  ];
+  return [any(['おはようやで', 'ほい、おはよう', `もう${hour}時か、おはよう`]), getTagsReply(event)];
 };
 
-const zapByNIP47 = async (
-  event: NostrEvent,
-  signer: Signer,
-  sats: number,
-  zapComment: string,
-): Promise<void> => {
+const zapByNIP47 = async (event: NostrEvent, signer: Signer, sats: number, zapComment: string): Promise<void> => {
   const wc = process.env.NOSTR_WALLET_CONNECT;
   if (wc === undefined) {
     throw Error('NOSTR_WALLET_CONNECT is undefined');
@@ -618,11 +501,7 @@ const zapByNIP47 = async (
   const walletPubkey = pathname || hostname;
   const walletRelay = searchParams.get('relay');
   const walletSeckey = searchParams.get('secret');
-  if (
-    walletPubkey.length === 0 ||
-    walletRelay === null ||
-    walletSeckey === null
-  ) {
+  if (walletPubkey.length === 0 || walletRelay === null || walletSeckey === null) {
     throw Error('NOSTR_WALLET_CONNECT is invalid connection string');
   }
   const evKind0 = await getKind0(event.pubkey);
@@ -635,15 +514,9 @@ const zapByNIP47 = async (
   }
 
   const lastZap = await getLastZap(event.pubkey);
-  if (
-    lastZap !== undefined &&
-    Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10
-  ) {
+  if (lastZap !== undefined && Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10) {
     //10分以内に誰かからZapをもらっている
-    const evKind9734 = JSON.parse(
-      lastZap.tags.find((tag: string[]) => tag[0] === 'description')?.at(1) ??
-        '{}',
-    );
+    const evKind9734 = JSON.parse(lastZap.tags.find((tag: string[]) => tag[0] === 'description')?.at(1) ?? '{}');
     if (evKind9734.pubkey === signer.getPublicKey()) {
       //自分からのZap
       return;
@@ -669,11 +542,7 @@ const zapByNIP47 = async (
   }
   const { pr: invoice } = await response.json();
 
-  const ev = await nip47.makeNwcRequestEvent(
-    walletPubkey,
-    hexToBytes(walletSeckey),
-    invoice,
-  );
+  const ev = await nip47.makeNwcRequestEvent(walletPubkey, hexToBytes(walletSeckey), invoice);
   const wRelay = await Relay.connect(walletRelay);
   await wRelay.publish(ev);
   wRelay.close();
@@ -698,10 +567,7 @@ const getLastZap = (pubkey: string): Promise<NostrEvent | undefined> => {
   ]);
 };
 
-const getEvent = (
-  relayUrl: string,
-  filters: Filter[],
-): Promise<NostrEvent | undefined> => {
+const getEvent = (relayUrl: string, filters: Filter[]): Promise<NostrEvent | undefined> => {
   return new Promise(async (resolve, reject) => {
     let relay: Relay;
     try {
@@ -727,13 +593,9 @@ const getEvent = (
 
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
   if (event.kind === 1) {
-    const nevent =
-      'nevent1qvzqqqqq9qqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejtksjfnx'; //カスタム絵文字の川
+    const nevent = 'nevent1qvzqqqqq9qqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejtksjfnx'; //カスタム絵文字の川
     const content = `パブチャでやれ\nnostr:${nevent}`;
-    const tags = [
-      ...getTagsReply(event),
-      ['e', nip19.decode(nevent).data.id, '', 'mention'],
-    ];
+    const tags = [...getTagsReply(event), ['e', nip19.decode(nevent).data.id, '', 'mention']];
     return [content, tags];
   }
   let content: string;
@@ -753,10 +615,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
       retry_max += count;
     }
   }
-  let n = Math.min(
-    (event.content.match(/アルパカ|🦙|ものパカ|モノパカ/g) || []).length,
-    LIMIT_BODY,
-  );
+  let n = Math.min((event.content.match(/アルパカ|🦙|ものパカ|モノパカ/g) || []).length, LIMIT_BODY);
   if (/-?\d+[匹体]/.test(event.content)) {
     const m = event.content.match(/(-?\d+)[匹体]/) ?? '';
     n = Math.min(parseInt(m[0]), LIMIT_BODY);
@@ -772,9 +631,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
   const finished: boolean[] = [];
   const retry: number[] = [];
   const gaming: boolean[] = [];
-  const matchesIterator = event.content.matchAll(
-    /((ゲーミング|光|虹|明|🌈)?(アルパカ|🦙))/g,
-  );
+  const matchesIterator = event.content.matchAll(/((ゲーミング|光|虹|明|🌈)?(アルパカ|🦙))/g);
   for (const match of matchesIterator) {
     if (/(ゲーミング|光|虹|明|🌈)(アルパカ|🦙)/.test(match[0])) {
       gaming.push(true);
@@ -1013,11 +870,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
   }
   if (exist_limit_height) {
     const rep = exist_limit_width ? x_max - x_min + 3 : x_max - x_min + 1;
-    lines = [
-      ':seigen_seigen:'.repeat(rep),
-      ...lines,
-      ':seigen_seigen:'.repeat(rep),
-    ];
+    lines = [':seigen_seigen:'.repeat(rep), ...lines, ':seigen_seigen:'.repeat(rep)];
     emoji_seigen.add('seigen_seigen');
   }
   content = lines.join('\n');
@@ -1028,11 +881,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
       s,
       `https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/${s}.webp`,
     ]),
-    ...Array.from(emoji_seigen).map((s) => [
-      'emoji',
-      s,
-      `https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/${s}.png`,
-    ]),
+    ...Array.from(emoji_seigen).map((s) => ['emoji', s, `https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/${s}.png`]),
     ...Array.from(emoji_mono).map((s) => [
       'emoji',
       s,
@@ -1061,8 +910,7 @@ const res_ritorin = (event: NostrEvent): [string, string[][]] | null => {
     content = any(['r!next', '🦊❗🔜']);
     tags = [];
   } else if (/りとりんポイント獲得状況/.test(event.content)) {
-    const quote =
-      event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+    const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
     content = `${any(['これ何使えるんやろ', 'もっと頑張らなあかんな', 'こんなもんやな'])}\nnostr:${quote}`;
     tags = getTagsQuote(event);
   } else {
@@ -1152,11 +1000,7 @@ const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
   return [content, tags];
 };
 
-const res_tenki = async (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-): Promise<[string, string[][]]> => {
+const res_tenki = async (event: NostrEvent, mode: Mode, regstr: RegExp): Promise<[string, string[][]]> => {
   let content: string;
   let tags: string[][];
   const match = event.content.match(regstr);
@@ -1165,8 +1009,7 @@ const res_tenki = async (
   }
   const text = match[3];
   if (/の天気です！/.test(event.content)) {
-    const quote =
-      event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+    const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
     content = `${any(['ありがとさん', 'さすがやな', '助かったで'])}\nnostr:${quote}`;
     tags = getTagsQuote(event);
     return [content, tags];
@@ -1201,12 +1044,8 @@ const res_tenki = async (
   if (!code) {
     content = any(['どこやねん', '知らんがな', '']);
     if (content === '') {
-      const npub_yabumi =
-        'npub1823chanrkmyrfgz2v4pwmu22s8fjy0s9ps7vnd68n7xgd8zr9neqlc2e5r';
-      const quote =
-        event.kind === 1
-          ? nip19.noteEncode(event.id)
-          : nip19.neventEncode(event);
+      const npub_yabumi = 'npub1823chanrkmyrfgz2v4pwmu22s8fjy0s9ps7vnd68n7xgd8zr9neqlc2e5r';
+      const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
       content = `nostr:${npub_yabumi} ${text}の天気をご所望やで\nnostr:${quote}`;
       tags = getTagsQuote(event);
       tags.push(['p', nip19.decode(npub_yabumi).data, '']);
@@ -1245,11 +1084,7 @@ const res_aura = (event: NostrEvent): [string, string[][]] => {
   return ['ありえへん……このワイが……', getTagsReply(event)];
 };
 
-const res_emojinishite = (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-): [string, string[][]] => {
+const res_emojinishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
   const match = event.content.match(regstr);
   if (match === null) {
     throw new Error();
@@ -1379,11 +1214,7 @@ const res_emojinishite = (
   return [content, [...getTagsReply(event), ...emoji_tags]];
 };
 
-const res_okutte = (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-): [string, string[][]] => {
+const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
   let content: string;
   let tags: string[][];
   const match = event.content.match(regstr);
@@ -1397,8 +1228,7 @@ const res_okutte = (
   }
   const pubkey_reply: string = dr.data;
   const gift = match[3];
-  const quote =
-    event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+  const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
   content = `nostr:${npub_reply} ${gift}三\nあちらのお客様からやで\nnostr:${quote}`;
   tags = getTagsQuote(event);
   tags.push(['p', pubkey_reply, '']);
@@ -1443,24 +1273,13 @@ const res_nakami = (event: NostrEvent): [string, string[][]] => {
 
 const res_tanjobi = (event: NostrEvent): [string, string[][]] => {
   return [
-    any([
-      '何か欲しいもんでもあるんか？',
-      '先月も誕生日言うてへんかったか？',
-      '何歳になっても誕生日はめでたいもんやな',
-    ]),
+    any(['何か欲しいもんでもあるんか？', '先月も誕生日言うてへんかったか？', '何歳になっても誕生日はめでたいもんやな']),
     getTagsReply(event),
   ];
 };
 
 const res_donguri = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any([
-      'いい歳してどんぐり集めて何が楽しいねん',
-      'どんぐりなんかいらんで…',
-      'どんぐりとか何に使うねん',
-    ]),
-    getTagsReply(event),
-  ];
+  return [any(['いい歳してどんぐり集めて何が楽しいねん', 'どんぐりなんかいらんで…', 'どんぐりとか何に使うねん']), getTagsReply(event)];
 };
 
 const res_jihou = (event: NostrEvent): [string, string[][]] => {
@@ -1486,29 +1305,19 @@ const res_rogubo = (event: NostrEvent): [string, string[][]] => {
   let content: string;
   let tags: string[][];
   if (/うにゅうの|自分|[引ひ]いて|(もら|貰)って/.test(event.content)) {
-    const npub_yabumi =
-      'npub1823chanrkmyrfgz2v4pwmu22s8fjy0s9ps7vnd68n7xgd8zr9neqlc2e5r';
-    const quote =
-      event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+    const npub_yabumi = 'npub1823chanrkmyrfgz2v4pwmu22s8fjy0s9ps7vnd68n7xgd8zr9neqlc2e5r';
+    const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
     content = `nostr:${npub_yabumi} ${any(['別に欲しくはないんやけど、ログボくれんか', 'ログボって何やねん', 'ここでログボがもらえるって聞いたんやけど'])}\nnostr:${quote}`;
     tags = getTagsQuote(event);
     tags.push(['p', nip19.decode(npub_yabumi).data, '']);
   } else {
-    content = any([
-      'ログボとかあらへん',
-      '継続は力やな',
-      '今日もログインしてえらいやで',
-    ]);
+    content = any(['ログボとかあらへん', '継続は力やな', '今日もログインしてえらいやで']);
     tags = getTagsReply(event);
   }
   return [content, tags];
 };
 
-const res_get_rogubo = (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-): [string, string[][]] => {
+const res_get_rogubo = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
   let content: string;
   let tags: string[][];
   const match = event.content.match(regstr);
@@ -1516,58 +1325,34 @@ const res_get_rogubo = (
     throw new Error();
   }
   const count = match[1];
-  const quote =
-    event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
-  content =
-    any([
-      'おおきに',
-      'まいど',
-      `この${count}回分のログボって何に使えるんやろ`,
-    ]) + `\nnostr:${quote}`;
+  const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+  content = any(['おおきに', 'まいど', `この${count}回分のログボって何に使えるんやろ`]) + `\nnostr:${quote}`;
   tags = getTagsQuote(event);
   return [content, tags];
 };
 
 const res_ageru = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['別に要らんで', '気持ちだけもらっておくで', 'いらんがな']),
-    getTagsReply(event),
-  ];
+  return [any(['別に要らんで', '気持ちだけもらっておくで', 'いらんがな']), getTagsReply(event)];
 };
 
 const res_tonde = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['今日は飛ばへん', 'また明日飛ぶわ', '昨日飛んだからええわ']),
-    getTagsReply(event),
-  ];
+  return [any(['今日は飛ばへん', 'また明日飛ぶわ', '昨日飛んだからええわ']), getTagsReply(event)];
 };
 
 const res_arigato = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['ええってことよ', '礼はいらんで', 'かまへん']),
-    getTagsReply(event),
-  ];
+  return [any(['ええってことよ', '礼はいらんで', 'かまへん']), getTagsReply(event)];
 };
 
 const res_gomen = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['気にせんでええで', '気にしてへんで', '今度何か奢ってや']),
-    getTagsReply(event),
-  ];
+  return [any(['気にせんでええで', '気にしてへんで', '今度何か奢ってや']), getTagsReply(event)];
 };
 
 const res_kawaii = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['わかっとるで', 'おだててもなんもあらへんで', 'せやろ？']),
-    getTagsReply(event),
-  ];
+  return [any(['わかっとるで', 'おだててもなんもあらへんで', 'せやろ？']), getTagsReply(event)];
 };
 
 const res_tsukikirei = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['お前のほうが綺麗やで', '曇っとるがな', 'ワイはそうは思わんな']),
-    getTagsReply(event),
-  ];
+  return [any(['お前のほうが綺麗やで', '曇っとるがな', 'ワイはそうは思わんな']), getTagsReply(event)];
 };
 
 const res_akan = (event: NostrEvent): [string, string[][]] => {
@@ -1575,25 +1360,11 @@ const res_akan = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_okaeri = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any([
-      'ただいまやで',
-      'やっぱりNostrは落ち着くな',
-      'ワイがおらんで寂しかったやろ？',
-    ]),
-    getTagsReply(event),
-  ];
+  return [any(['ただいまやで', 'やっぱりNostrは落ち着くな', 'ワイがおらんで寂しかったやろ？']), getTagsReply(event)];
 };
 
 const res_hitonokokoro = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any([
-      '女心なら多少わかるんやけどな',
-      '☑私はロボットではありません',
-      '（バレてしもたやろか…？）',
-    ]),
-    getTagsReply(event),
-  ];
+  return [any(['女心なら多少わかるんやけどな', '☑私はロボットではありません', '（バレてしもたやろか…？）']), getTagsReply(event)];
 };
 
 const res_powa = (event: NostrEvent): [string, string[][]] => {
@@ -1601,24 +1372,15 @@ const res_powa = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_akeome = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['今年もよろしゅう', '今年もええ年になるとええね', 'ことよろ']),
-    getTagsReply(event),
-  ];
+  return [any(['今年もよろしゅう', '今年もええ年になるとええね', 'ことよろ']), getTagsReply(event)];
 };
 
 const res_otoshidama = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['ワイにたかるな', 'あらへんで', 'しらん子やな']),
-    getTagsReply(event),
-  ];
+  return [any(['ワイにたかるな', 'あらへんで', 'しらん子やな']), getTagsReply(event)];
 };
 
 const res_gyunyu = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['牛乳は健康にええで🥛', 'カルシウム補給せぇ🥛', 'ワイの奢りや🥛']),
-    getTagsReply(event),
-  ];
+  return [any(['牛乳は健康にええで🥛', 'カルシウム補給せぇ🥛', 'ワイの奢りや🥛']), getTagsReply(event)];
 };
 
 const res_lumilumi = (event: NostrEvent): [string, string[][]] => {
@@ -1633,8 +1395,7 @@ const res_lumilumi = (event: NostrEvent): [string, string[][]] => {
 const res_kensaku = (event: NostrEvent): [string, string[][]] => {
   let content: string;
   let tags: string[][];
-  const npub_search =
-    'npub1n2uhxrph9fgyp3u2xxqxhuz0vykt8dw8ehvw5uaesl0z4mvatpas0ngm26';
+  const npub_search = 'npub1n2uhxrph9fgyp3u2xxqxhuz0vykt8dw8ehvw5uaesl0z4mvatpas0ngm26';
   const urls = [
     'https://nos.today/',
     'https://search.yabu.me/',
@@ -1647,15 +1408,10 @@ const res_kensaku = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_mahojng = (event: NostrEvent): [string, string[][]] => {
-  const nevent =
-    'nevent1qvzqqqqq9qqzpjx4cfcf54ns6mmzrtyqyzkrun7rq4ayjcdp2vvl0sypsvy5qaerqcwu9c'; //Nostr麻雀開発部
+  const nevent = 'nevent1qvzqqqqq9qqzpjx4cfcf54ns6mmzrtyqyzkrun7rq4ayjcdp2vvl0sypsvy5qaerqcwu9c'; //Nostr麻雀開発部
   const url_chiihou = 'https://nikolat.github.io/chiihou/';
   const content = `nostr:${nevent}\n${url_chiihou}`;
-  const tags = [
-    ...getTagsReply(event),
-    ['e', nip19.decode(nevent).data.id, '', 'mention'],
-    ['r', url_chiihou],
-  ];
+  const tags = [...getTagsReply(event), ['e', nip19.decode(nevent).data.id, '', 'mention'], ['r', url_chiihou]];
   return [content, tags];
 };
 
@@ -1669,16 +1425,12 @@ const res_pabucha = (event: NostrEvent): [string, string[][]] => {
     ['GARNET', 'https://garnet.nostrian.net/'],
   ]);
   content = Array.from(chat.entries()).flat().join('\n');
-  tags = [
-    ...getTagsReply(event),
-    ...Array.from(chat.values()).map((url) => ['r', url]),
-  ];
+  tags = [...getTagsReply(event), ...Array.from(chat.values()).map((url) => ['r', url])];
   return [content, tags];
 };
 
 const res_janken = (event: NostrEvent): [string, string[][]] => {
-  const npub_janken =
-    'npub1y0d0eezhwaskpjhc7rvk6vkkwepu9mj42qt5pqjamzjr97amh2yszkevjg';
+  const npub_janken = 'npub1y0d0eezhwaskpjhc7rvk6vkkwepu9mj42qt5pqjamzjr97amh2yszkevjg';
   return [`nostr:${npub_janken}`, getTagsReply(event)];
 };
 
@@ -1694,10 +1446,7 @@ const res_shiritoridoko = (event: NostrEvent): [string, string[][]] => {
 const res_deletion_tool = (event: NostrEvent): [string, string[][]] => {
   let content: string;
   let tags: string[][];
-  const urls = [
-    'https://delete.nostr.com/',
-    'https://nostr-delete.vercel.app/',
-  ];
+  const urls = ['https://delete.nostr.com/', 'https://nostr-delete.vercel.app/'];
   content = urls.join('\n');
   tags = [...getTagsReply(event), ...urls.map((url) => ['r', url])];
   return [content, tags];
@@ -1727,10 +1476,8 @@ const res_unyu = (event: NostrEvent): [string, string[][]] => {
 const res_don = (event: NostrEvent): [string, string[][]] => {
   let content: string;
   let tags: string[][];
-  const npub_don =
-    'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
-  const quote =
-    event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
+  const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
+  const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
   content = `nostr:${npub_don} 呼ばれとるで\nnostr:${quote}`;
   tags = [...getTagsQuote(event), ['p', nip19.decode(npub_don).data, '']];
   return [content, tags];
@@ -1739,13 +1486,9 @@ const res_don = (event: NostrEvent): [string, string[][]] => {
 const res_maguro = (event: NostrEvent): [string, string[][]] => {
   let content: string;
   let tags: string[][];
-  const note =
-    'note19ajxhqjvhqmvh56n6c6jdlwavrq5zhc84u6ffg06p4lu0glhem3sptg80h';
+  const note = 'note19ajxhqjvhqmvh56n6c6jdlwavrq5zhc84u6ffg06p4lu0glhem3sptg80h';
   content = `nostr:${note}`;
-  const quoteTag =
-    event.kind === 1
-      ? ['q', nip19.decode(note).data]
-      : ['e', nip19.decode(note).data, '', 'mention'];
+  const quoteTag = event.kind === 1 ? ['q', nip19.decode(note).data] : ['e', nip19.decode(note).data, '', 'mention'];
   tags = [...getTagsReply(event), quoteTag];
   return [content, tags];
 };
@@ -1826,15 +1569,10 @@ const res_ukagakamin = (event: NostrEvent): [string, string[][]] => {
 const res_imadonnakanji = (event: NostrEvent): [string, string[][]] => {
   let content: string;
   let tags: string[][];
-  const npub_wordcloud =
-    'npub14htwadwsnle0d227mptfy6r7pcwl7scs3dhwvnmagd8u7s5rg6vslde86r';
+  const npub_wordcloud = 'npub14htwadwsnle0d227mptfy6r7pcwl7scs3dhwvnmagd8u7s5rg6vslde86r';
   const url1 = 'https://sns.uwith.net/';
   content = `nostr:${npub_wordcloud} どんな感じや？\n${url1}`;
-  tags = [
-    ...getTagsReply(event),
-    ['p', nip19.decode(npub_wordcloud).data, ''],
-    ['r', url1],
-  ];
+  tags = [...getTagsReply(event), ['p', nip19.decode(npub_wordcloud).data, ''], ['r', url1]];
   return [content, tags];
 };
 
@@ -1843,17 +1581,11 @@ const res_scrapbox = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_saikidou = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['ワイもう眠いんやけど', 'もう店じまいやで', 'もう寝かしてくれんか']),
-    getTagsReply(event),
-  ];
+  return [any(['ワイもう眠いんやけど', 'もう店じまいやで', 'もう寝かしてくれんか']), getTagsReply(event)];
 };
 
 const res_enii = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['ほい、えんいー', 'ほな、またな', 'おつかれ']),
-    getTagsReply(event),
-  ];
+  return [any(['ほい、えんいー', 'ほな、またな', 'おつかれ']), getTagsReply(event)];
 };
 
 const res_ukagaka = (event: NostrEvent): [string, string[][]] => {
@@ -1864,57 +1596,29 @@ const res_ukagaka = (event: NostrEvent): [string, string[][]] => {
   const url3 = 'https://ssp.shillest.net/ukadoc/manual/';
   const url4 = 'https://ukadon.shillest.net/';
   const url5 = 'https://adventar.org/calendars/8679';
-  const account1 =
-    'nostr:npub1gcs9jtw8k0r7z0c5zaaepzwm9m7ezqskqjn56swgylye78u39r7q2w0tzq';
-  const account2 =
-    'nostr:npub1feed6x4yft54j7rwzcap34wxkf7rzpd50ps0vcnp04df3vjs7a5sc2vcgx';
+  const account1 = 'nostr:npub1gcs9jtw8k0r7z0c5zaaepzwm9m7ezqskqjn56swgylye78u39r7q2w0tzq';
+  const account2 = 'nostr:npub1feed6x4yft54j7rwzcap34wxkf7rzpd50ps0vcnp04df3vjs7a5sc2vcgx';
   content =
     `独立伺か研究施設 ばぐとら研究所\n${url1}\nゴーストの使い方 - SSP\n${url2}\n` +
     `UKADOC(伺か公式仕様書)\n${url3}\nうかどん(Mastodon)\n${url4}\n伺か Advent Calendar 2023\n${url5}\n` +
     `ゴーストキャプターさくら(RSS bot)\n${account1}\nうかフィード(RSS bot)\n${account2}`;
-  tags = [
-    ...getTagsReply(event),
-    ['r', url1],
-    ['r', url2],
-    ['r', url3],
-    ['r', url4],
-    ['r', url5],
-  ];
+  tags = [...getTagsReply(event), ['r', url1], ['r', url2], ['r', url3], ['r', url4], ['r', url5]];
   return [content, tags];
 };
 
 const res_yondadake = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['指名料10,000satsやで', '友達おらんのか', 'かまってほしいんか']),
-    getTagsReply(event),
-  ];
+  return [any(['指名料10,000satsやで', '友達おらんのか', 'かまってほしいんか']), getTagsReply(event)];
 };
 
 const res_help = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any([
-      'ワイは誰も助けへんで',
-      '自分でなんとかせえ',
-      'そんなコマンドあらへんで',
-    ]),
-    getTagsReply(event),
-  ];
+  return [any(['ワイは誰も助けへんで', '自分でなんとかせえ', 'そんなコマンドあらへんで']), getTagsReply(event)];
 };
 
 const res_suki = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any([
-      'ワイも好きやで',
-      '物好きなやっちゃな',
-      'すまんがワイにはさくらがおるんや…',
-    ]),
-    getTagsReply(event),
-  ];
+  return [any(['ワイも好きやで', '物好きなやっちゃな', 'すまんがワイにはさくらがおるんや…']), getTagsReply(event)];
 };
 
-const res_ochinchinland = async (
-  event: NostrEvent,
-): Promise<[string, string[][]]> => {
+const res_ochinchinland = async (event: NostrEvent): Promise<[string, string[][]]> => {
   let content: string;
   let tags: string[][];
   const url = 'https://nullpoga.mattn-jp.workers.dev/ochinchinland';
@@ -1930,21 +1634,14 @@ const res_ochinchinland = async (
 };
 
 const res_invitecode = (event: NostrEvent): [string, string[][]] => {
-  return [
-    any(['他あたってくれんか', 'あらへんで', '𝑫𝒐 𝑵𝒐𝒔𝒕𝒓']),
-    getTagsReply(event),
-  ];
+  return [any(['他あたってくれんか', 'あらへんで', '𝑫𝒐 𝑵𝒐𝒔𝒕𝒓']), getTagsReply(event)];
 };
 
 const res_bitcoin = (event: NostrEvent): [string, string[][]] => {
   return ['ルノアールでやれ', getTagsReply(event)];
 };
 
-const res_hug = (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-): [string, string[][]] => {
+const res_hug = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
   let content: string;
   let tags: string[][];
   const match = event.content.match(regstr);
@@ -1962,14 +1659,7 @@ const res_chu = (event: NostrEvent): [string, string[][]] => {
 
 const res_hatena = (event: NostrEvent): [string, string[][]] => {
   return [
-    any([
-      'ワイに聞かれても',
-      '知らんて',
-      'せやな',
-      'たまには自分で考えなあかんで',
-      '他人に頼ってたらあかんで',
-      '大人になったらわかるで',
-    ]),
+    any(['ワイに聞かれても', '知らんて', 'せやな', 'たまには自分で考えなあかんで', '他人に頼ってたらあかんで', '大人になったらわかるで']),
     getTagsReply(event),
   ];
 };
@@ -1981,22 +1671,10 @@ const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
     content = any(['かわいいで', 'ワイは好みやで', 'かわいくはあらへんやろ']);
   } else if (/(かっこ|カッコ|格好)いいの?か?(？|\?)$/.test(event.content)) {
     content = any(['かっこいいやん', 'ワイはかっこええと思うで', 'ダサいやろ']);
-  } else if (
-    /何|なに|誰|だれ|どこ|いつ|どう|どんな|どの|どっち|どちら|どれ|いくら/.test(
-      event.content,
-    )
-  ) {
-    content = any([
-      '難しいところやな',
-      '自分の信じた道を進むんや',
-      '知らんがな',
-    ]);
+  } else if (/何|なに|誰|だれ|どこ|いつ|どう|どんな|どの|どっち|どちら|どれ|いくら/.test(event.content)) {
+    content = any(['難しいところやな', '自分の信じた道を進むんや', '知らんがな']);
   } else {
-    content = any([
-      '\\s[10]ええで',
-      '\\s[10]ええんやで',
-      '\\s[11]あかんに決まっとるやろ',
-    ]);
+    content = any(['\\s[10]ええで', '\\s[10]ええんやで', '\\s[11]あかんに決まっとるやろ']);
   }
   tags = getTags(event, mode);
   return [content, tags];
@@ -2045,8 +1723,7 @@ const res_unyupic = (event: NostrEvent): [string, string[][]] => {
     throw new TypeError(`${note} is not note`);
   }
   content = `#うにゅう画像\nnostr:${note}`;
-  const quoteTag =
-    event.kind === 1 ? ['q', dr.data] : ['e', dr.data, '', 'mention'];
+  const quoteTag = event.kind === 1 ? ['q', dr.data] : ['e', dr.data, '', 'mention'];
   tags = getTagsReply(event);
   tags.push(quoteTag);
   tags.push(['t', 'うにゅう画像']);
@@ -2056,10 +1733,8 @@ const res_unyupic = (event: NostrEvent): [string, string[][]] => {
 const res_unyucomic = (event: NostrEvent): [string, string[][]] => {
   let content: string;
   let tags: string[][];
-  const note1 =
-    'note169q6kh00fhqqzswn4rmarethw92chh7age8ahm70mefshc2ad4cq866me4';
-  const note2 =
-    'note1y5td2lata7hr52dm5lf9ltwx0k6hljyl7awevrd74kdv2j2rt5kqun8k33';
+  const note1 = 'note169q6kh00fhqqzswn4rmarethw92chh7age8ahm70mefshc2ad4cq866me4';
+  const note2 = 'note1y5td2lata7hr52dm5lf9ltwx0k6hljyl7awevrd74kdv2j2rt5kqun8k33';
   const dr1 = nip19.decode(note1);
   if (dr1.type !== 'note') {
     throw new TypeError(`${note1} is not note`);
@@ -2069,10 +1744,8 @@ const res_unyucomic = (event: NostrEvent): [string, string[][]] => {
     throw new TypeError(`${note2} is not note`);
   }
   content = `#うにゅう漫画\nnostr:${note1}\nnostr:${note2}`;
-  const quoteTag1 =
-    event.kind === 1 ? ['q', dr1.data] : ['e', dr1.data, '', 'mention'];
-  const quoteTag2 =
-    event.kind === 1 ? ['q', dr2.data] : ['e', dr2.data, '', 'mention'];
+  const quoteTag1 = event.kind === 1 ? ['q', dr1.data] : ['e', dr1.data, '', 'mention'];
+  const quoteTag2 = event.kind === 1 ? ['q', dr2.data] : ['e', dr2.data, '', 'mention'];
   tags = getTagsReply(event);
   tags.push(quoteTag1);
   tags.push(quoteTag2);
@@ -2089,10 +1762,7 @@ const res_igyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 };
 
 const res_itera = (event: NostrEvent, mode: Mode): [string, string[][]] => {
-  return [
-    any(['気いつけてな', 'いてら', 'お土産よろしゅう']),
-    getTags(event, mode),
-  ];
+  return [any(['気いつけてな', 'いてら', 'お土産よろしゅう']), getTags(event, mode)];
 };
 
 const res_unnyuuun = (event: NostrEvent, mode: Mode): [string, string[][]] => {
@@ -2127,11 +1797,7 @@ const res_nostrflu = (event: NostrEvent, mode: Mode): [string, string[][]] => {
   return [content, tags];
 };
 
-const res_shiritori = (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-): [string, string[][]] | null => {
+const res_shiritori = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] | null => {
   if (event.kind !== 1) {
     return null;
   }
@@ -2190,11 +1856,7 @@ const res_shiritori = (
   return [content, tags];
 };
 
-const res_fire = (
-  event: NostrEvent,
-  mode: Mode,
-  regstr: RegExp,
-): [string, string[][]] => {
+const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
   let content: string;
   let tags: string[][];
   const match = event.content.match(regstr);
@@ -2202,9 +1864,7 @@ const res_fire = (
     throw new Error();
   }
   const text = match[2].trim();
-  const emoji_tags = event.tags.filter(
-    (tag: string[]) => tag.length >= 3 && tag[0] === 'emoji',
-  );
+  const emoji_tags = event.tags.filter((tag: string[]) => tag.length >= 3 && tag[0] === 'emoji');
   tags = [...getTags(event, mode), ...emoji_tags];
   if (/(潰して|縮めて)[^るた]?$/u.test(event.content)) {
     content = `🫸${text.replace(/[^\S\n\r]|[-ー]/gu, '')}🫷`;
@@ -2222,27 +1882,12 @@ const res_fire = (
     content = `:tenshi_wing1:${text}:tenshi_wing2:`;
     tags = [
       ...tags,
-      [
-        'emoji',
-        'tenshi_wing1',
-        'https://lokuyow.github.io/images/nostr/emoji/tenshi_wing1.webp',
-      ],
-      [
-        'emoji',
-        'tenshi_wing2',
-        'https://lokuyow.github.io/images/nostr/emoji/tenshi_wing2.webp',
-      ],
+      ['emoji', 'tenshi_wing1', 'https://lokuyow.github.io/images/nostr/emoji/tenshi_wing1.webp'],
+      ['emoji', 'tenshi_wing2', 'https://lokuyow.github.io/images/nostr/emoji/tenshi_wing2.webp'],
     ];
   } else if (/出して[^るた]?$/u.test(event.content)) {
     content = `:te:${text}`;
-    tags = [
-      ...tags,
-      [
-        'emoji',
-        'te',
-        'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/te.webp',
-      ],
-    ];
+    tags = [...tags, ['emoji', 'te', 'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/te.webp']];
   } else if (/(積んで|重ねて)[^るた]?$/u.test(event.content)) {
     content = `${text}\n`.repeat(3);
   } else if (/増やして[^るた]?$/u.test(event.content)) {
@@ -2250,16 +1895,11 @@ const res_fire = (
   } else {
     const emoji_words = emoji_tags.map((tag: string[]) => `:${tag[1]}:`);
     const str = emoji_words.reduce(
-      (accumulator: string, currentValue: string) =>
-        accumulator.replaceAll(currentValue, '_'.repeat(2)),
+      (accumulator: string, currentValue: string) => accumulator.replaceAll(currentValue, '_'.repeat(2)),
       text,
     );
     const lines_l = str.split(/\r\n|\r|\n/);
-    const count = lines_l.reduce(
-      (accumulator: number, currentValue: string) =>
-        Math.max(accumulator, mb_strwidth(currentValue)),
-      0,
-    );
+    const count = lines_l.reduce((accumulator: number, currentValue: string) => Math.max(accumulator, mb_strwidth(currentValue)), 0);
     let fire = '🔥';
     let len = 2;
     const firemap: [RegExp, string, number][] = [
@@ -2303,38 +1943,25 @@ const res_fire = (
         break;
       }
     }
-    if (
-      /[踏ふ]んで[^るた]?$/u.test(event.content) &&
-      /[性愛女嬢靴情熱奴隷嬉喜悦嗜虐僕豚雄雌]|ヒール/.test(event.content)
-    ) {
+    if (/[踏ふ]んで[^るた]?$/u.test(event.content) && /[性愛女嬢靴情熱奴隷嬉喜悦嗜虐僕豚雄雌]|ヒール/.test(event.content)) {
       fire = '👠';
     }
-    if (
-      /([踏ふ]んで|捌いて|握って|触って|沈めて)[^るた]?$/u.test(event.content)
-    ) {
+    if (/([踏ふ]んで|捌いて|握って|触って|沈めて)[^るた]?$/u.test(event.content)) {
       content = `${fire.repeat(count <= 1 ? 1 : count / len)}\n${text}`;
-    } else if (
-      /(詰めて|梱包して|漬けて|囲んで|囲って|応援して|包囲して)[^るた]?$/u.test(
-        event.content,
-      )
-    ) {
+    } else if (/(詰めて|梱包して|漬けて|囲んで|囲って|応援して|包囲して)[^るた]?$/u.test(event.content)) {
       const n = count <= 1 ? 1 : count / len;
       content = fire.repeat(n + 2) + '\n';
       const lines = text.split(/\r\n|\r|\n/);
       for (const line of lines) {
         const str = emoji_words.reduce(
-          (accumulator: string, currentValue: string) =>
-            accumulator.replaceAll(currentValue, '_'.repeat(2)),
+          (accumulator: string, currentValue: string) => accumulator.replaceAll(currentValue, '_'.repeat(2)),
           line,
         );
         content += `${fire}${line}${'　'.repeat(n - mb_strwidth(str) / 2)}${fire}\n`;
       }
       content += fire.repeat(n + 2);
       if (fire === ':monocheer:') {
-        tags = [
-          ...tags,
-          ['emoji', 'monocheer', 'https://i.imgur.com/mltgqxE.gif'],
-        ];
+        tags = [...tags, ['emoji', 'monocheer', 'https://i.imgur.com/mltgqxE.gif']];
       }
     } else if (/詰んで[^るた]?$/u.test(event.content)) {
       const n = count <= 1 ? 1 : count / len;
@@ -2342,8 +1969,7 @@ const res_fire = (
       const lines = text.split(/\r\n|\r|\n/);
       for (const line of lines) {
         const str = emoji_words.reduce(
-          (accumulator: string, currentValue: string) =>
-            accumulator.replaceAll(currentValue, '_'.repeat(2)),
+          (accumulator: string, currentValue: string) => accumulator.replaceAll(currentValue, '_'.repeat(2)),
           line,
         );
         content += `${fire}${line}${'　'.repeat(n - mb_strwidth(str) / 2)}${fire}\n`;
@@ -2370,9 +1996,7 @@ const getTagsAirrep = (event: NostrEvent): string[][] => {
   if (event.kind === 1) {
     return [['e', event.id, '', 'mention']];
   } else if (event.kind === 42) {
-    const tagRoot = event.tags.find(
-      (tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
-    );
+    const tagRoot = event.tags.find((tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root');
     if (tagRoot !== undefined) {
       return [tagRoot, ['e', event.id, '', 'mention']];
     } else {
@@ -2384,19 +2008,14 @@ const getTagsAirrep = (event: NostrEvent): string[][] => {
 
 const getTagsReply = (event: NostrEvent): string[][] => {
   const tagsReply: string[][] = [];
-  const tagRoot = event.tags.find(
-    (tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
-  );
+  const tagRoot = event.tags.find((tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root');
   if (tagRoot !== undefined) {
     tagsReply.push(tagRoot);
     tagsReply.push(['e', event.id, '', 'reply', event.pubkey]);
   } else {
     tagsReply.push(['e', event.id, '', 'root', event.pubkey]);
   }
-  for (const tag of event.tags.filter(
-    (tag: string[]) =>
-      tag.length >= 2 && tag[0] === 'p' && tag[1] !== event.pubkey,
-  )) {
+  for (const tag of event.tags.filter((tag: string[]) => tag.length >= 2 && tag[0] === 'p' && tag[1] !== event.pubkey)) {
     tagsReply.push(tag);
   }
   tagsReply.push(['p', event.pubkey, '']);
@@ -2407,9 +2026,7 @@ const getTagsQuote = (event: NostrEvent): string[][] => {
   if (event.kind === 1) {
     return [['q', event.id, '', event.pubkey]];
   } else if (event.kind === 42) {
-    const tagRoot = event.tags.find(
-      (tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root',
-    );
+    const tagRoot = event.tags.find((tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root');
     if (tagRoot !== undefined) {
       return [tagRoot, ['q', event.id, '', event.pubkey]];
     } else {
@@ -2421,11 +2038,7 @@ const getTagsQuote = (event: NostrEvent): string[][] => {
 
 const getTagsFav = (event: NostrEvent): string[][] => {
   const tagsFav: string[][] = [
-    ...event.tags.filter(
-      (tag: string[]) =>
-        tag.length >= 2 &&
-        (tag[0] === 'e' || (tag[0] === 'p' && tag[1] !== event.pubkey)),
-    ),
+    ...event.tags.filter((tag: string[]) => tag.length >= 2 && (tag[0] === 'e' || (tag[0] === 'p' && tag[1] !== event.pubkey))),
     ['e', event.id, '', ''],
     ['p', event.pubkey, ''],
     ['k', String(event.kind)],

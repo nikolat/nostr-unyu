@@ -14,42 +14,24 @@ const defaultRelays = [
   'wss://nostr-relay.nokotaro.com',
 ];
 
-export default async function (
-  request: VercelRequest,
-  response: VercelResponse,
-) {
+export default async function (request: VercelRequest, response: VercelResponse) {
   if (request.method !== 'GET') {
-    return response
-      .status(405)
-      .setHeader('Allow', 'GET')
-      .end('Method Not Allowed');
+    return response.status(405).setHeader('Allow', 'GET').end('Method Not Allowed');
   }
   //署名用インスタンスを準備
   const nsec = process.env.NOSTR_PRIVATE_KEY;
   if (nsec === undefined) {
-    return response
-      .status(500)
-      .json({ error: 'NOSTR_PRIVATE_KEY is undefined' });
+    return response.status(500).json({ error: 'NOSTR_PRIVATE_KEY is undefined' });
   }
   const dr = nip19.decode(nsec);
   if (dr.type !== 'nsec') {
-    return response
-      .status(500)
-      .json({ error: 'NOSTR_PRIVATE_KEY is not `nsec`' });
+    return response.status(500).json({ error: 'NOSTR_PRIVATE_KEY is not `nsec`' });
   }
   const seckey = dr.data;
   const signer = new Signer(seckey);
 
   //クエリを解析
-  const {
-    id = null,
-    note = null,
-    nevent = null,
-    pubkey = null,
-    npub = null,
-    sats = '50',
-    comment = '',
-  } = request.query;
+  const { id = null, note = null, nevent = null, pubkey = null, npub = null, sats = '50', comment = '' } = request.query;
   if (
     !(typeof id === 'string' || id === null) ||
     !(typeof note === 'string' || note === null) ||
@@ -124,11 +106,7 @@ export default async function (
   return response.status(200).send(invoice);
 }
 
-const getKind0 = async (
-  pool: SimplePool,
-  relays: string[],
-  pubkey: string,
-): Promise<NostrEvent> => {
+const getKind0 = async (pool: SimplePool, relays: string[], pubkey: string): Promise<NostrEvent> => {
   return new Promise(async (resolve) => {
     let r: NostrEvent;
     const filters = [

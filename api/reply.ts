@@ -10,18 +10,12 @@ export const config = {
   },
 };
 
-export default async function (
-  request: VercelRequest,
-  response: VercelResponse,
-) {
+export default async function (request: VercelRequest, response: VercelResponse) {
   if (request.method === 'POST') {
     const buf = await buffer(request);
     const rawBody = buf.toString('utf8');
     return await base(rawBody, response, mode);
   } else {
-    return response
-      .status(405)
-      .setHeader('Allow', 'POST')
-      .end('Method Not Allowed');
+    return response.status(405).setHeader('Allow', 'POST').end('Method Not Allowed');
   }
 }
