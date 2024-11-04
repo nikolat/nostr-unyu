@@ -94,9 +94,13 @@ const selectResponse = async (
     }
     const surface = parseInt(match[1]);
     if ([10, 11].includes(surface)) {
+      const npub_don =
+        'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
+      const npub_awayuki =
+        'npub1e4qg56wvd3ehegd8dm7rlgj8cm998myq0ah8e9t5zeqkg7t7s93q750p76';
       const kind0: EventTemplate = {
         content: JSON.stringify({
-          about: 'うにゅうやで\n※自動返信BOTです',
+          about: `うにゅうやで\n※自動返信BOTです\n管理者: nostr:${npub_don}\nアイコン: nostr:${npub_awayuki} さん`,
           bot: true,
           display_name: 'うにゅう',
           lud16: 'nikolat@getalby.com',
@@ -2305,7 +2309,9 @@ const res_fire = (
     ) {
       fire = '👠';
     }
-    if (/([踏ふ]んで|捌いて|握って|触って|沈めて)[^るた]?$/u.test(event.content)) {
+    if (
+      /([踏ふ]んで|捌いて|握って|触って|沈めて)[^るた]?$/u.test(event.content)
+    ) {
       content = `${fire.repeat(count <= 1 ? 1 : count / len)}\n${text}`;
     } else if (
       /(詰めて|梱包して|漬けて|囲んで|囲って|応援して|包囲して)[^るた]?$/u.test(
