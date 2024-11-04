@@ -76,7 +76,10 @@ const selectResponse = async (
     default:
       throw new TypeError(`unknown mode: ${mode}`);
   }
-  if (res !== null && isNsecPost(event)) {
+  if (res === null) {
+    return null;
+  }
+  if (isNsecPost(event)) {
     res = {
       content: 'お前……秘密鍵を漏らすのは……あかんに決まっとるやろ！！',
       kind: event.kind,
@@ -84,32 +87,31 @@ const selectResponse = async (
       created_at: event.created_at + 1,
     };
   }
-  if (res !== null && /^\\s\[\d+\]/.test(res.content)) {
+  if (/^\\s\[\d+\]/.test(res.content)) {
     const match = res.content.match(/^\\s\[(\d+)\]/);
     if (match === null) {
       throw new Error();
     }
     const surface = parseInt(match[1]);
-    const kind0: EventTemplate = {
-      content: JSON.stringify({
-        about: 'うにゅうやで\n※自動返信BOTです',
-        bot: true,
-        display_name: 'うにゅう',
-        lud16: 'nikolat@getalby.com',
-        name: 'unyu',
-        nip05: 'unyu@nikolat.github.io',
-        picture: `https://nikolat.github.io/avatar/unyu-${surface}.png`,
-        website: 'https://nikolat.github.io/',
-      }),
-      kind: 0,
-      tags: [],
-      created_at: event.created_at + 1,
-    };
-    res.content = res.content.replace(/^\\s\[\d+\]/, '');
-    return [kind0, res];
-  }
-  if (res === null) {
-    return null;
+    if ([10, 11].includes(surface)) {
+      const kind0: EventTemplate = {
+        content: JSON.stringify({
+          about: 'うにゅうやで\n※自動返信BOTです',
+          bot: true,
+          display_name: 'うにゅう',
+          lud16: 'nikolat@getalby.com',
+          name: 'unyu',
+          nip05: 'unyu@nikolat.github.io',
+          picture: `https://nikolat.github.io/avatar/unyu-${surface}.png`,
+          website: 'https://nikolat.github.io/',
+        }),
+        kind: 0,
+        tags: [],
+        created_at: event.created_at + 1,
+      };
+      res.content = res.content.replace(/^\\s\[\d+\]/, '');
+      return [kind0, res];
+    }
   }
   return [res];
 };
