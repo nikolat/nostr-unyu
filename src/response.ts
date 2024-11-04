@@ -30,12 +30,6 @@ export const getResponseEvent = async (requestEvent: NostrEvent, signer: Signer,
     return null;
   }
   const events = res.map((r) => signer.finishEvent(r));
-  //nostr-webhookが対応するまで暫定
-  if (events.length >= 2) {
-    const wRelay = await Relay.connect(zapRelay);
-    await wRelay.publish(events[0]);
-    wRelay.close();
-  }
   return events;
 };
 
