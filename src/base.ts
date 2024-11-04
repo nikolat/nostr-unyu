@@ -47,7 +47,7 @@ export const base = async (
     return response.status(400).json({ error: 'Unverified event' });
   }
   //出力イベントを取得
-  let responseEvent: VerifiedEvent | null;
+  let responseEvent: VerifiedEvent[] | null;
   try {
     responseEvent = await getResponseEvent(requestEvent, signer, mode);
   } catch (error) {
@@ -65,5 +65,5 @@ export const base = async (
   return response
     .status(200)
     .setHeader('content-type', 'application/json; charset=utf-8')
-    .send(JSON.stringify(responseEvent));
+    .send(JSON.stringify(responseEvent.at(-1)));
 };

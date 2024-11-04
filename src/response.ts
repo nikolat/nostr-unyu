@@ -28,7 +28,7 @@ export const getResponseEvent = async (
   requestEvent: NostrEvent,
   signer: Signer,
   mode: Mode,
-): Promise<VerifiedEvent | null> => {
+): Promise<VerifiedEvent[] | null> => {
   if (requestEvent.pubkey === signer.getPublicKey()) {
     //自分自身の投稿には反応しない
     return null;
@@ -38,14 +38,14 @@ export const getResponseEvent = async (
     //反応しないことを選択
     return null;
   }
-  return signer.finishEvent(res);
+  return res.map((r) => signer.finishEvent(r));
 };
 
 const selectResponse = async (
   event: NostrEvent,
   mode: Mode,
   signer: Signer,
-): Promise<EventTemplate | null> => {
+): Promise<EventTemplate[] | null> => {
   if (!isAllowedToPost(event)) {
     return null;
   }
@@ -70,14 +70,40 @@ const selectResponse = async (
       throw new TypeError(`unknown mode: ${mode}`);
   }
   if (res !== null && isNsecPost(event)) {
-    return {
+    res = {
       content: 'お前……秘密鍵を漏らすのは……あかんに決まっとるやろ！！',
       kind: event.kind,
       tags: getTags(event, mode),
       created_at: event.created_at + 1,
     };
   }
-  return res;
+  if (res !== null && /^\\s\[\d+\]/.test(res.content)) {
+    const match = res.content.match(/^\\s\[(\d+)\]/);
+    if (match === null) {
+      throw new Error();
+    }
+    const surface = parseInt(match[1]);
+    const kind0: EventTemplate = {
+      content: JSON.stringify({
+        about: 'うにゅうやで\n※自動返信BOTです',
+        bot: true,
+        display_name: 'うにゅう',
+        lud16: 'nikolat@getalby.com',
+        name: 'unyu',
+        nip05: 'unyu@nikolat.github.io',
+        picture: `https://nikolat.github.io/avatar/unyu-${surface}.png`,
+        website: 'https://nikolat.github.io/',
+      }),
+      kind: 0,
+      tags: [],
+      created_at: event.created_at + 1,
+    };
+    return [kind0, res];
+  }
+  if (res === null) {
+    return null;
+  }
+  return [res];
 };
 
 const isAllowedToPost = (event: NostrEvent) => {
@@ -167,6 +193,7 @@ const getResmap = (
     ) => Promise<[string, string[][]]> | [string, string[][]] | null,
   ][] = [
     [/zapテスト$/i, res_zaptest],
+    [/^\\s\[(\d+)\]$/, res_surfacetest],
     [/おはよ/, res_ohayo],
     [/アルパカ|🦙|ものパカ|モノパカ/, res_arupaka],
     [/画像生成/, res_gazouseisei],
@@ -460,6 +487,26 @@ const mode_zap = async (
     tags: [],
     created_at: event.created_at + 1,
   };
+};
+
+const res_surfacetest = (
+  event: NostrEvent,
+  mode: Mode,
+  regstr: RegExp,
+): [string, string[][]] => {
+  let content: string;
+  const tags: string[][] = getTagsReply(event);
+  const match = event.content.match(regstr);
+  if (match === null) {
+    throw new Error();
+  }
+  const surface = parseInt(match[1]);
+  if (![10, 11].includes(surface)) {
+    content = 'そんな番号あらへん';
+  } else {
+    content = `\\s[${surface}]表情変更テストやで`;
+  }
+  return [content, tags];
 };
 
 const res_zaptest = async (
