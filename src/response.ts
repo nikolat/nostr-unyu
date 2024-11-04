@@ -105,6 +105,7 @@ const selectResponse = async (
       tags: [],
       created_at: event.created_at + 1,
     };
+    res.content = res.content.replace(/^\\s\[\d+\]/, '');
     return [kind0, res];
   }
   if (res === null) {
@@ -1985,7 +1986,11 @@ const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
       '知らんがな',
     ]);
   } else {
-    content = any(['ええで', 'ええんやで', 'あかんに決まっとるやろ']);
+    content = any([
+      '\\s[10]ええで',
+      '\\s[10]ええんやで',
+      '\\s[11]あかんに決まっとるやろ',
+    ]);
   }
   tags = getTags(event, mode);
   return [content, tags];
