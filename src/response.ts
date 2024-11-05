@@ -301,7 +301,7 @@ const mode_reply = async (event: NostrEvent, signer: Signer): Promise<EventTempl
       tags = getTagsReply(event);
     }
   } else {
-    content = 'えんいー';
+    content = '\\s[10]えんいー';
     tags = getTagsAirrep(event);
   }
   return { content, kind: event.kind, tags, created_at: created_at_res };
@@ -1579,7 +1579,7 @@ const res_saikidou = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_enii = (event: NostrEvent): [string, string[][]] => {
-  return [any(['ほい、えんいー', 'ほな、またな', 'おつかれ']), getTagsReply(event)];
+  return ['\\s[10]' + any(['ほい、えんいー', 'ほな、またな', 'おつかれ']), getTagsReply(event)];
 };
 
 const res_ukagaka = (event: NostrEvent): [string, string[][]] => {
@@ -1677,7 +1677,7 @@ const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 const res_enyee = (event: NostrEvent, mode: Mode): [string, string[][]] => {
   let content: string;
   let tags: string[][];
-  content = 'えんいー';
+  content = '\\s[10]えんいー';
   tags = getTags(event, mode);
   return [content, tags];
 };
