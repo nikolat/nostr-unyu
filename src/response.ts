@@ -1075,7 +1075,7 @@ const res_tenki = async (event: NostrEvent, mode: Mode, regstr: RegExp): Promise
 };
 
 const res_aura = (event: NostrEvent): [string, string[][]] => {
-  return ['ありえへん……このワイが……', getTagsReply(event)];
+  return ['\\s[11]ありえへん……このワイが……', getTagsReply(event)];
 };
 
 const res_emojinishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
