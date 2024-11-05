@@ -62,7 +62,7 @@ const selectResponse = async (event: NostrEvent, mode: Mode, signer: Signer): Pr
   }
   if (isNsecPost(event)) {
     res = {
-      content: 'お前……秘密鍵を漏らすのは……あかんに決まっとるやろ！！',
+      content: '\\s[11]お前……秘密鍵を漏らすのは……あかんに決まっとるやろ！！',
       kind: event.kind,
       tags: getTags(event, mode),
       created_at: event.created_at + 1,
