@@ -895,12 +895,12 @@ const res_tiger = (event: NostrEvent): [string, string[][]] => {
     return array;
   };
   const tigers = [
-    'shining_tiger_upper_left',
-    'shining_tiger_upper_right',
-    'shining_tiger_middle_left',
-    'shining_tiger_middle_right',
-    'shining_tiger_lower_left',
-    'shining_tiger_lower_right',
+    'tiger_upper_left',
+    'tiger_upper_right',
+    'tiger_middle_left',
+    'tiger_middle_right',
+    'tiger_lower_left',
+    'tiger_lower_right',
   ];
   const tiger_shuffle = shuffle(tigers.map((t) => `:${t}:`));
   const content: string = `${tiger_shuffle[0]}${tiger_shuffle[1]}\n${tiger_shuffle[2]}${tiger_shuffle[3]}\n${tiger_shuffle[4]}${tiger_shuffle[5]}`;
