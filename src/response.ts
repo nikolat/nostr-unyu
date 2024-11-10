@@ -904,7 +904,7 @@ const res_tiger = (event: NostrEvent): [string, string[][]] => {
   ];
   const tiger_shuffle = shuffle(tigers.map((t) => `:${t}:`));
   const content: string = `${tiger_shuffle[0]}${tiger_shuffle[1]}\n${tiger_shuffle[2]}${tiger_shuffle[3]}\n${tiger_shuffle[4]}${tiger_shuffle[5]}`;
-  const url_base = 'https://raw.githubusercontent.com/shibayamap/Custom_emoji/refs/heads/main/';
+  const url_base = 'https://raw.githubusercontent.com/shibayamap/Custom_emoji/main/';
   const tags: string[][] = [...tigers.map((t) => ['emoji', t, `${url_base}${t}.webp`]), ...getTagsReply(event)];
   return [content, tags];
 };
