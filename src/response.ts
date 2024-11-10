@@ -166,6 +166,7 @@ const getResmap = (
     [/^\\s\[(\d+)\]$/, res_surfacetest],
     [/おはよ/, res_ohayo],
     [/アルパカ|🦙|ものパカ|モノパカ/, res_arupaka],
+    [/タイガー|🐯|🐅/u, res_tiger],
     [/画像生成/, res_gazouseisei],
     [/りとりん|つぎはなにから？/, res_ritorin],
     [/占って|占い/, res_uranai],
@@ -882,6 +883,29 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
       `https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/${s}.webp`,
     ]),
   ];
+  return [content, tags];
+};
+
+const res_tiger = (event: NostrEvent): [string, string[][]] => {
+  const shuffle = (array: string[]) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+  const tigers = [
+    'shining_tiger_upper_left',
+    'shining_tiger_upper_right',
+    'shining_tiger_middle_left',
+    'shining_tiger_middle_right',
+    'shining_tiger_lower_left',
+    'shining_tiger_lower_right',
+  ];
+  const tiger_shuffle = shuffle(tigers.map((t) => `:${t}:`));
+  const content: string = `${tiger_shuffle[0]}${tiger_shuffle[1]}\n${tiger_shuffle[2]}${tiger_shuffle[3]}\n${tiger_shuffle[4]}${tiger_shuffle[5]}`;
+  const url_base = 'https://raw.githubusercontent.com/shibayamap/Custom_emoji/refs/heads/main/';
+  const tags: string[][] = [...tigers.map((t) => ['emoji', t, `${url_base}${t}`]), ...getTagsReply(event)];
   return [content, tags];
 };
 
