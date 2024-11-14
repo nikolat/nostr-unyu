@@ -208,7 +208,7 @@ const getResmap = (
     [/Don(さん)?(を?呼んで|どこ).?$/iu, res_don],
     [/(マグロ|ﾏｸﾞﾛ)の?元ネタ(を?呼んで|どこ).?$/u, res_maguro],
     [/(カレンダー|アドカレ|アドベントカレンダー)(を?呼んで|どこ).?$/u, res_adokare],
-    [/(nostr-hours|ノス廃|時間[見み]るやつ)(を?呼んで|どこ).?$/u, res_nostr_hours],
+    [/(nostr-hours|(ノス|のす)廃|時間[見み]るやつ)(を?呼んで|どこ).?$/ui, res_nostr_hours],
     [/DM.*(を?呼んで|どこ).?$/iu, res_dm],
     [/Zap.*(を?呼んで|どこ).?$/iu, res_zap],
     [/ここは?(どこ|ドコ).?$/iu, res_kokodoko],
