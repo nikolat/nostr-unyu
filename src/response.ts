@@ -208,6 +208,7 @@ const getResmap = (
     [/Don(さん)?(を?呼んで|どこ).?$/iu, res_don],
     [/(マグロ|ﾏｸﾞﾛ)の?元ネタ(を?呼んで|どこ).?$/u, res_maguro],
     [/(カレンダー|アドカレ|アドベントカレンダー)(を?呼んで|どこ).?$/u, res_adokare],
+    [/(nostr-hours|ノス廃|時間[見み]るやつ)(を?呼んで|どこ).?$/u, res_nostr_hours],
     [/DM.*(を?呼んで|どこ).?$/iu, res_dm],
     [/Zap.*(を?呼んで|どこ).?$/iu, res_zap],
     [/ここは?(どこ|ドコ).?$/iu, res_kokodoko],
@@ -1519,6 +1520,13 @@ const res_adokare = (event: NostrEvent): [string, string[][]] => {
   const url2024 = 'https://adventar.org/calendars/10004';
   content = `${url2024}`;
   tags = [...getTagsReply(event), ['r', url2024]];
+  return [content, tags];
+};
+
+const res_nostr_hours = (event: NostrEvent): [string, string[][]] => {
+  const url = 'https://snowcait.github.io/nostr-hours/';
+  const content: string = url;
+  const tags: string[][] = [...getTagsReply(event), ['r', url]];
   return [content, tags];
 };
 
