@@ -209,6 +209,9 @@ const getResmap = (
     [/(マグロ|ﾏｸﾞﾛ)の?元ネタ(を?呼んで|どこ).?$/u, res_maguro],
     [/(カレンダー|アドカレ|アドベントカレンダー)(を?呼んで|どこ).?$/u, res_adokare],
     [/(nostr-hours|(ノス|のす)廃|時間[見み]るやつ)(を?呼んで|どこ).?$/ui, res_nostr_hours],
+    [/(chronostr|ちょろのす)(を?呼んで|どこ).?$/ui, res_chronostr],
+    [/((タイムライン|TL)(遡る|振り返る)やつ)|(nosaray|のさらい)(を?呼んで|どこ).?$/ui, res_nosaray],
+    [/(togetter|トゥギャッター|nosli|のすり|ノスリ)(を?呼んで|どこ).?$/ui, res_nosli],
     [/DM.*(を?呼んで|どこ).?$/iu, res_dm],
     [/Zap.*(を?呼んで|どこ).?$/iu, res_zap],
     [/ここは?(どこ|ドコ).?$/iu, res_kokodoko],
@@ -1525,6 +1528,27 @@ const res_adokare = (event: NostrEvent): [string, string[][]] => {
 
 const res_nostr_hours = (event: NostrEvent): [string, string[][]] => {
   const url = 'https://snowcait.github.io/nostr-hours/';
+  const content: string = url;
+  const tags: string[][] = [...getTagsReply(event), ['r', url]];
+  return [content, tags];
+};
+
+const res_chronostr = (event: NostrEvent): [string, string[][]] => {
+  const url = 'https://chronostr.pages.dev/';
+  const content: string = url;
+  const tags: string[][] = [...getTagsReply(event), ['r', url]];
+  return [content, tags];
+};
+
+const res_nosaray = (event: NostrEvent): [string, string[][]] => {
+  const url = 'https://nosaray.vercel.app/';
+  const content: string = url;
+  const tags: string[][] = [...getTagsReply(event), ['r', url]];
+  return [content, tags];
+};
+
+const res_nosli = (event: NostrEvent): [string, string[][]] => {
+  const url = 'https://nosli.vercel.app/';
   const content: string = url;
   const tags: string[][] = [...getTagsReply(event), ['r', url]];
   return [content, tags];
