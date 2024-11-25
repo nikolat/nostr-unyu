@@ -214,6 +214,7 @@ const getResmap = (
     [/(togetter|トゥギャッター|nosli|のすり|ノスリ)(を?呼んで|どこ).?$/iu, res_nosli],
     [/DM.*(を?呼んで|どこ).?$/iu, res_dm],
     [/Zap.*(を?呼んで|どこ).?$/iu, res_zap],
+    [/おいくら(サッツ|さっつ|sats).*(を?呼んで|どこ).?$/iu, res_oikurasats],
     [/ここは?(どこ|ドコ).?$/iu, res_kokodoko],
     [/絵文字.*(を?呼んで|どこ).?$/iu, res_emoji],
     [/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
@@ -1568,6 +1569,15 @@ const res_zap = (event: NostrEvent): [string, string[][]] => {
   let content: string;
   let tags: string[][];
   const url1 = 'https://tiltpapa.github.io/zapline-jp/';
+  content = url1;
+  tags = [...getTagsReply(event), ['r', url1]];
+  return [content, tags];
+};
+
+const res_oikurasats = (event: NostrEvent): [string, string[][]] => {
+  let content: string;
+  let tags: string[][];
+  const url1 = 'https://osats.money/';
   content = url1;
   tags = [...getTagsReply(event), ['r', url1]];
   return [content, tags];
