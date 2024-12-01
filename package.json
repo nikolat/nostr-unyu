@@ -1,34 +1,34 @@
 {
-  "name": "nostr-unyu",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.ts",
-  "scripts": {
-    "dev": "npx tsx main.ts",
-    "test": "mocha -r ts-node/register 'test/**/*.ts'",
-    "lint": "prettier --check .",
-    "format": "prettier --write ."
-  },
-  "keywords": [],
-  "author": "",
-  "license": "CC0-1.0",
-  "dependencies": {
-    "nostr-tools": "^2.10.3",
-    "rss-parser": "^3.13.0",
-    "ws": "^8.18.0"
-  },
-  "devDependencies": {
-    "@types/chai": "^5.0.1",
-    "@types/mocha": "^10.0.9",
-    "@types/node": "^22.9.0",
-    "@types/ws": "^8.5.13",
-    "@vercel/node": "^2.10.3",
-    "chai": "^5.1.2",
-    "mocha": "^10.8.2",
-    "prettier": "^3.3.3",
-    "ts-node": "^10.9.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.6.3"
-  },
-  "type": "module"
+	"name": "nostr-unyu",
+	"version": "1.0.0",
+	"description": "",
+	"main": "main.ts",
+	"scripts": {
+		"dev": "npx tsx main.ts",
+		"test": "mocha -r ts-node/register 'test/**/*.ts'",
+		"lint": "prettier --check .",
+		"format": "prettier --write ."
+	},
+	"keywords": [],
+	"author": "",
+	"license": "CC0-1.0",
+	"dependencies": {
+		"nostr-tools": "^2.10.3",
+		"rss-parser": "^3.13.0",
+		"ws": "^8.18.0"
+	},
+	"devDependencies": {
+		"@types/chai": "^5.0.1",
+		"@types/mocha": "^10.0.9",
+		"@types/node": "^22.9.0",
+		"@types/ws": "^8.5.13",
+		"@vercel/node": "^2.10.3",
+		"chai": "^5.1.2",
+		"mocha": "^10.8.2",
+		"prettier": "^3.3.3",
+		"ts-node": "^10.9.2",
+		"tsx": "^4.19.2",
+		"typescript": "^5.6.3"
+	},
+	"type": "module"
 }
