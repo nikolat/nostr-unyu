@@ -222,6 +222,7 @@ const getResmap = (
 		[/お(かえ|帰)り/, res_okaeri],
 		[/人の心/, res_hitonokokoro],
 		[/ぽわ/, res_powa],
+		[/クリスマス|メリー|Xmas/i, res_xmas],
 		[/あけおめ|あけまして|ことよろ/, res_akeome],
 		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
@@ -1490,6 +1491,17 @@ const res_hitonokokoro = (event: NostrEvent): [string, string[][]] => {
 
 const res_powa = (event: NostrEvent): [string, string[][]] => {
 	return ['ぽわ〜', getTagsReply(event)];
+};
+
+const res_xmas = (event: NostrEvent): [string, string[][]] => {
+	return [
+		any([
+			'ワイは仏教徒やから関係あらへん',
+			'プレゼントなら年中受け付けとるで',
+			'Nostrしとる場合ちゃうで'
+		]),
+		getTagsReply(event)
+	];
 };
 
 const res_akeome = (event: NostrEvent): [string, string[][]] => {
