@@ -223,6 +223,7 @@ const getResmap = (
 		[/人の心/, res_hitonokokoro],
 		[/ぽわ/, res_powa],
 		[/クリスマス|メリー|Xmas/i, res_xmas],
+		[/[良よ]いお年を|来年も/, res_oomisoka],
 		[/あけおめ|あけまして|ことよろ/, res_akeome],
 		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
@@ -1502,6 +1503,10 @@ const res_xmas = (event: NostrEvent): [string, string[][]] => {
 		]),
 		getTagsReply(event)
 	];
+};
+
+const res_oomisoka = (event: NostrEvent): [string, string[][]] => {
+	return [any(['来年もよろしゅうな', '一年いろいろあったな', '楽しい一年やったな']), getTagsReply(event)];
 };
 
 const res_akeome = (event: NostrEvent): [string, string[][]] => {
