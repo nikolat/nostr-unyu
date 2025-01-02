@@ -227,6 +227,7 @@ const getResmap = (
 		[/あけおめ|あけまして|ことよろ/, res_akeome],
 		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
+		[/(ハイク|はいく)(を?呼んで|どこ).?$/u, res_haiku],
 		[/(るみるみ|ルミルミ|lumilumi|もの(さん)?のクライアント)(を?呼んで|どこ).?$/iu, res_lumilumi],
 		[/検索(を?呼んで|どこ).?$/u, res_kensaku],
 		[/麻雀(を?呼んで|どこ).?$/u, res_mahojng],
@@ -1522,6 +1523,15 @@ const res_gyunyu = (event: NostrEvent): [string, string[][]] => {
 		any(['牛乳は健康にええで🥛', 'カルシウム補給せぇ🥛', 'ワイの奢りや🥛']),
 		getTagsReply(event)
 	];
+};
+
+const res_haiku = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://nos-haiku.vercel.app/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
 };
 
 const res_lumilumi = (event: NostrEvent): [string, string[][]] => {
