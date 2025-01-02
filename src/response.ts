@@ -119,7 +119,8 @@ const isAllowedToPost = (event: NostrEvent) => {
 		'330fc57e48e39427dd5ea555b0741a3f715a55e10f8bb6616c27ec92ebc5e64b', //カスタム絵文字の川
 		'c8d5c2709a5670d6f621ac8020ac3e4fc3057a4961a15319f7c0818309407723', //Nostr麻雀開発部
 		'5b0703f5add2bb9e636bcae1ef7870ba6a591a93b6b556aca0f14b0919006598', //₍ ﾃｽﾄ ₎
-		'addfe50481fb4edcf4ca42faaf0fa28e4b4caa36409f37f0cf0c1c6bf4acb3b5' //ノスハイクのテスト
+		'addfe50481fb4edcf4ca42faaf0fa28e4b4caa36409f37f0cf0c1c6bf4acb3b5', //ノスハイクのテスト
+		'e3e2fef762933fb7d4dd59d215a9616911d958cbf0ae0401cbf9b1a9764d2915' //おはよう
 	];
 	const disallowedNpubs = [
 		'npub1j0ng5hmm7mf47r939zqkpepwekenj6uqhd5x555pn80utevvavjsfgqem2' //雀卓
@@ -1508,7 +1509,10 @@ const res_xmas = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_oomisoka = (event: NostrEvent): [string, string[][]] => {
-	return [any(['来年もよろしゅうな', '一年いろいろあったな', '楽しい一年やったな']), getTagsReply(event)];
+	return [
+		any(['来年もよろしゅうな', '一年いろいろあったな', '楽しい一年やったな']),
+		getTagsReply(event)
+	];
 };
 
 const res_akeome = (event: NostrEvent): [string, string[][]] => {
