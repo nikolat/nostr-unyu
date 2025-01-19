@@ -243,6 +243,7 @@ const getResmap = (
 		[/うにゅう(を?呼んで|どこ).?$/u, res_unyu],
 		[/Don(さん)?(を?呼んで|どこ).?$/iu, res_don],
 		[/(マグロ|ﾏｸﾞﾛ)の?元ネタ(を?呼んで|どこ).?$/u, res_maguro],
+		[/(nip-?96|画像のやつ|あぷろだ|アッ?プロー?ダー?).*(を?呼んで|どこ).?$/iu, res_nip96],
 		[/(カレンダー|アドカレ|アドベントカレンダー)(を?呼んで|どこ).?$/u, res_adokare],
 		[/(nostr-hours|(ノス|のす)廃|時間[見み]るやつ).*(を?呼んで|どこ).?$/iu, res_nostr_hours],
 		[/(chronostr|ちょろのす)(を?呼んで|どこ).?$/iu, res_chronostr],
@@ -1653,6 +1654,15 @@ const res_maguro = (event: NostrEvent): [string, string[][]] => {
 			? ['q', nip19.decode(note).data]
 			: ['e', nip19.decode(note).data, '', 'mention'];
 	tags = [...getTagsReply(event), quoteTag];
+	return [content, tags];
+};
+
+const res_nip96 = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://nikolat.github.io/nostr-learn-nip96/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
 };
 
