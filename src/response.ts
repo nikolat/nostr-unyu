@@ -255,6 +255,7 @@ const getResmap = (
 		[/ここは?(どこ|ドコ).?$/iu, res_kokodoko],
 		[/絵文字.*(を?呼んで|どこ).?$/iu, res_emoji],
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
+		[/宇和さん/, res_uwasan],
 		[/キャラサイ|くまざわ/, res_charasai],
 		[/(今|いま)どんな(感|かん)じ.?$/u, res_imadonnakanji],
 		[/スクラップボックス|Scrapbox|wikiみたいな/i, res_scrapbox],
@@ -1774,6 +1775,10 @@ const res_ukagakamin = (event: NostrEvent): [string, string[][]] => {
 	content = npubs.map((npub) => `nostr:${npub}`).join('\n');
 	tags = getTagsReply(event);
 	return [content, tags];
+};
+
+const res_uwasan = (event: NostrEvent): [string, string[][]] => {
+	return ['電波が悪いみたいやで', getTagsReply(event)];
 };
 
 const res_charasai = (event: NostrEvent): [string, string[][]] => {
