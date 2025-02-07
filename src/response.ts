@@ -660,7 +660,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (event.kind === 1) {
 		const nevent = 'nevent1qvzqqqqq9qqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejtksjfnx'; //カスタム絵文字の川
 		const content = `パブチャでやれ\nnostr:${nevent}`;
-		const tags = [...getTagsReply(event), ['e', nip19.decode(nevent).data.id, '', 'mention']];
+		const tags = [...getTagsReply(event), ['q', nip19.decode(nevent).data.id]];
 		return [content, tags];
 	}
 	let content: string;
@@ -1569,11 +1569,7 @@ const res_mahojng = (event: NostrEvent): [string, string[][]] => {
 	const nevent = 'nevent1qvzqqqqq9qqzpjx4cfcf54ns6mmzrtyqyzkrun7rq4ayjcdp2vvl0sypsvy5qaerqcwu9c'; //Nostr麻雀開発部
 	const url_chiihou = 'https://nikolat.github.io/chiihou/';
 	const content = `nostr:${nevent}\n${url_chiihou}`;
-	const tags = [
-		...getTagsReply(event),
-		['e', nip19.decode(nevent).data.id, '', 'mention'],
-		['r', url_chiihou]
-	];
+	const tags = [...getTagsReply(event), ['q', nip19.decode(nevent).data.id], ['r', url_chiihou]];
 	return [content, tags];
 };
 
@@ -1650,10 +1646,7 @@ const res_maguro = (event: NostrEvent): [string, string[][]] => {
 	let tags: string[][];
 	const note = 'note19ajxhqjvhqmvh56n6c6jdlwavrq5zhc84u6ffg06p4lu0glhem3sptg80h';
 	content = `nostr:${note}`;
-	const quoteTag =
-		event.kind === 1
-			? ['q', nip19.decode(note).data]
-			: ['e', nip19.decode(note).data, '', 'mention'];
+	const quoteTag = ['q', nip19.decode(note).data];
 	tags = [...getTagsReply(event), quoteTag];
 	return [content, tags];
 };
@@ -1972,7 +1965,7 @@ const res_unyupic = (event: NostrEvent): [string, string[][]] => {
 		throw new TypeError(`${note} is not note`);
 	}
 	content = `#うにゅう画像\nnostr:${note}`;
-	const quoteTag = event.kind === 1 ? ['q', dr.data] : ['e', dr.data, '', 'mention'];
+	const quoteTag = ['q', dr.data];
 	tags = getTagsReply(event);
 	tags.push(quoteTag);
 	tags.push(['t', 'うにゅう画像']);
@@ -1993,8 +1986,8 @@ const res_unyucomic = (event: NostrEvent): [string, string[][]] => {
 		throw new TypeError(`${note2} is not note`);
 	}
 	content = `#うにゅう漫画\nnostr:${note1}\nnostr:${note2}`;
-	const quoteTag1 = event.kind === 1 ? ['q', dr1.data] : ['e', dr1.data, '', 'mention'];
-	const quoteTag2 = event.kind === 1 ? ['q', dr2.data] : ['e', dr2.data, '', 'mention'];
+	const quoteTag1 = ['q', dr1.data];
+	const quoteTag2 = ['q', dr2.data];
 	tags = getTagsReply(event);
 	tags.push(quoteTag1);
 	tags.push(quoteTag2);
@@ -2269,22 +2262,10 @@ const getTags = (event: NostrEvent, mode: Mode): string[][] => {
 };
 
 const getTagsAirrep = (event: NostrEvent): string[][] => {
-	if (event.kind === 1) {
-		return [['e', event.id, '', 'mention']];
-	} else if (event.kind === 42) {
-		const tagRoot = event.tags.find(
-			(tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root'
-		);
-		if (tagRoot !== undefined) {
-			return [tagRoot, ['e', event.id, '', 'mention']];
-		} else {
-			throw new TypeError('root is not found');
-		}
-	}
-	throw new TypeError(`kind ${event.kind} is not supported`);
+	return getTagsReply(event, false);
 };
 
-const getTagsReply = (event: NostrEvent): string[][] => {
+const getTagsReply = (event: NostrEvent, addPTag: boolean = true): string[][] => {
 	const tagsReply: string[][] = [];
 	const tagRoot = event.tags.find(
 		(tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root'
@@ -2295,24 +2276,29 @@ const getTagsReply = (event: NostrEvent): string[][] => {
 	} else {
 		tagsReply.push(['e', event.id, '', 'root', event.pubkey]);
 	}
-	for (const tag of event.tags.filter(
-		(tag: string[]) => tag.length >= 2 && tag[0] === 'p' && tag[1] !== event.pubkey
-	)) {
-		tagsReply.push(tag);
+	if (addPTag) {
+		for (const tag of event.tags.filter(
+			(tag: string[]) => tag.length >= 2 && tag[0] === 'p' && tag[1] !== event.pubkey
+		)) {
+			tagsReply.push(tag);
+		}
+		tagsReply.push(['p', event.pubkey]);
 	}
-	tagsReply.push(['p', event.pubkey, '']);
 	return tagsReply;
 };
 
 const getTagsQuote = (event: NostrEvent): string[][] => {
 	if (event.kind === 1) {
-		return [['q', event.id, '', event.pubkey]];
+		return [
+			['q', event.id, '', event.pubkey],
+			['p', event.pubkey]
+		];
 	} else if (event.kind === 42) {
 		const tagRoot = event.tags.find(
 			(tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root'
 		);
 		if (tagRoot !== undefined) {
-			return [tagRoot, ['q', event.id, '', event.pubkey]];
+			return [tagRoot, ['q', event.id, '', event.pubkey], ['p', event.pubkey]];
 		} else {
 			throw new TypeError('root is not found');
 		}
