@@ -1150,7 +1150,7 @@ const res_tenki = async (
 			const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 			content = `nostr:${npub_yabumi} ${text}の天気をご所望やで\nnostr:${quote}`;
 			tags = getTagsQuote(event);
-			tags.push(['p', nip19.decode(npub_yabumi).data, '']);
+			tags.push(['p', nip19.decode(npub_yabumi).data]);
 		} else {
 			tags = getTagsReply(event);
 		}
@@ -1333,7 +1333,7 @@ const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, str
 	const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 	content = `nostr:${npub_reply} ${gift}三\nあちらのお客様からやで\nnostr:${quote}`;
 	tags = getTagsQuote(event);
-	tags.push(['p', pubkey_reply, '']);
+	tags.push(['p', pubkey_reply]);
 	return [content, tags];
 };
 
@@ -1422,7 +1422,7 @@ const res_rogubo = (event: NostrEvent): [string, string[][]] => {
 		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 		content = `nostr:${npub_yabumi} ${any(['別に欲しくはないんやけど、ログボくれんか', 'ログボって何やねん', 'ここでログボがもらえるって聞いたんやけど'])}\nnostr:${quote}`;
 		tags = getTagsQuote(event);
-		tags.push(['p', nip19.decode(npub_yabumi).data, '']);
+		tags.push(['p', nip19.decode(npub_yabumi).data]);
 	} else {
 		content = any(['ログボとかあらへん', '継続は力やな', '今日もログインしてえらいやで']);
 		tags = getTagsReply(event);
@@ -1637,7 +1637,7 @@ const res_don = (event: NostrEvent): [string, string[][]] => {
 	const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
 	const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 	content = `nostr:${npub_don} 呼ばれとるで\nnostr:${quote}`;
-	tags = [...getTagsQuote(event), ['p', nip19.decode(npub_don).data, '']];
+	tags = [...getTagsQuote(event), ['p', nip19.decode(npub_don).data]];
 	return [content, tags];
 };
 
