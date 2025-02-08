@@ -12,9 +12,7 @@ import {
 import * as nip19 from 'nostr-tools/nip19';
 import { nip47 } from 'nostr-tools';
 import * as nip57 from 'nostr-tools/nip57';
-import { useWebSocketImplementation, Relay } from 'nostr-tools/relay';
-import WebSocket from 'ws';
-useWebSocketImplementation(WebSocket);
+import { Relay } from 'nostr-tools/relay';
 
 const defaultRelays = [
 	'wss://relay-jp.nostr.wirednet.jp',

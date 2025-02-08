@@ -1,4 +1,4 @@
-import * as fs from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import { it } from 'mocha';
 import { assert } from 'chai';
 import { generateSecretKey, getPublicKey, type NostrEvent } from 'nostr-tools/pure';
@@ -7,7 +7,7 @@ import { getResponseEvent } from '../src/response.js';
 
 it('get response with JSON file', async () => {
 	const sk = generateSecretKey();
-	const text = await fs.readFile('./test/fixtures/input.json', {
+	const text = await readFile('./test/fixtures/input.json', {
 		encoding: 'utf8'
 	});
 	const json = JSON.parse(text);
@@ -29,7 +29,7 @@ it('get response with JSON file', async () => {
 			...event.tags.filter(
 				(tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root'
 			),
-			['e', event.id, '', 'mention']
+			['e', event.id, '', 'reply', event.pubkey]
 		]
 	};
 	assert.isNotNull(actual);
