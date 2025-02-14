@@ -194,6 +194,7 @@ const getResmap = (
 		[/^\\s\[(\d+)\]$/, res_surfacetest],
 		[/おはよ/, res_ohayo],
 		[/アルパカ|🦙|ものパカ|モノパカ/, res_arupaka],
+		[/ケルベ[ロノ]ス/, res_kerubenos],
 		[/タイガー|🐯|🐅/u, res_tiger],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
@@ -957,6 +958,58 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			s,
 			`https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/${s}.webp`
 		])
+	];
+	return [content, tags];
+};
+
+const res_kerubenos = (event: NostrEvent): [string, string[][]] => {
+	const getKubi = (): string => {
+		return [':nostopus_eating:', ':kubipaca_kao:', ':monopaca_kao:'][Math.floor(Math.random() * 3)];
+	};
+	const content: string = `${getKubi()}${getKubi()}${getKubi()}\n:kubipaca_kubi_uemigi::kubipaca_kubi_juji::kubipaca_kubi_uehidari:\n:kubipaca_null::kubipaca_karada_l::kubipaca_karada_r:`;
+	const tags = [
+		...getTagsAirrep(event),
+		[
+			'emoji',
+			'kubipaca_kao',
+			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_kao.webp'
+		],
+		[
+			'emoji',
+			'monopaca_kao',
+			'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/monopaka.webp'
+		],
+		['emoji', 'nostopus_eating', 'https://awayuki.github.io/emoji/np-027.png'],
+		[
+			'emoji',
+			'kubipaca_kubi_uemigi',
+			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_kubi_uemigi.webp'
+		],
+		[
+			'emoji',
+			'kubipaca_kubi_juji',
+			'https://lokuyow.github.io/images/nostr/emoji/kubipaca_kubi_juji.png'
+		],
+		[
+			'emoji',
+			'kubipaca_kubi_uehidari',
+			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_kubi_uehidari.webp'
+		],
+		[
+			'emoji',
+			'kubipaca_null',
+			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_null.webp'
+		],
+		[
+			'emoji',
+			'kubipaca_karada_l',
+			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_karada_l.webp'
+		],
+		[
+			'emoji',
+			'kubipaca_karada_r',
+			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_karada_r.webp'
+		]
 	];
 	return [content, tags];
 };
