@@ -977,7 +977,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		emoji_seigen.add('seigen_seigen');
 	}
 	if (isKerubenos) {
-		emoji.add('kubipaca_kubi_juji');
+		emoji.delete('kubipaca_kubi_juji');
 	}
 	content = lines.join('\n');
 	tags = [
@@ -998,6 +998,13 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			`https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/${s}.webp`
 		])
 	];
+	if (isKerubenos) {
+		tags.push([
+			'emoji',
+			':kubipaca_kubi_juji:',
+			'https://lokuyow.github.io/images/nostr/emoji/kubipaca_kubi_juji.png'
+		]);
+	}
 	return [content, tags];
 };
 
