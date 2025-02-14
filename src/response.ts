@@ -977,7 +977,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		emoji_seigen.add('seigen_seigen');
 	}
 	if (isKerubenos) {
-		emoji.add('kubipaca_juji');
+		emoji.add('kubipaca_kubi_juji');
 	}
 	content = lines.join('\n');
 	tags = [
