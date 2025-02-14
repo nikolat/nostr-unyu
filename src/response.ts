@@ -989,53 +989,49 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_kerubenos = (event: NostrEvent): [string, string[][]] => {
-	const getKubi = (): string => {
-		return [':nostopus_eating:', ':kubipaca_kao:', ':monopaca_kao:'][Math.floor(Math.random() * 3)];
+	const getKubi = (): [string, string] => {
+		const normal: Map<string, string> = new Map([
+			['nostopus_eating', 'https://awayuki.github.io/emoji/np-027.png'],
+			['kubipaca_kao', 'https://lokuyow.github.io/images/nostr/emoji/kubipaca/kubipaca_kao.webp'],
+			[
+				'monopaca_kao',
+				'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/monopaka.webp'
+			]
+		]);
+		const rare: Map<string, string> = new Map([
+			[
+				'shining_tiger_close_up',
+				'https://raw.githubusercontent.com/shibayamap/Custom_emoji/main/tiger_close_up.webp'
+			],
+			[
+				'monobeampaca_kao',
+				'https://image.nostr.build/b63e654b02d001c0f49a0a6d4b2a766215be1571709d7576f6fc238e9b21f572.png'
+			],
+			['very_sad', 'https://i.floppy.media/d2a0f27fe29bbee7eb2a7abc669e25d1.png']
+		]);
+		const r = Math.floor(Math.random() * 10) === 0 ? rare : normal;
+		return Array.from(r)[Math.floor(Math.random() * r.size)];
 	};
-	const content: string = `${getKubi()}${getKubi()}${getKubi()}\n:kubipaca_kubi_uemigi::kubipaca_kubi_juji::kubipaca_kubi_uehidari:\n:kubipaca_null::kubipaca_karada_l::kubipaca_karada_r:`;
+	const slot: [string, string][] = [getKubi(), getKubi(), getKubi()];
+	const emoji = [
+		'kubipaca_kubi_uemigi',
+		'kubipaca_kubi_juji',
+		'kubipaca_kubi_uehidari',
+		'kubipaca_null',
+		'kubipaca_karada_l',
+		'kubipaca_karada_r'
+	];
+	const content: string =
+		slot.map((kubi) => `:${kubi[0]}:`).join('') +
+		`\n:${emoji[0]}::${emoji[1]}::${emoji[2]}:\n:${emoji[3]}::${emoji[4]}::${emoji[5]}:`;
 	const tags = [
-		...getTagsAirrep(event),
-		[
+		...getTagsReply(event),
+		...slot.map((kubi) => ['emoji', kubi[0], kubi[1]]),
+		...emoji.map((s) => [
 			'emoji',
-			'kubipaca_kao',
-			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_kao.webp'
-		],
-		[
-			'emoji',
-			'monopaca_kao',
-			'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/monopaka.webp'
-		],
-		['emoji', 'nostopus_eating', 'https://awayuki.github.io/emoji/np-027.png'],
-		[
-			'emoji',
-			'kubipaca_kubi_uemigi',
-			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_kubi_uemigi.webp'
-		],
-		[
-			'emoji',
-			'kubipaca_kubi_juji',
-			'https://lokuyow.github.io/images/nostr/emoji/kubipaca_kubi_juji.png'
-		],
-		[
-			'emoji',
-			'kubipaca_kubi_uehidari',
-			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_kubi_uehidari.webp'
-		],
-		[
-			'emoji',
-			'kubipaca_null',
-			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_null.webp'
-		],
-		[
-			'emoji',
-			'kubipaca_karada_l',
-			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_karada_l.webp'
-		],
-		[
-			'emoji',
-			'kubipaca_karada_r',
-			'https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/kubipaca_karada_r.webp'
-		]
+			s,
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca/${s}.webp`
+		])
 	];
 	return [content, tags];
 };
