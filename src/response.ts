@@ -668,6 +668,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const LIMIT_HEIGHT = 30;
 	const LIMIT_BODY = 5;
 	let retry_max = 1;
+	const isKerubenos = /ケルベ[ロノ]ス/.test(event.content);
 	const isMonopaka = /ものパカ|モノパカ/.test(event.content);
 	if (/みじかい|短い/.test(event.content)) {
 		retry_max = 0;
@@ -688,7 +689,6 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		n = Math.min(parseInt(m[0]), LIMIT_BODY);
 		n = Math.max(1, n);
 	}
-	const startpoint = [];
 	const save: number[][] = [];
 	const x: number[] = [];
 	const y: number[] = [];
@@ -709,18 +709,51 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			break;
 		}
 	}
-	for (let i = 0; i < n; i++) {
-		startpoint.push([0 + 2 * i, 1]);
-		save.push([0 + 2 * i, 0], [1 + 2 * i, 0], [0 + 2 * i, 1]);
-		x.push(0 + 2 * i);
-		y.push(1);
-		b.push([0 + 2 * i, 0]);
-		c.push([0 + 2 * i, 1]);
-		finished.push(false);
-		retry.push(retry_max);
-		if (gaming[i] === undefined) gaming.push(gaming[i - 1]);
-		arrow.set(`${0 + 2 * i},0`, 'body' + (gaming[i] ? 'g' : ''));
-		arrow.set(`${1 + 2 * i},0`, '');
+	if (isKerubenos) {
+		n = 3;
+		save.push([0, 0], [1, 0], [0, 1], [-1, 1], [0, 2], [1, 1]);
+		for (let i = 0; i < n; i++) {
+			switch (i) {
+				case 0:
+					x.push(-1);
+					y.push(1);
+					b.push([0, 1]);
+					c.push([-1, 1]);
+					break;
+				case 1:
+					x.push(0);
+					y.push(2);
+					b.push([0, 1]);
+					c.push([0, 2]);
+					break;
+				case 2:
+					x.push(1);
+					y.push(1);
+					b.push([0, 1]);
+					c.push([1, 1]);
+					break;
+				default:
+					break;
+			}
+			finished.push(false);
+			retry.push(retry_max);
+		}
+		arrow.set('0,0', 'body');
+		arrow.set('1,0', '');
+		arrow.set('0,1', 'juji');
+	} else {
+		for (let i = 0; i < n; i++) {
+			save.push([0 + 2 * i, 0], [1 + 2 * i, 0], [0 + 2 * i, 1]);
+			x.push(0 + 2 * i);
+			y.push(1);
+			b.push([0 + 2 * i, 0]);
+			c.push([0 + 2 * i, 1]);
+			finished.push(false);
+			retry.push(retry_max);
+			if (gaming[i] === undefined) gaming.push(gaming[i - 1]);
+			arrow.set(`${0 + 2 * i},0`, 'body' + (gaming[i] ? 'g' : ''));
+			arrow.set(`${1 + 2 * i},0`, '');
+		}
 	}
 	const emoji = new Set<string>();
 	const emoji_seigen = new Set<string>();
@@ -910,6 +943,9 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 						break;
 					case 'bo':
 						k = 'kubipaca_karada';
+						break;
+					case 'ju':
+						k = 'kubipaca_kubi_juji';
 						break;
 					default:
 						break;
