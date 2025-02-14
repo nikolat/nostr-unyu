@@ -712,29 +712,19 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (isKerubenos) {
 		n = 3;
 		save.push([0, 0], [1, 0], [0, 1], [-1, 1], [0, 2], [1, 1]);
+		x.push(-1);
+		y.push(1);
+		b.push([0, 1]);
+		c.push([-1, 1]);
+		x.push(0);
+		y.push(2);
+		b.push([0, 1]);
+		c.push([0, 2]);
+		x.push(1);
+		y.push(1);
+		b.push([0, 1]);
+		c.push([1, 1]);
 		for (let i = 0; i < n; i++) {
-			switch (i) {
-				case 0:
-					x.push(-1);
-					y.push(1);
-					b.push([0, 1]);
-					c.push([-1, 1]);
-					break;
-				case 1:
-					x.push(0);
-					y.push(2);
-					b.push([0, 1]);
-					c.push([0, 2]);
-					break;
-				case 2:
-					x.push(1);
-					y.push(1);
-					b.push([0, 1]);
-					c.push([1, 1]);
-					break;
-				default:
-					break;
-			}
 			finished.push(false);
 			retry.push(retry_max);
 		}
@@ -976,16 +966,13 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		lines = [':seigen_seigen:'.repeat(rep), ...lines, ':seigen_seigen:'.repeat(rep)];
 		emoji_seigen.add('seigen_seigen');
 	}
-	if (isKerubenos) {
-		emoji.delete('kubipaca_kubi_juji');
-	}
 	content = lines.join('\n');
 	tags = [
 		...getTagsReply(event),
 		...Array.from(emoji).map((s) => [
 			'emoji',
 			s,
-			`https://raw.githubusercontent.com/Lokuyow/Lokuyow.github.io/main/images/nostr/emoji/${s}.webp`
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca/${s}.webp`
 		]),
 		...Array.from(emoji_seigen).map((s) => [
 			'emoji',
@@ -998,13 +985,6 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			`https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/${s}.webp`
 		])
 	];
-	if (isKerubenos) {
-		tags.push([
-			'emoji',
-			'kubipaca_kubi_juji',
-			'https://lokuyow.github.io/images/nostr/emoji/kubipaca_kubi_juji.png'
-		]);
-	}
 	return [content, tags];
 };
 
