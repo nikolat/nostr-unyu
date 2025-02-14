@@ -1001,7 +1001,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (isKerubenos) {
 		tags.push([
 			'emoji',
-			':kubipaca_kubi_juji:',
+			'kubipaca_kubi_juji',
 			'https://lokuyow.github.io/images/nostr/emoji/kubipaca_kubi_juji.png'
 		]);
 	}
