@@ -820,35 +820,35 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 				const r = Math.floor(Math.random() * 2);
 				if (
 					cs === '→' &&
-					['↑↓', '↓↑'].includes(next_arrow) &&
+					['↑↓_', '↓↑_'].includes(next_arrow) &&
 					!save.some((e) => e[0] === x[i] + 1 && e[1] === y[i]) &&
 					Math.max(...save.map((e) => e[0]), x[i] + 1) - x_min < LIMIT_WIDTH
 				) {
-					if (r) arrow.set(`${x[i]},${y[i]}`, '←→' + (gaming[i] ? 'g' : ''));
+					if (r) arrow.set(`${x[i]},${y[i]}`, '←→_' + (gaming[i] ? 'g' : ''));
 					x[i]++;
 				} else if (
 					cs === '←' &&
-					['↑↓', '↓↑'].includes(next_arrow) &&
+					['↑↓_', '↓↑_'].includes(next_arrow) &&
 					!save.some((e) => e[0] === x[i] - 1 && e[1] === y[i]) &&
 					x_max - Math.min(...save.map((e) => e[0]), x[i] - 1) < LIMIT_WIDTH
 				) {
-					if (r) arrow.set(`${x[i]},${y[i]}`, '←→' + (gaming[i] ? 'g' : ''));
+					if (r) arrow.set(`${x[i]},${y[i]}`, '←→_' + (gaming[i] ? 'g' : ''));
 					x[i]--;
 				} else if (
 					cs === '↑' &&
-					['←→', '→←'].includes(next_arrow) &&
+					['←→_', '→←_'].includes(next_arrow) &&
 					!save.some((e) => e[0] === x[i] && e[1] === y[i] + 1) &&
 					Math.max(...save.map((e) => e[1]), y[i] + 1) - y_min < LIMIT_HEIGHT
 				) {
-					if (r) arrow.set(`${x[i]},${y[i]}`, '↑↓' + (gaming[i] ? 'g' : ''));
+					if (r) arrow.set(`${x[i]},${y[i]}`, '↑↓_' + (gaming[i] ? 'g' : ''));
 					y[i]++;
 				} else if (
 					cs === '↓' &&
-					['←→', '→←'].includes(next_arrow) &&
+					['←→_', '→←_'].includes(next_arrow) &&
 					!save.some((e) => e[0] === x[i] && e[1] === y[i] - 1) &&
 					y_max - Math.min(...save.map((e) => e[1]), y[i] - 1) < LIMIT_HEIGHT
 				) {
-					if (r) arrow.set(`${x[i]},${y[i]}`, '↑↓' + (gaming[i] ? 'g' : ''));
+					if (r) arrow.set(`${x[i]},${y[i]}`, '↑↓_' + (gaming[i] ? 'g' : ''));
 					y[i]--;
 				} else {
 					if (retry[i] > 0) {
