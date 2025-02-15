@@ -727,10 +727,11 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		for (let i = 0; i < n; i++) {
 			finished.push(false);
 			retry.push(retry_max);
+			if (gaming[i] === undefined) gaming.push(gaming[i - 1]);
 		}
-		arrow.set('0,0', 'body');
+		arrow.set('0,0', 'body' + (gaming[0] ? 'g' : ''));
 		arrow.set('1,0', '');
-		arrow.set('0,1', 'juji');
+		arrow.set('0,1', 'juji' + (gaming[0] ? 'g' : ''));
 	} else {
 		for (let i = 0; i < n; i++) {
 			save.push([0 + 2 * i, 0], [1 + 2 * i, 0], [0 + 2 * i, 1]);
