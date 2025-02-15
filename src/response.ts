@@ -1013,6 +1013,9 @@ const res_kerubenos = (event: NostrEvent): [string, string[][]] => {
 		return Array.from(r)[Math.floor(Math.random() * r.size)];
 	};
 	const slot: [string, string][] = [getKubi(), getKubi(), getKubi()];
+	const headEmojiMap: Map<string, string> = new Map<string, string>(
+		slot.map((kubi) => [kubi[0], kubi[1]])
+	);
 	const emoji = [
 		'kubipaca_kubi_uemigi',
 		'kubipaca_kubi_juji',
@@ -1026,7 +1029,7 @@ const res_kerubenos = (event: NostrEvent): [string, string[][]] => {
 		`\n:${emoji[0]}::${emoji[1]}::${emoji[2]}:\n:${emoji[3]}::${emoji[4]}::${emoji[5]}:`;
 	const tags = [
 		...getTagsReply(event),
-		...slot.map((kubi) => ['emoji', kubi[0], kubi[1]]),
+		...Array.from(headEmojiMap.entries()).map((kubi) => ['emoji', kubi[0], kubi[1]]),
 		...emoji.map((s) => [
 			'emoji',
 			s,
