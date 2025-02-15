@@ -857,7 +857,9 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 						i--;
 						continue;
 					}
-					arrow.set(`${c[i][0]},${c[i][1]}`, bs + '■_' + (gaming[i] ? 'g' : ''));
+					if (!arrow.has(`${c[i][0]},${c[i][1]}`)) {
+						arrow.set(`${c[i][0]},${c[i][1]}`, bs + '■_' + (gaming[i] ? 'g' : ''));
+					}
 					finished[i] = true;
 					continue;
 				}
