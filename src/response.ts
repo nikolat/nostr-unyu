@@ -973,7 +973,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		...Array.from(emoji).map((s) => [
 			'emoji',
 			s,
-			`https://lokuyow.github.io/images/nostr/emoji/kubipaca/${s}.webp`
+			`https://lokuyow.github.io/images/nostr/emoji/${s.endsWith('_gaming') ? 'kubipaca_gaming' : 'kubipaca'}/${s}.webp`
 		]),
 		...Array.from(emoji_seigen).map((s) => [
 			'emoji',
