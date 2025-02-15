@@ -669,6 +669,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const LIMIT_BODY = 5;
 	let retry_max = 1;
 	const isKerubenos = /ケルベ[ロノ]ス/.test(event.content);
+	const isBunretsu = /分裂|分散/.test(event.content);
 	const isMonopaka = /ものパカ|モノパカ/.test(event.content);
 	if (/みじかい|短い/.test(event.content)) {
 		retry_max = 0;
@@ -694,7 +695,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const y: number[] = [];
 	const b: number[][] = []; //2つ前の座標を覚えておく
 	const c: number[][] = []; //1つ前の座標を覚えておく
-	const arrow = new Map();
+	const arrow = new Map<string, string>();
 	const finished: boolean[] = [];
 	const retry: number[] = [];
 	const gaming: boolean[] = [];
@@ -751,6 +752,22 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const emoji_mono = new Set<string>();
 	//頭を上下左右にとりあえず動かしてみる
 	while (true) {
+		if (isBunretsu) {
+			const nFix = n;
+			for (let i = 0; i < nFix; i++) {
+				const r = Math.floor(Math.random() * 4);
+				if (r === 0) {
+					finished[n] = finished[i];
+					retry[n] = retry[i];
+					gaming[n] = gaming[i];
+					x[n] = x[i];
+					y[n] = y[i];
+					b[n] = b[i];
+					c[n] = c[i];
+					n++;
+				}
+			}
+		}
 		for (let i = 0; i < n; i++) {
 			if (finished[i]) {
 				continue;
@@ -840,13 +857,25 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 						i--;
 						continue;
 					}
-					arrow.set(`${c[i][0]},${c[i][1]}`, bs + '■' + (gaming[i] ? 'g' : ''));
+					arrow.set(`${c[i][0]},${c[i][1]}`, bs + '■_' + (gaming[i] ? 'g' : ''));
 					finished[i] = true;
 					continue;
 				}
 			}
 			save.push([x[i], y[i]]); //体の座標をマッピング
-			arrow.set(`${c[i][0]},${c[i][1]}`, bs + cs + (gaming[i] ? 'g' : '')); //この座標はどっちから動いてきてどっちに動いた？
+			//この座標はどっちから動いてきてどっちに動いた？
+			const arrowE = arrow.get(`${c[i][0]},${c[i][1]}`);
+			if (arrowE === undefined) {
+				arrow.set(`${c[i][0]},${c[i][1]}`, bs + cs + '_' + (gaming[i] ? 'g' : ''));
+			} else {
+				const bsE = arrowE.slice(0, 1);
+				const csE = arrowE.slice(1, 2);
+				if (csE === '■') {
+					arrow.set(`${c[i][0]},${c[i][1]}`, bs + cs + '_' + (gaming[i] ? 'g' : ''));
+				} else {
+					arrow.set(`${c[i][0]},${c[i][1]}`, bsE + csE + cs + (gaming[i] ? 'g' : ''));
+				}
+			}
 			retry[i] = retry_max;
 			b[i] = c[i];
 			c[i] = [x[i], y[i]];
@@ -874,33 +903,36 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		for (let x = x_min; x <= x_max; x++) {
 			if (save.some((e) => e[0] === x && e[1] === y)) {
 				let s = arrow.get(`${x},${y}`);
+				if (s === undefined) {
+					throw new Error();
+				}
 				let k;
-				switch (s.slice(0, 2)) {
-					case '←→':
-					case '→←':
+				switch (s.slice(0, 3)) {
+					case '←→_':
+					case '→←_':
 						k = 'kubipaca_kubi_yoko';
 						break;
-					case '↑↓':
-					case '↓↑':
+					case '↑↓_':
+					case '↓↑_':
 						k = 'kubipaca_kubi';
 						break;
-					case '↑→':
-					case '→↑':
+					case '↑→_':
+					case '→↑_':
 						k = 'kubipaca_kubi_uemigi';
 						break;
-					case '↑←':
-					case '←↑':
+					case '↑←_':
+					case '←↑_':
 						k = 'kubipaca_kubi_uehidari';
 						break;
-					case '→↓':
-					case '↓→':
+					case '→↓_':
+					case '↓→_':
 						k = 'kubipaca_kubi_migisita';
 						break;
-					case '←↓':
-					case '↓←':
+					case '←↓_':
+					case '↓←_':
 						k = 'kubipaca_kubi_hidarisita';
 						break;
-					case '↓■':
+					case '↓■_':
 						if (isMonopaka) {
 							k = 'monopaka';
 							emoji_mono.add(k);
@@ -908,7 +940,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 							k = 'kubipaca_kao';
 						}
 						break;
-					case '←■':
+					case '←■_':
 						if (isMonopaka) {
 							k = 'monopaka_r';
 							emoji_mono.add(k);
@@ -916,7 +948,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 							k = 'kubipaca_kao_migi';
 						}
 						break;
-					case '→■':
+					case '→■_':
 						if (isMonopaka) {
 							k = 'monopaka_l';
 							emoji_mono.add(k);
@@ -924,7 +956,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 							k = 'kubipaca_kao_hidari';
 						}
 						break;
-					case '↑■':
+					case '↑■_':
 						if (isMonopaka) {
 							k = 'monopaka_gyaku';
 							emoji_mono.add(k);
@@ -932,13 +964,23 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 							k = 'kubipaca_kao_sakasa';
 						}
 						break;
-					case 'bo':
+					case 'bod':
 						k = 'kubipaca_karada';
 						break;
-					case 'ju':
+					case 'juj':
 						k = 'kubipaca_kubi_juji';
 						break;
 					default:
+						const a = s.slice(0, 3);
+						if (['↑', '→', '↓'].every((arw) => a.includes(arw))) {
+							k = 'kubipaca_kubi_hidariT';
+						} else if (['→', '↓', '←'].every((arw) => a.includes(arw))) {
+							k = 'kubipaca_kubi_T';
+						} else if (['↓', '←', '↑'].every((arw) => a.includes(arw))) {
+							k = 'kubipaca_kubi_migiT';
+						} else if (['←', '↑', '→'].every((arw) => a.includes(arw))) {
+							k = 'kubipaca_kubi_gyakuT';
+						}
 						break;
 				}
 				if (k) {
