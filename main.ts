@@ -1,4 +1,4 @@
-//curl -X POST -H "Content-Type: application/json" -d @test/fixtures/input.json https://nostr-unyu.vercel.app/api/normal
+//curl --json @test/fixtures/input.json https://nostr-unyu.vercel.app/api/normal
 import { readFile } from 'node:fs/promises';
 import { generateSecretKey, type NostrEvent } from 'nostr-tools/pure';
 import { Mode, Signer } from './src/utils.js';
