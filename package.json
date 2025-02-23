@@ -5,7 +5,7 @@
 	"main": "main.ts",
 	"scripts": {
 		"dev": "npx tsx main.ts",
-		"test": "mocha -r ts-node/register 'test/**/*.ts'",
+		"test": "mocha -r ts-node/register \"test/**/*.ts\"",
 		"lint": "prettier --check .",
 		"format": "prettier --write ."
 	},
@@ -19,13 +19,13 @@
 	"devDependencies": {
 		"@types/chai": "^5.0.1",
 		"@types/mocha": "^10.0.10",
-		"@types/node": "^22.13.1",
-		"@vercel/node": "^5.1.2",
-		"chai": "^5.1.2",
-		"mocha": "^10.8.2",
-		"prettier": "^3.4.2",
+		"@types/node": "^22.13.5",
+		"@vercel/node": "^5.1.8",
+		"chai": "^5.2.0",
+		"mocha": "^11.1.0",
+		"prettier": "^3.5.2",
 		"ts-node": "^10.9.2",
-		"tsx": "^4.19.2",
+		"tsx": "^4.19.3",
 		"typescript": "^5.7.3"
 	},
 	"type": "module",
