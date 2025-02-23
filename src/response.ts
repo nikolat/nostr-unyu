@@ -1804,7 +1804,8 @@ const res_nostr_hours = (event: NostrEvent): [string, string[][]] => {
 
 const res_chronostr = (event: NostrEvent): [string, string[][]] => {
 	const url = 'https://chro.nostrapp.me/';
-	const content: string = url;
+	const npub = 'npub1c3xutxzwzvwhmjycutv0kaxwrq7tfav4q4tuamhj3rhx2df3385qsdz0hm';
+	const content: string = `${url}\nnostr:${npub}`;
 	const tags: string[][] = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
 };
