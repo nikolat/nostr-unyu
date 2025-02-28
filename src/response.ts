@@ -2434,12 +2434,8 @@ const getTagsQuote = (event: NostrEvent): string[][] => {
 
 const getTagsFav = (event: NostrEvent): string[][] => {
 	const tagsFav: string[][] = [
-		...event.tags.filter(
-			(tag: string[]) =>
-				tag.length >= 2 && (tag[0] === 'e' || (tag[0] === 'p' && tag[1] !== event.pubkey))
-		),
-		['e', event.id, '', ''],
-		['p', event.pubkey, ''],
+		['e', event.id],
+		['p', event.pubkey],
 		['k', String(event.kind)]
 	];
 	return tagsFav;
