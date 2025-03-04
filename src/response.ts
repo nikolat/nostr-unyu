@@ -256,7 +256,7 @@ const getResmap = (
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/宇和さん/, res_uwasan],
 		[/キャラサイ|くまざわ/, res_charasai],
-		[/ぷろてあ|ぷいちゃん/, res_charasai_puichan],
+		[/えびふらいあざらし|おなかさん|今日はもうダメラニアン|くりゅおね|ココ・ユニちゃん|シュシュ|食パンレスラー|デビタ|なまこもの|なまはむ|はらぺことら|アムー|ピノ|ぷろてあ|ぷいちゃん|ペコペコザメ|ポチョ|まこたまろ|ンガ/, res_charasai_puichan],
 		[/(今|いま)どんな(感|かん)じ.?$/u, res_imadonnakanji],
 		[/スクラップボックス|Scrapbox|wikiみたいな/i, res_scrapbox],
 		[/再起動/, res_saikidou],
@@ -1911,15 +1911,20 @@ const res_charasai = (event: NostrEvent): [string, string[][]] => {
 	return [content, tags];
 };
 
-const res_charasai_puichan = (event: NostrEvent): [string, string[][]] => {
+const res_charasai_puichan = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const chara = match[0];
 	const url = 'https://bsp-prize.jp/chara-sai/2025.html';
 	content =
 		any([
 			'くまざわに投票しろ言うとるやろ',
 			'くまざわを応援しろ言うとるやろ',
-			'ぷいちゃんやない、くまざわに投票するんや'
+			`${chara}やない、くまざわに投票するんや`
 		]) + `\n${url}`;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
