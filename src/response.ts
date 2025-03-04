@@ -256,6 +256,7 @@ const getResmap = (
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/宇和さん/, res_uwasan],
 		[/キャラサイ|くまざわ/, res_charasai],
+		[/ぷいちゃん/, res_charasai_puichan],
 		[/(今|いま)どんな(感|かん)じ.?$/u, res_imadonnakanji],
 		[/スクラップボックス|Scrapbox|wikiみたいな/i, res_scrapbox],
 		[/再起動/, res_saikidou],
@@ -1906,6 +1907,20 @@ const res_charasai = (event: NostrEvent): [string, string[][]] => {
 	content =
 		any(['くまざわに投票するんやで', 'くまざわを応援するんやで', 'ワイも飛び入り参加できんかな']) +
 		`\n${url}`;
+	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
+};
+
+const res_charasai_puichan = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://bsp-prize.jp/chara-sai/2025.html';
+	content =
+		any([
+			'くまざわに投票しろ言うとうやろ',
+			'くまざわを応援しろ言うとうやろ',
+			'ぷいちゃんやない、くまざわに投票するんや'
+		]) + `\n${url}`;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
 };
