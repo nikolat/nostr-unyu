@@ -255,7 +255,7 @@ const getResmap = (
 		[/絵文字.*(を?呼んで|どこ).?$/iu, res_emoji],
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/宇和さん/, res_uwasan],
-		[/キャラサイ|くま[ざざ]わ/, res_charasai],
+		[/キャラサイ|くま(ざ|ざ)わ/u, res_charasai],
 		[/えびふらいあざらし|おなかさん|今日はもうダメラニアン|くりゅおね|ココ・ユニちゃん|シュシュ|食パンレスラー|デビタ|なまこもの|なまはむ|はらぺことら|アムー|ピノ|ぷろてあ|ぷいちゃん|ペコペコザメ|ポチョ|まこたまろ|ンガ/, res_charasai_puichan],
 		[/(今|いま)どんな(感|かん)じ.?$/u, res_imadonnakanji],
 		[/スクラップボックス|Scrapbox|wikiみたいな/i, res_scrapbox],
