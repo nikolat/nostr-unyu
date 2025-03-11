@@ -107,6 +107,19 @@ const selectResponse = async (
 			return [kind0, res];
 		}
 	}
+	if (/^\\__q$/.test(res.content)) {
+		const relaysToWrite = ['wss://yabu.me/', 'wss://nostr.compile-error.net/'];
+		const pollEvent: EventTemplate = getPollEventTemplate(event, relaysToWrite);
+		const pollEventSigned: VerifiedEvent = signer.finishEvent(pollEvent);
+		const nevent: string = nip19.neventEncode({
+			...pollEventSigned,
+			author: pollEventSigned.pubkey,
+			relays: relaysToWrite
+		});
+		res.content = `\\__qアンケートやで\nnostr:${nevent}`;
+		res.tags.push(['q', pollEventSigned.id]);
+		return [pollEvent, res];
+	}
 	return [res];
 };
 
@@ -198,6 +211,7 @@ const getResmap = (
 		[/タイガー|🐯|🐅/u, res_tiger],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
+		[/アンケート|投票/, res_poll],
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
@@ -256,7 +270,10 @@ const getResmap = (
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/宇和さん/, res_uwasan],
 		[/キャラサイ|くま(ざ|ざ)わ/u, res_charasai],
-		[/えびふらいあざらし|おなかさん|今日はもうダメラニアン|くりゅおね|ココ・ユニちゃん|シュシュ|食パンレスラー|デビタ|なまこもの|なまはむ|はらぺことら|アムー|ピノ|ぷろてあ|ぷいちゃん|ペコペコザメ|ポチョ|まこたまろ|ンガ/, res_charasai_puichan],
+		[
+			/えびふらいあざらし|おなかさん|今日はもうダメラニアン|くりゅおね|ココ・ユニちゃん|シュシュ|食パンレスラー|デビタ|なまこもの|なまはむ|はらぺことら|アムー|ピノ|ぷろてあ|ぷいちゃん|ペコペコザメ|ポチョ|まこたまろ|ンガ/,
+			res_charasai_puichan
+		],
 		[/(今|いま)どんな(感|かん)じ.?$/u, res_imadonnakanji],
 		[/スクラップボックス|Scrapbox|wikiみたいな/i, res_scrapbox],
 		[/再起動/, res_saikidou],
@@ -1142,6 +1159,53 @@ const res_ritorin = (event: NostrEvent): [string, string[][]] | null => {
 	return [content, tags];
 };
 
+const res_poll = (event: NostrEvent): [string, string[][]] | null => {
+	try {
+		const _pollEvent: EventTemplate = getPollEventTemplate(event, []);
+	} catch (_error) {
+		return [
+			'こんな感じで2個以上の項目を書くんや:\n次のうちどれがいい？\n- 項目1\n-項目2',
+			getTagsReply(event)
+		];
+	}
+	return ['\\__q', [...getTagsReply(event)]];
+};
+
+const getPollEventTemplate = (event: NostrEvent, relaysToWrite: string[]): EventTemplate => {
+	const sp = event.content.split('\n');
+	const pollContent: string | undefined = sp
+		.filter((v) => !v.startsWith('-') || v.length === 0)
+		.at(1);
+	const pollItems: string[] = sp
+		.filter((v) => v.startsWith('-'))
+		.map((v) => v.replace('-', '').trim());
+	if (pollContent === undefined || pollItems.length < 2) {
+		throw new Error();
+	}
+	const pollKind: number = 1068;
+	const pollType: string = 'singlechoice';
+	const pollEndsAt: number = event.created_at + 1 * 24 * 60 * 60;
+	const getRandomString = (n: number): string => {
+		const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
+		return [...Array(n)]
+			.map((_) => chars.charAt(Math.floor(Math.random() * chars.length)))
+			.join('');
+	};
+	const pollTags: string[][] = [
+		...pollItems.map((item) => ['option', getRandomString(9), item]),
+		...relaysToWrite.map((relay) => ['relay', relay]),
+		['polltype', pollType],
+		['endsAt', String(pollEndsAt)]
+	];
+	const pollEvent: EventTemplate = {
+		kind: pollKind,
+		tags: pollTags,
+		content: pollContent,
+		created_at: event.created_at + 1
+	};
+	return pollEvent;
+};
+
 const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
 	let content: string;
 	let tags: string[][];
@@ -1911,7 +1975,11 @@ const res_charasai = (event: NostrEvent): [string, string[][]] => {
 	return [content, tags];
 };
 
-const res_charasai_puichan = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
+const res_charasai_puichan = (
+	event: NostrEvent,
+	mode: Mode,
+	regstr: RegExp
+): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const match = event.content.match(regstr);
