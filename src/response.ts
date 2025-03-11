@@ -116,7 +116,7 @@ const selectResponse = async (
 			author: pollEventSigned.pubkey,
 			relays: relaysToWrite
 		});
-		res.content = `\\__qアンケートやで\nnostr:${nevent}`;
+		res.content = `アンケートやで\nnostr:${nevent}`;
 		res.tags.push(['q', pollEventSigned.id]);
 		return [pollEvent, res];
 	}
