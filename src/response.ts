@@ -2053,7 +2053,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 		const d = resEvent.tags.find((tag) => tag.length >= 2 && tag[0] === 'd')?.at(1) ?? '';
 		const naddr: string = `nostr:${nip19.naddrEncode({ ...resEvent, identifier: d })}`;
 		naddrs.push(naddr);
-		tags.push(['a', `${resEvent.kind}:${resEvent.pubkey}:${d}`]);
+		tags.push(['a', `${resEvent.kind}:${resEvent.pubkey}:${d}`, defaultRelay]);
 	}
 	const content = naddrs.join('\n');
 	tags.push(...getTagsReply(event));
