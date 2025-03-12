@@ -2026,7 +2026,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 		const aid = resATag[1];
 		const [kind, pubkey, identifier] = aid.split(':');
 		const relays = URL.canParse(resATag[2]) ? [resATag[2]] : undefined;
-		const naddr: string = nip19.naddrEncode({ kind: parseInt(kind), pubkey, identifier, relays });
+		const naddr: string = `nostr:${nip19.naddrEncode({ kind: parseInt(kind), pubkey, identifier, relays })}`;
 		naddrs.push(naddr);
 	}
 	content = naddrs.join('\n');
