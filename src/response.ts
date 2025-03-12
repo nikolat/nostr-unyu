@@ -2010,6 +2010,10 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 					break;
 				}
 			}
+			//10秒でtimeoutしちゃうのでとりあえず1個にする
+			if (resATags.length > 0) {
+				break;
+			}
 		}
 	}
 	if (resATags.length === 0) {
