@@ -2029,7 +2029,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 				.fill(undefined)
 				.map((_, i) => array.slice(i * number, (i + 1) * number));
 		};
-		for (const filterGroup of sliceByNumber(filters, 10)) {
+		for (const filterGroup of sliceByNumber(mergeFilterForAddressableEvents(filters, 30030), 10)) {
 			await getEvents(defaultRelay, filterGroup, (ev: NostrEvent) => {
 				const emojiTags: string[][] = ev.tags.filter(
 					(tag) =>
@@ -2058,6 +2058,27 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 	const content = naddrs.join('\n');
 	tags.push(...getTagsReply(event));
 	return [content, tags];
+};
+
+const mergeFilterForAddressableEvents = (filterdToMerge: Filter[], kind: number): Filter[] => {
+	const newFilters: Filter[] = [];
+	const filterMap: Map<string, Set<string>> = new Map<string, Set<string>>();
+	for (const filter of filterdToMerge) {
+		const author: string = filter.authors?.at(0) ?? '';
+		const dTags: string[] = filter['#d'] ?? [];
+		if (filterMap.has(author)) {
+			for (const dTag of dTags) {
+				filterMap.set(author, filterMap.get(author)!.add(dTag));
+			}
+		} else {
+			filterMap.set(author, new Set<string>(dTags));
+		}
+	}
+	for (const [author, dTagSet] of filterMap) {
+		const filter = { kinds: [kind], authors: [author], '#d': Array.from(dTagSet) };
+		newFilters.push(filter);
+	}
+	return newFilters;
 };
 
 const res_uwasan = (event: NostrEvent): [string, string[][]] => {
