@@ -674,6 +674,31 @@ const getEvent = (relayUrl: string, filters: Filter[]): Promise<NostrEvent | und
 	});
 };
 
+const getEvents = (
+	relayUrl: string,
+	filters: Filter[],
+	callback: (event: NostrEvent) => void
+): Promise<void> => {
+	return new Promise(async (resolve, reject) => {
+		let relay: Relay;
+		try {
+			relay = await Relay.connect(relayUrl);
+		} catch (error) {
+			reject(error);
+			return;
+		}
+		const onevent = (ev: NostrEvent) => {
+			callback(ev);
+		};
+		const oneose = () => {
+			sub.close();
+			relay.close();
+			resolve();
+		};
+		const sub = relay.subscribe(filters, { onevent, oneose });
+	});
+};
+
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (event.kind === 1) {
 		const nevent = 'nevent1qvzqqqqq9qqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejtksjfnx'; //カスタム絵文字の川
@@ -1973,7 +1998,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 			quotedEvents.push(quotedEvent);
 		}
 	}
-	const resATags: string[][] = [];
+	const resEvents: NostrEvent[] = [];
 	for (const qEvent of quotedEvents) {
 		const emojiTagsToSearch: string[][] = qEvent.tags.filter(
 			(tag) => tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
@@ -1988,49 +2013,50 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 			continue;
 		}
 		const aTags = event10030.tags.filter((tag) => tag.length >= 2 && tag[0] === 'a');
+		const filters: Filter[] = [];
 		for (const aTag of aTags) {
 			const aid = aTag[1];
 			const [kind, pubkey, d] = aid.split(':');
-			const relay = URL.canParse(aTag[2]) ? aTag[2] : defaultRelay;
 			const filter: Filter = { kinds: [parseInt(kind)], authors: [pubkey] };
 			if (d !== undefined) {
 				filter['#d'] = [d];
 			}
-			const event30030: NostrEvent | undefined = await getEvent(relay, [filter]);
-			if (event30030 === undefined) {
-				continue;
-			}
-			const emojiTags: string[][] = event30030.tags.filter(
-				(tag) =>
-					tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
-			);
-			for (const emojiTagToSearch of emojiTagsToSearch) {
-				if (emojiTags.map((tag) => tag[2]).includes(emojiTagToSearch[2])) {
-					resATags.push(aTag);
-					break;
+			filters.push(filter);
+		}
+		const sliceByNumber = (array: any[], number: number) => {
+			const length = Math.ceil(array.length / number);
+			return new Array(length)
+				.fill(undefined)
+				.map((_, i) => array.slice(i * number, (i + 1) * number));
+		};
+		for (const filterGroup of sliceByNumber(filters, 10)) {
+			await getEvents(defaultRelay, filterGroup, (ev: NostrEvent) => {
+				const emojiTags: string[][] = ev.tags.filter(
+					(tag) =>
+						tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
+				);
+				for (const emojiTagToSearch of emojiTagsToSearch) {
+					if (emojiTags.map((tag) => tag[2]).includes(emojiTagToSearch[2])) {
+						resEvents.push(ev);
+						break;
+					}
 				}
-			}
-			//10秒でtimeoutしちゃうのでとりあえず1個にする
-			if (resATags.length > 0) {
-				break;
-			}
+			});
 		}
 	}
-	if (resATags.length === 0) {
+	if (resEvents.length === 0) {
 		return ['見つからへん', getTagsReply(event)];
 	}
-	let content: string;
-	let tags: string[][];
+	const tags: string[][] = [];
 	const naddrs: string[] = [];
-	for (const resATag of resATags) {
-		const aid = resATag[1];
-		const [kind, pubkey, identifier] = aid.split(':');
-		const relays = URL.canParse(resATag[2]) ? [resATag[2]] : undefined;
-		const naddr: string = `nostr:${nip19.naddrEncode({ kind: parseInt(kind), pubkey, identifier, relays })}`;
+	for (const resEvent of resEvents) {
+		const d = resEvent.tags.find((tag) => tag.length >= 2 && tag[0] === 'd')?.at(1) ?? '';
+		const naddr: string = `nostr:${nip19.naddrEncode({ ...resEvent, identifier: d })}`;
 		naddrs.push(naddr);
+		tags.push(['a', `${resEvent.kind}:${resEvent.pubkey}:${d}`]);
 	}
-	content = naddrs.join('\n');
-	tags = [...resATags, ...getTagsReply(event)];
+	const content = naddrs.join('\n');
+	tags.push(...getTagsReply(event));
 	return [content, tags];
 };
 
