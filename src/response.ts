@@ -268,6 +268,7 @@ const getResmap = (
 		[/ここは?(どこ|ドコ).?$/iu, res_kokodoko],
 		[/絵文字.*(を?呼んで|どこ).?$/iu, res_emoji],
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
+		[/絵文字(を?探して|教えて)/iu, res_emoji_search],
 		[/宇和さん/, res_uwasan],
 		[/キャラサイ|くま(ざ|ざ)わ/u, res_charasai],
 		[
@@ -1957,6 +1958,75 @@ const res_ukagakamin = (event: NostrEvent): [string, string[][]] => {
 	];
 	content = npubs.map((npub) => `nostr:${npub}`).join('\n');
 	tags = getTagsReply(event);
+	return [content, tags];
+};
+
+const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]> => {
+	const defaultRelay = 'wss://yabu.me/';
+	const qTags: string[][] = event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'q');
+	const quotedEvents: NostrEvent[] = [];
+	for (const qTag of qTags) {
+		const id = qTag[1];
+		const relay = URL.canParse(qTag[2]) ? qTag[2] : defaultRelay;
+		const quotedEvent: NostrEvent | undefined = await getEvent(relay, [{ ids: [id] }]);
+		if (quotedEvent !== undefined) {
+			quotedEvents.push(quotedEvent);
+		}
+	}
+	const resATags: string[][] = [];
+	for (const qEvent of quotedEvents) {
+		const emojiTagsToSearch: string[][] = qEvent.tags.filter(
+			(tag) => tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
+		);
+		if (emojiTagsToSearch.length === 0) {
+			continue;
+		}
+		const event10030: NostrEvent | undefined = await getEvent(defaultRelay, [
+			{ kinds: [10030], authors: [qEvent.pubkey] }
+		]);
+		if (event10030 === undefined) {
+			continue;
+		}
+		const aTags = event10030.tags.filter((tag) => tag.length >= 2 && tag[0] === 'a');
+		for (const aTag of aTags) {
+			const aid = aTag[1];
+			const [kind, pubkey, d] = aid.split(':');
+			const relay = URL.canParse(aTag[2]) ? aTag[2] : defaultRelay;
+			const filter: Filter = { kinds: [parseInt(kind)], authors: [pubkey] };
+			if (d !== undefined) {
+				filter['#d'] = [d];
+			}
+			const event30030: NostrEvent | undefined = await getEvent(relay, [filter]);
+			if (event30030 === undefined) {
+				continue;
+			}
+			const emojiTags: string[][] = event30030.tags.filter(
+				(tag) =>
+					tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
+			);
+			for (const emojiTagToSearch of emojiTagsToSearch) {
+				if (emojiTags.map((tag) => tag[2]).includes(emojiTagToSearch[2])) {
+					resATags.push(aTag);
+					break;
+				}
+			}
+		}
+	}
+	if (resATags.length === 0) {
+		return ['見つからへん', getTagsReply(event)];
+	}
+	let content: string;
+	let tags: string[][];
+	const naddrs: string[] = [];
+	for (const resATag of resATags) {
+		const aid = resATag[1];
+		const [kind, pubkey, identifier] = aid.split(':');
+		const relays = URL.canParse(resATag[2]) ? [resATag[2]] : undefined;
+		const naddr: string = nip19.naddrEncode({ kind: parseInt(kind), pubkey, identifier, relays });
+		naddrs.push(naddr);
+	}
+	content = naddrs.join('\n');
+	tags = [...resATags, ...getTagsReply(event)];
 	return [content, tags];
 };
 
