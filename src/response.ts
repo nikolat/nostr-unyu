@@ -1210,7 +1210,7 @@ const getPollEventTemplate = (event: NostrEvent, relaysToWrite: string[]): Event
 		throw new Error();
 	}
 	const pollKind: number = 1068;
-	const pollType: string = 'singlechoice';
+	const pollType: string = sp[0].includes('複数') ? 'multiplechoice' : 'singlechoice';
 	const pollEndsAt: number = event.created_at + 1 * 24 * 60 * 60;
 	const getRandomString = (n: number): string => {
 		const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
