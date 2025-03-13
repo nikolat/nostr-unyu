@@ -1191,7 +1191,7 @@ const res_poll = (event: NostrEvent): [string, string[][]] | null => {
 		const _pollEvent: EventTemplate = getPollEventTemplate(event, []);
 	} catch (_error) {
 		return [
-			'こんな感じで2個以上の項目を書くんや:\n次のうちどれがいい？\n- 項目1\n-項目2',
+			'こんな感じで2個以上の項目を書くんや:\n次のうちどれがいい？\n- 項目1\n- 項目2',
 			getTagsReply(event)
 		];
 	}
