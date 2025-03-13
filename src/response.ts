@@ -259,6 +259,7 @@ const getResmap = (
 		[/(nip-?96|画像のやつ|あぷろだ|アッ?プロー?ダー?).*(を?呼んで|どこ).?$/iu, res_nip96],
 		[/(カレンダー|アドカレ|アドベントカレンダー)(を?呼んで|どこ).?$/u, res_adokare],
 		[/(nostr-hours|(ノス|のす)廃|時間[見み]るやつ).*(を?呼んで|どこ).?$/iu, res_nostr_hours],
+		[/(ノス|のす)貢献.*(を?呼んで|どこ).?$/iu, res_nostr_contribution],
 		[/(chronostr|ちょろのす)(を?呼んで|どこ).?$/iu, res_chronostr],
 		[/((タイムライン|TL)(遡る|振り返る)やつ)|(nosaray|のさらい)(を?呼んで|どこ).?$/iu, res_nosaray],
 		[/(togetter|トゥギャッター|nosli|のすり|ノスリ)(を?呼んで|どこ).?$/iu, res_nosli],
@@ -1888,6 +1889,13 @@ const res_adokare = (event: NostrEvent): [string, string[][]] => {
 
 const res_nostr_hours = (event: NostrEvent): [string, string[][]] => {
 	const url = 'https://snowcait.github.io/nostr-hours/';
+	const content: string = url;
+	const tags: string[][] = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
+};
+
+const res_nostr_contribution = (event: NostrEvent): [string, string[][]] => {
+	const url = 'https://kojira.github.io/NostrActivity/';
 	const content: string = url;
 	const tags: string[][] = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
