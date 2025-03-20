@@ -1224,6 +1224,12 @@ const getPollEventTemplate = (event: NostrEvent, relaysToWrite: string[]): Event
 		['polltype', pollType],
 		['endsAt', String(pollEndsAt)]
 	];
+	const emojiTags: string[][] = event.tags.filter(
+		(tag) => tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
+	);
+	if (emojiTags.length > 0) {
+		pollTags.push(...emojiTags);
+	}
 	const pollEvent: EventTemplate = {
 		kind: pollKind,
 		tags: pollTags,
