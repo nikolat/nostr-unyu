@@ -2470,8 +2470,16 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 		content = `:tenshi_wing1:${text}:tenshi_wing2:`;
 		tags = [
 			...tags,
-			['emoji', 'tenshi_wing1', 'https://lokuyow.github.io/images/nostr/emoji/tenshi_wing1.webp'],
-			['emoji', 'tenshi_wing2', 'https://lokuyow.github.io/images/nostr/emoji/tenshi_wing2.webp']
+			[
+				'emoji',
+				'tenshi_wing1',
+				'https://lokuyow.github.io/images/nostr/emoji/item/tenshi_wing1.webp'
+			],
+			[
+				'emoji',
+				'tenshi_wing2',
+				'https://lokuyow.github.io/images/nostr/emoji/item/tenshi_wing2.webp'
+			]
 		];
 	} else if (/出して[^るた]?$/u.test(event.content)) {
 		content = `:te:${text}`;
