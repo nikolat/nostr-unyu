@@ -2104,8 +2104,11 @@ const res_charasai = (event: NostrEvent): [string, string[][]] => {
 	let tags: string[][];
 	const url = 'https://bsp-prize.jp/chara-sai/2025.html';
 	content =
-		any(['くまざわに投票するんやで', 'くまざわを応援するんやで', 'ワイも飛び入り参加できんかな']) +
-		`\n${url}`;
+		any([
+			'おかげさんでくまざわが1位になったで',
+			'くまざわは可愛いで',
+			'次はワイも参加できたらええな'
+		]) + `\n${url}`;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
 };
@@ -2125,9 +2128,9 @@ const res_charasai_puichan = (
 	const url = 'https://bsp-prize.jp/chara-sai/2025.html';
 	content =
 		any([
-			'くまざわに投票しろ言うとるやろ',
-			'くまざわを応援しろ言うとるやろ',
-			`${chara}やない、くまざわに投票するんや`
+			`${chara}もええキャラしとるな`,
+			`${chara}を応援してくるとええで`,
+			`${chara}とはいい趣味しとるな`
 		]) + `\n${url}`;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
