@@ -14,13 +14,15 @@ import { nip47 } from 'nostr-tools';
 import * as nip57 from 'nostr-tools/nip57';
 import { Relay } from 'nostr-tools/relay';
 
-const defaultRelays = [
-	'wss://relay-jp.nostr.wirednet.jp',
-	'wss://relay.nostr.wirednet.jp',
-	'wss://yabu.me',
-	'wss://nostr-relay.nokotaro.com'
+const zapBroadcastRelays = [
+	'wss://relay-jp.nostr.wirednet.jp/',
+	'wss://relay.nostr.wirednet.jp/',
+	'wss://yabu.me/'
 ];
-const zapRelay = 'wss://yabu.me';
+const pollRelays = ['wss://yabu.me/', 'wss://nostr.compile-error.net/'];
+const profileRelay = 'wss://yabu.me/';
+const zapCheckRelay = 'wss://yabu.me/';
+const emojiRearchRelay = 'wss://yabu.me/';
 
 export const getResponseEvent = async (
 	requestEvent: NostrEvent,
@@ -108,16 +110,15 @@ const selectResponse = async (
 		}
 	}
 	if (/^\\__q$/.test(res.content)) {
-		const relaysToWrite = ['wss://yabu.me/', 'wss://nostr.compile-error.net/'];
-		const pollEvent: EventTemplate = getPollEventTemplate(event, relaysToWrite);
+		const pollEvent: EventTemplate = getPollEventTemplate(event, pollRelays);
 		const pollEventSigned: VerifiedEvent = signer.finishEvent(pollEvent);
 		const nevent: string = nip19.neventEncode({
 			...pollEventSigned,
 			author: pollEventSigned.pubkey,
-			relays: relaysToWrite
+			relays: pollRelays
 		});
 		res.content = `アンケートやで\nnostr:${nevent}`;
-		res.tags.push(['q', pollEventSigned.id]);
+		res.tags.push(['q', pollEventSigned.id, pollRelays[0], pollEventSigned.pubkey]);
 		return [pollEvent, res];
 	}
 	return [res];
@@ -613,7 +614,7 @@ const zapByNIP47 = async (
 		event: event.kind == 9734 ? null : event.id,
 		amount,
 		comment: zapComment,
-		relays: defaultRelays
+		relays: zapBroadcastRelays
 	});
 	const zapRequestEvent = signer.finishEvent(zapRequest);
 	const encoded = encodeURI(JSON.stringify(zapRequestEvent));
@@ -633,7 +634,7 @@ const zapByNIP47 = async (
 };
 
 const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
-	return getEvent(zapRelay, [
+	return getEvent(profileRelay, [
 		{
 			kinds: [0],
 			authors: [pubkey]
@@ -642,7 +643,7 @@ const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
 };
 
 const getLastZap = (pubkey: string): Promise<NostrEvent | undefined> => {
-	return getEvent(zapRelay, [
+	return getEvent(zapCheckRelay, [
 		{
 			kinds: [9735],
 			'#p': [pubkey],
@@ -2001,12 +2002,11 @@ const res_ukagakamin = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]> => {
-	const defaultRelay = 'wss://yabu.me/';
 	const qTags: string[][] = event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'q');
 	const quotedEvents: NostrEvent[] = [];
 	for (const qTag of qTags) {
 		const id = qTag[1];
-		const relay = URL.canParse(qTag[2]) ? qTag[2] : defaultRelay;
+		const relay = URL.canParse(qTag[2]) ? qTag[2] : emojiRearchRelay;
 		const quotedEvent: NostrEvent | undefined = await getEvent(relay, [{ ids: [id] }]);
 		if (quotedEvent !== undefined) {
 			quotedEvents.push(quotedEvent);
@@ -2020,7 +2020,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 		if (emojiTagsToSearch.length === 0) {
 			continue;
 		}
-		const event10030: NostrEvent | undefined = await getEvent(defaultRelay, [
+		const event10030: NostrEvent | undefined = await getEvent(emojiRearchRelay, [
 			{ kinds: [10030], authors: [qEvent.pubkey] }
 		]);
 		if (event10030 === undefined) {
@@ -2044,7 +2044,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 				.map((_, i) => array.slice(i * number, (i + 1) * number));
 		};
 		for (const filterGroup of sliceByNumber(mergeFilterForAddressableEvents(filters, 30030), 10)) {
-			await getEvents(defaultRelay, filterGroup, (ev: NostrEvent) => {
+			await getEvents(emojiRearchRelay, filterGroup, (ev: NostrEvent) => {
 				const emojiTags: string[][] = ev.tags.filter(
 					(tag) =>
 						tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
@@ -2067,7 +2067,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 		const d = resEvent.tags.find((tag) => tag.length >= 2 && tag[0] === 'd')?.at(1) ?? '';
 		const naddr: string = `nostr:${nip19.naddrEncode({ ...resEvent, identifier: d })}`;
 		naddrs.push(naddr);
-		tags.push(['a', `${resEvent.kind}:${resEvent.pubkey}:${d}`, defaultRelay]);
+		tags.push(['a', `${resEvent.kind}:${resEvent.pubkey}:${d}`, emojiRearchRelay]);
 	}
 	const content = naddrs.join('\n');
 	tags.push(...getTagsReply(event));
