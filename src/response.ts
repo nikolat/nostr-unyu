@@ -22,7 +22,7 @@ const zapBroadcastRelays = [
 const pollRelays = ['wss://yabu.me/', 'wss://nostr.compile-error.net/'];
 const profileRelay = 'wss://yabu.me/';
 const zapCheckRelay = 'wss://yabu.me/';
-const emojiRearchRelay = 'wss://yabu.me/';
+const emojiSearchRelay = 'wss://yabu.me/';
 
 export const getResponseEvent = async (
 	requestEvent: NostrEvent,
@@ -2006,7 +2006,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 	const quotedEvents: NostrEvent[] = [];
 	for (const qTag of qTags) {
 		const id = qTag[1];
-		const relay = URL.canParse(qTag[2]) ? qTag[2] : emojiRearchRelay;
+		const relay = URL.canParse(qTag[2]) ? qTag[2] : emojiSearchRelay;
 		const quotedEvent: NostrEvent | undefined = await getEvent(relay, [{ ids: [id] }]);
 		if (quotedEvent !== undefined) {
 			quotedEvents.push(quotedEvent);
@@ -2020,7 +2020,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 		if (emojiTagsToSearch.length === 0) {
 			continue;
 		}
-		const event10030: NostrEvent | undefined = await getEvent(emojiRearchRelay, [
+		const event10030: NostrEvent | undefined = await getEvent(emojiSearchRelay, [
 			{ kinds: [10030], authors: [qEvent.pubkey] }
 		]);
 		if (event10030 === undefined) {
@@ -2044,7 +2044,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 				.map((_, i) => array.slice(i * number, (i + 1) * number));
 		};
 		for (const filterGroup of sliceByNumber(mergeFilterForAddressableEvents(filters, 30030), 10)) {
-			await getEvents(emojiRearchRelay, filterGroup, (ev: NostrEvent) => {
+			await getEvents(emojiSearchRelay, filterGroup, (ev: NostrEvent) => {
 				const emojiTags: string[][] = ev.tags.filter(
 					(tag) =>
 						tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
@@ -2067,7 +2067,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 		const d = resEvent.tags.find((tag) => tag.length >= 2 && tag[0] === 'd')?.at(1) ?? '';
 		const naddr: string = `nostr:${nip19.naddrEncode({ ...resEvent, identifier: d })}`;
 		naddrs.push(naddr);
-		tags.push(['a', `${resEvent.kind}:${resEvent.pubkey}:${d}`, emojiRearchRelay]);
+		tags.push(['a', `${resEvent.kind}:${resEvent.pubkey}:${d}`, emojiSearchRelay]);
 	}
 	const content = naddrs.join('\n');
 	tags.push(...getTagsReply(event));
