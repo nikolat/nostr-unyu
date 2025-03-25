@@ -19,6 +19,11 @@ const zapBroadcastRelays = [
 	'wss://relay.nostr.wirednet.jp/',
 	'wss://yabu.me/'
 ];
+const badgeRelays = [
+	'wss://yabu.me/',
+	'wss://relay-jp.nostr.wirednet.jp/',
+	'wss://nrelay.c-stellar.net/'
+];
 const pollRelays = ['wss://yabu.me/', 'wss://nostr.compile-error.net/'];
 const profileRelay = 'wss://yabu.me/';
 const zapCheckRelay = 'wss://yabu.me/';
@@ -108,6 +113,18 @@ const selectResponse = async (
 			res.content = res.content.replace(/^\\s\[\d+\]/, '');
 			return [kind0, res];
 		}
+	}
+	if (/^\\\[\*\]$/.test(res.content)) {
+		const badgeEvent: EventTemplate = getBadgeEventTemplate(event);
+		const badgeEventSigned: VerifiedEvent = signer.finishEvent(badgeEvent);
+		const nevent: string = nip19.neventEncode({
+			...badgeEventSigned,
+			author: badgeEventSigned.pubkey,
+			relays: badgeRelays
+		});
+		res.content = `ワイのバッジやで\nnostr:${nevent}`;
+		res.tags.push(['q', badgeEventSigned.id, badgeRelays[0], badgeEventSigned.pubkey]);
+		return [badgeEvent, res];
 	}
 	if (/^\\__q$/.test(res.content)) {
 		const pollEvent: EventTemplate = getPollEventTemplate(event, pollRelays);
@@ -212,6 +229,7 @@ const getResmap = (
 		[/タイガー|🐯|🐅/u, res_tiger],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
+		[/バッジ$/, res_badge],
 		[/アンケート|投票/, res_poll],
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
@@ -1187,6 +1205,27 @@ const res_ritorin = (event: NostrEvent): [string, string[][]] | null => {
 	return [content, tags];
 };
 
+const res_badge = (event: NostrEvent): [string, string[][]] | null => {
+	return ['\\[*]', getTagsReply(event)];
+};
+
+const getBadgeEventTemplate = (event: NostrEvent): EventTemplate => {
+	const badgeEvent: EventTemplate = {
+		kind: 8,
+		tags: [
+			[
+				'a',
+				'30009:2bb2abbfc5892b7bda8f78d53682d913cc9a446b45e11929f0935d8fdfcb40bd:unyu-enyee',
+				badgeRelays[0]
+			],
+			['p', event.pubkey]
+		],
+		content: '',
+		created_at: event.created_at + 1
+	};
+	return badgeEvent;
+};
+
 const res_poll = (event: NostrEvent): [string, string[][]] | null => {
 	try {
 		const _pollEvent: EventTemplate = getPollEventTemplate(event, []);
@@ -1196,7 +1235,7 @@ const res_poll = (event: NostrEvent): [string, string[][]] | null => {
 			getTagsReply(event)
 		];
 	}
-	return ['\\__q', [...getTagsReply(event)]];
+	return ['\\__q', getTagsReply(event)];
 };
 
 const getPollEventTemplate = (event: NostrEvent, relaysToWrite: string[]): EventTemplate => {
