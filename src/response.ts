@@ -114,7 +114,7 @@ const selectResponse = async (
 			return [kind0, res];
 		}
 	}
-	if (/^\\\[\*\]$/.test(res.content)) {
+	if (/^\\!\[\*\]$/.test(res.content)) {
 		const badgeEvent: EventTemplate = getBadgeEventTemplate(event);
 		const badgeEventSigned: VerifiedEvent = signer.finishEvent(badgeEvent);
 		const nevent: string = nip19.neventEncode({
@@ -1206,7 +1206,7 @@ const res_ritorin = (event: NostrEvent): [string, string[][]] | null => {
 };
 
 const res_badge = (event: NostrEvent): [string, string[][]] | null => {
-	return ['\\[*]', getTagsReply(event)];
+	return ['\\![*]', getTagsReply(event)];
 };
 
 const getBadgeEventTemplate = (event: NostrEvent): EventTemplate => {
@@ -2530,12 +2530,12 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			]
 		];
 	} else if (/出して[^るた]?$/u.test(event.content)) {
-		content = `:te:${text}`;
+		content = `:dora_te:${text}`;
 		tags = [
 			...tags,
 			[
 				'emoji',
-				'te',
+				'dora_te',
 				'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/te.webp'
 			]
 		];
