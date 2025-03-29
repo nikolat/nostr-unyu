@@ -95,6 +95,17 @@ const selectResponse = async (
 		if ([10, 11].includes(surface)) {
 			const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
 			const npub_awayuki = 'npub1e4qg56wvd3ehegd8dm7rlgj8cm998myq0ah8e9t5zeqkg7t7s93q750p76';
+			const date = new Date();
+			date.setHours(date.getHours() + 9); //JST
+			const [year, month, day, hour, minutes, seconds, week] = [
+				date.getFullYear(),
+				date.getMonth() + 1,
+				date.getDate(),
+				date.getHours(),
+				date.getMinutes(),
+				date.getSeconds(),
+				'日月火水木金土'.at(date.getDay())
+			];
 			const kind0: EventTemplate = {
 				content: JSON.stringify({
 					about: `うにゅうやで\n※自動返信BOTです\n管理者: nostr:${npub_don}\nアイコン: nostr:${npub_awayuki} さん`,
@@ -104,7 +115,11 @@ const selectResponse = async (
 					name: 'unyu',
 					nip05: 'unyu@nikolat.github.io',
 					picture: `https://nikolat.github.io/avatar/unyu-${surface}.png`,
-					website: 'https://nikolat.github.io/'
+					website: 'https://nikolat.github.io/',
+					birthday: {
+						month,
+						day
+					}
 				}),
 				kind: 0,
 				tags: [],
