@@ -317,6 +317,7 @@ const getResmap = (
 		[/伺か/, res_ukagaka],
 		[/[呼よ](んだだけ|んでみた)|(何|なん)でもない/, res_yondadake],
 		[/ヘルプ|へるぷ|help|(助|たす)けて|(教|おし)えて|手伝って/i, res_help],
+		[/できること/, res_usage],
 		[/すき|好き|愛してる|あいしてる/, res_suki],
 		[/ランド|開いてる|閉じてる|開園|閉園/, res_ochinchinland],
 		[/招待コード/, res_invitecode],
@@ -2245,6 +2246,15 @@ const res_help = (event: NostrEvent): [string, string[][]] => {
 		any(['ワイは誰も助けへんで', '自分でなんとかせえ', 'そんなコマンドあらへんで']),
 		getTagsReply(event)
 	];
+};
+
+const res_usage = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url1 = 'https://zenn.dev/nikolat/articles/3d55e71e810332';
+	content = url1;
+	tags = [...getTagsReply(event), ['r', url1]];
+	return [content, tags];
 };
 
 const res_suki = (event: NostrEvent): [string, string[][]] => {
