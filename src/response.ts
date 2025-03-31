@@ -1594,6 +1594,9 @@ const res_emojinishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [strin
 	return [content, [...getTagsReply(event), ...emoji_tags]];
 };
 
+const isEmojiTag = (tag: string[]) =>
+	tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2]);
+
 const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
@@ -1612,6 +1615,7 @@ const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, str
 	content = `nostr:${npub_reply} ${gift}三\nあちらのお客様からやで\nnostr:${quote}`;
 	tags = getTagsQuote(event);
 	tags.push(['p', pubkey_reply]);
+	tags.push(...event.tags.filter(isEmojiTag));
 	return [content, tags];
 };
 
@@ -2069,9 +2073,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 	}
 	const resEvents: NostrEvent[] = [];
 	for (const qEvent of quotedEvents) {
-		const emojiTagsToSearch: string[][] = qEvent.tags.filter(
-			(tag) => tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
-		);
+		const emojiTagsToSearch: string[][] = qEvent.tags.filter(isEmojiTag);
 		if (emojiTagsToSearch.length === 0) {
 			continue;
 		}
@@ -2100,10 +2102,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 		};
 		for (const filterGroup of sliceByNumber(mergeFilterForAddressableEvents(filters, 30030), 10)) {
 			await getEvents(emojiSearchRelay, filterGroup, (ev: NostrEvent) => {
-				const emojiTags: string[][] = ev.tags.filter(
-					(tag) =>
-						tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
-				);
+				const emojiTags: string[][] = ev.tags.filter(isEmojiTag);
 				for (const emojiTagToSearch of emojiTagsToSearch) {
 					if (emojiTags.map((tag) => tag[2]).includes(emojiTagToSearch[2])) {
 						resEvents.push(ev);
@@ -2525,7 +2524,7 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 		throw new Error();
 	}
 	const text = match[2].trim();
-	const emoji_tags = event.tags.filter((tag: string[]) => tag.length >= 3 && tag[0] === 'emoji');
+	const emoji_tags = event.tags.filter(isEmojiTag);
 	tags = [...getTags(event, mode), ...emoji_tags];
 	if (/(潰して|縮めて)[^るた]?$/u.test(event.content)) {
 		content = `🫸${text.replace(/[^\S\n\r]|[-ー]/gu, '')}🫷`;
