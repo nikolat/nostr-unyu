@@ -305,6 +305,7 @@ const getResmap = (
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/絵文字(を?探して|教えて)/iu, res_emoji_search],
 		[/宇和さん/, res_uwasan],
+		[/ファクトチェック/, res_factcheck],
 		[/キャラサイ|くま(ざ|ざ)わ/u, res_charasai],
 		[
 			/えびふらいあざらし|おなかさん|今日はもうダメラニアン|くりゅおね|ココ・ユニちゃん|シュシュ|食パンレスラー|デビタ|なまこもの|なまはむ|はらぺことら|アムー|ピノ|ぷろてあ|ぷいちゃん|ペコペコザメ|ポチョ|まこたまろ|ンガ/,
@@ -2151,6 +2152,10 @@ const mergeFilterForAddressableEvents = (filterdToMerge: Filter[], kind: number)
 
 const res_uwasan = (event: NostrEvent): [string, string[][]] => {
 	return ['電波が悪いみたいやで', getTagsReply(event)];
+};
+
+const res_factcheck = (event: NostrEvent): [string, string[][]] => {
+	return [any(['FACT', 'FAKE']), getTagsReply(event)];
 };
 
 const res_charasai = (event: NostrEvent): [string, string[][]] => {
