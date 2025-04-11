@@ -130,7 +130,14 @@ const selectResponse = async (
 		}
 	}
 	if (/^\\!\[\*\]$/.test(res.content)) {
-		const badgeEvent: EventTemplate = getBadgeEventTemplate(event);
+		let badgeEvent: EventTemplate;
+		if (/バッジ$/.test(event.content)) {
+			badgeEvent = getBadgeEventTemplate(event);
+		} else if (/バッジを授与して/.test(event.content)) {
+			badgeEvent = getOthersBadgeEventTemplate(event);
+		} else {
+			return null;
+		}
 		const badgeEventSigned: VerifiedEvent = signer.finishEvent(badgeEvent);
 		const nevent: string = nip19.neventEncode({
 			...badgeEventSigned,
@@ -245,6 +252,7 @@ const getResmap = (
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
 		[/バッジ$/, res_badge],
+		[/バッジを授与して/, res_others_badge],
 		[/アンケート|投票/, res_poll],
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
@@ -1226,6 +1234,10 @@ const res_badge = (event: NostrEvent): [string, string[][]] | null => {
 	return ['\\![*]', getTagsReply(event)];
 };
 
+const res_others_badge = (event: NostrEvent): [string, string[][]] | null => {
+	return ['\\![*]', getTagsReply(event)];
+};
+
 const getBadgeEventTemplate = (event: NostrEvent): EventTemplate => {
 	const badgeEvent: EventTemplate = {
 		kind: 8,
@@ -1237,6 +1249,20 @@ const getBadgeEventTemplate = (event: NostrEvent): EventTemplate => {
 			],
 			['p', event.pubkey]
 		],
+		content: '',
+		created_at: event.created_at + 1
+	};
+	return badgeEvent;
+};
+
+const getOthersBadgeEventTemplate = (event: NostrEvent): EventTemplate => {
+	const aTag = event.tags.find((tag) => tag.length >= 2 && tag[0] === 'a');
+	if (aTag === undefined) {
+		return getBadgeEventTemplate(event);
+	}
+	const badgeEvent: EventTemplate = {
+		kind: 8,
+		tags: [aTag, ['p', event.pubkey]],
 		content: '',
 		created_at: event.created_at + 1
 	};
