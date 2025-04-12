@@ -593,7 +593,8 @@ const res_ohayo = async (
 		'日月火水木金土'.at(date.getDay())
 	];
 	if (4 <= hour && hour < 8) {
-		const mes = any([
+		let sats = 3;
+		let mes = any([
 			'早起きのご褒美やで',
 			'健康的でええな',
 			'みんなには内緒やで',
@@ -605,8 +606,38 @@ const res_ohayo = async (
 			'継続は力やで',
 			'今日はきっといいことあるで'
 		]);
+		if (week === '日') {
+			sats = 13;
+			mes = any([
+				'日曜日なのに早起きやな',
+				'日曜日やからてゴロゴロせえへんのは偉いやで',
+				'今日は休みとちゃうんか？',
+				'曜日に限らず毎日早起きするんやで',
+				'土曜日に夜ふかししなかったのは偉業やな'
+			]);
+		}
+		if (day === 1) {
+			sats = 30;
+			mes = any([
+				`${month}月の始まりや、今月も元気にいくで`,
+				'今日は月初めや、気合い入れていこか',
+				'月初から早起きとはええ心がけや',
+				`${month}月も毎日早起きするんやで`,
+				`今日は${month}月${day}日や、今月もよろしゅうな`
+			]);
+			if (month === 1) {
+				sats = 333;
+				mes = any([
+					'正月から早起きとはええ心がけや',
+					'新年早々早起きして偉業やで',
+					'今年も早起きを継続するんやで',
+					'今年はどんな年になるんやろな',
+					'今年もよろしゅうな'
+				]);
+			}
+		}
 		try {
-			await zapByNIP47(event, signer, 3, mes);
+			await zapByNIP47(event, signer, sats, mes);
 		} catch (error) {
 			return [any(['zzz...', 'まだ寝ときや', 'もう朝やて？ワイは信じへんで']), getTagsReply(event)];
 		}
