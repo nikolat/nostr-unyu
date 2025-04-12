@@ -144,7 +144,11 @@ const selectResponse = async (
 			author: badgeEventSigned.pubkey,
 			relays: badgeRelays
 		});
-		res.content = `ワイのバッジやで\nnostr:${nevent}`;
+		if (/バッジ$/.test(event.content)) {
+			res.content = `ワイのバッジやで\nnostr:${nevent}`;
+		} else if (/バッジを授与して/.test(event.content)) {
+			res.content = `勝手に授与してええんやろか？\nnostr:${nevent}`;
+		}
 		res.tags.push(['q', badgeEventSigned.id, badgeRelays[0], badgeEventSigned.pubkey]);
 		return [badgeEvent, res];
 	}
