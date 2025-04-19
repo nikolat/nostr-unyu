@@ -258,6 +258,7 @@ const getResmap = (
 		[/バッジ$/, res_badge],
 		[/バッジを授与して/, res_others_badge],
 		[/アンケート|投票/, res_poll],
+		[/まだ(助|たす)かる|マダガスカル/, res_madagasukaru],
 		[/占って|占い/, res_uranai],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
@@ -1355,6 +1356,10 @@ const getPollEventTemplate = (event: NostrEvent, relaysToWrite: string[]): Event
 		created_at: event.created_at + 1
 	};
 	return pollEvent;
+};
+
+const res_madagasukaru = (event: NostrEvent): [string, string[][]] => {
+	return ['🌍👈ここやで', getTagsReply(event)];
 };
 
 const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
