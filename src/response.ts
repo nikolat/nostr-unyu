@@ -140,7 +140,7 @@ const selectResponse = async (
 			],
 			created_at: event.created_at + 1
 		};
-		res.content = res.content.replace(/^\\_a$/, '');
+		res.content = res.content.replace(/^\\_a/, '');
 		return [kind10002, res];
 	}
 	if (/^\\!\[\*\]$/.test(res.content)) {
