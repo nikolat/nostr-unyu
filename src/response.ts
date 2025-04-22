@@ -129,6 +129,20 @@ const selectResponse = async (
 			return [kind0, res];
 		}
 	}
+	if (/^\\_a/.test(res.content)) {
+		const kind10002: EventTemplate = {
+			content: '',
+			kind: 10002,
+			tags: [
+				['r', 'wss://relay-jp.nostr.wirednet.jp/'],
+				['r', 'wss://yabu.me/'],
+				['r', 'wss://nostr.compile-error.net/']
+			],
+			created_at: event.created_at + 1
+		};
+		res.content = res.content.replace(/^\\_a$/, '');
+		return [kind10002, res];
+	}
 	if (/^\\!\[\*\]$/.test(res.content)) {
 		let badgeEvent: EventTemplate;
 		if (/バッジ$/.test(event.content)) {
@@ -249,6 +263,7 @@ const getResmap = (
 	][] = [
 		[/zapテスト$/i, res_zaptest],
 		[/^\\s\[(\d+)\]$/, res_surfacetest],
+		[/update\srelay/, res_relayupdate],
 		[/おはよ/, res_ohayo],
 		[/アルパカ|🦙|ものパカ|モノパカ/, res_arupaka],
 		[/ケルベ[ロノ]ス/, res_kerubenos],
@@ -543,6 +558,13 @@ const res_surfacetest = (event: NostrEvent, mode: Mode, regstr: RegExp): [string
 	} else {
 		content = `\\s[${surface}]表情変更テストやで`;
 	}
+	return [content, tags];
+};
+
+const res_relayupdate = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
+	let content: string;
+	const tags: string[][] = getTagsReply(event);
+	content = '\\_akind:10002 を更新したで';
 	return [content, tags];
 };
 
