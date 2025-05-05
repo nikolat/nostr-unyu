@@ -143,6 +143,59 @@ const selectResponse = async (
 		res.content = res.content.replace(/^\\_a/, '');
 		return [kind10002, res];
 	}
+	if (/^\\b$/.test(res.content)) {
+		const r = event.tags.find((tag) => tag.length >= 2 && tag[0] === 'r')?.at(1) ?? '';
+		if (!URL.canParse(r)) {
+			return [
+				{
+					content: 'rタグが必要や',
+					kind: event.kind,
+					tags: getTags(event, mode),
+					created_at: event.created_at + 1
+				}
+			];
+		}
+		const url = new URL(r);
+		if (url.search !== '' || url.hash !== '' || r.endsWith('?') || r.endsWith('#')) {
+			return [
+				{
+					content: 'https://example.com/ みたいな形式で頼むで',
+					kind: event.kind,
+					tags: getTags(event, mode),
+					created_at: event.created_at + 1
+				}
+			];
+		}
+		const hasnTags = Array.from(
+			new Set<string>(
+				event.tags
+					.filter((tag) => tag.length >= 2 && tag[0] === 't')
+					.map((tag) => tag[1].toLowerCase())
+			)
+		);
+		const identifier = r.replace(/^https?:\/\//, '');
+		const pubkey = signer.getPublicKey();
+		const kind = 39701;
+		const kind39701: EventTemplate = {
+			content: '',
+			kind,
+			tags: [
+				['d', identifier],
+				['published_at', String(Math.floor(Date.now() / 1000))],
+				...hasnTags.map((t) => ['t', t])
+			],
+			created_at: event.created_at + 1
+		};
+		const naddr: string = nip19.naddrEncode({
+			identifier,
+			pubkey,
+			kind,
+			relays: pollRelays
+		});
+		res.content = `ブックマークしといたで\nnostr:${naddr}`;
+		res.tags.push(['a', `${kind}:${pubkey}:${identifier}`, pollRelays[0]]);
+		return [kind39701, res];
+	}
 	if (/^\\!\[\*\]$/.test(res.content)) {
 		let badgeEvent: EventTemplate;
 		if (/バッジ$/.test(event.content)) {
@@ -283,6 +336,7 @@ const getResmap = (
 			res_emojinishite
 		],
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
+		[/(ブクマ|ブックマーク)して/, res_bukuma],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
 		[/誕生日/, res_tanjobi],
@@ -561,7 +615,7 @@ const res_surfacetest = (event: NostrEvent, mode: Mode, regstr: RegExp): [string
 	return [content, tags];
 };
 
-const res_relayupdate = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
+const res_relayupdate = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	const tags: string[][] = getTagsReply(event);
 	content = '\\_akind:10002 を更新したで';
@@ -1710,6 +1764,13 @@ const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, str
 	tags = getTagsQuote(event);
 	tags.push(['p', pubkey_reply]);
 	tags.push(...event.tags.filter(isEmojiTag));
+	return [content, tags];
+};
+
+const res_bukuma = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	const tags: string[][] = getTagsReply(event);
+	content = '\\b';
 	return [content, tags];
 };
 
