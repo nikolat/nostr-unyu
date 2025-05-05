@@ -359,6 +359,7 @@ const getResmap = (
 		[/あけおめ|あけまして|ことよろ/, res_akeome],
 		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
+		[/(ブクマ|ブックマーク)(を?呼んで|どこ).?$/, res_bukumadoko],
 		[/(ハイク|はいく)(を?呼んで|どこ).?$/u, res_haiku],
 		[/(るみるみ|ルミルミ|lumilumi|もの(さん)?のクライアント)(を?呼んで|どこ).?$/iu, res_lumilumi],
 		[/検索(を?呼んで|どこ).?$/u, res_kensaku],
@@ -1967,6 +1968,15 @@ const res_gyunyu = (event: NostrEvent): [string, string[][]] => {
 		any(['牛乳は健康にええで🥛', 'カルシウム補給せぇ🥛', 'ワイの奢りや🥛']),
 		getTagsReply(event)
 	];
+};
+
+const res_bukumadoko = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://nostr-web-bookmark-trend.vercel.app/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
 };
 
 const res_haiku = (event: NostrEvent): [string, string[][]] => {
