@@ -1396,18 +1396,28 @@ const res_poll = (event: NostrEvent): [string, string[][]] | null => {
 };
 
 const getPollEventTemplate = (event: NostrEvent, relaysToWrite: string[]): EventTemplate => {
-	const sp = event.content.split('\n');
-	const pollContent: string | undefined = sp
-		.filter((v) => !v.startsWith('-') || v.length === 0)
-		.at(1);
-	const pollItems: string[] = sp
-		.filter((v) => v.startsWith('-'))
-		.map((v) => v.replace('-', '').trim());
-	if (pollContent === undefined || pollItems.length < 2) {
+	const pollContentArray: string[] = [];
+	const pollItems: string[] = [];
+	let isItemsField: boolean = false;
+	for (const line of event.content.split('\n')) {
+		if (!isItemsField) {
+			if (line.startsWith('-')) {
+				isItemsField = true;
+			} else {
+				pollContentArray.push(line);
+			}
+		}
+		if (isItemsField) {
+			if (line.startsWith('-')) {
+				pollItems.push(line.replace('-', '').trim());
+			}
+		}
+	}
+	if (pollContentArray.length === 0 || pollItems.length < 2) {
 		throw new Error();
 	}
 	const pollKind: number = 1068;
-	const pollType: string = sp[0].includes('複数') ? 'multiplechoice' : 'singlechoice';
+	const pollType: string = pollContentArray[0].includes('複数') ? 'multiplechoice' : 'singlechoice';
 	const pollEndsAt: number = event.created_at + 1 * 24 * 60 * 60;
 	const getRandomString = (n: number): string => {
 		const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
@@ -1430,7 +1440,7 @@ const getPollEventTemplate = (event: NostrEvent, relaysToWrite: string[]): Event
 	const pollEvent: EventTemplate = {
 		kind: pollKind,
 		tags: pollTags,
-		content: pollContent,
+		content: pollContentArray.slice(1).join('\n'),
 		created_at: event.created_at + 1
 	};
 	return pollEvent;
