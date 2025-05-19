@@ -329,6 +329,7 @@ const getResmap = (
 		[/まだ(助|たす)かる|マダガスカル/, res_madagasukaru],
 		[/いいスタート|イースター島/, res_iisutato],
 		[/占って|占い/, res_uranai],
+		[/カレーの材料/, res_curry],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
 		[
@@ -1532,6 +1533,18 @@ const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
 		content = `${type}のあなたの今日の運勢は『${star}』\nラッキーゴーストは『${feed.items[index].title}』やで\n${feed.items[index].link}`;
 		tags.push(['r', link]);
 	}
+	return [content, tags];
+};
+
+const res_curry = (event: NostrEvent): [string, string[][]] => {
+	const getRandomString = (n: number): string => {
+		const str = Array.from(
+			'🍇🍈🍉🍊🍋🍌🍍🥭🍎🍏🍐🍑🍒🍓🫐🥝🍅🫒🥥🥑🍆🥔🥕🌽🌶️🫑🥒🥬🥦🧄🧅🥜🫘🌰🫚🫛🍞🥐🥖🫓🥨🥯🥞🧇🧀🍖🍗🥩🥓🍔🍟🍕🌭🥪🌮🌯🫔🥙🧆🥚🍳🥘🍲🫕🥣🥗🍿🧈🧂🥫🍱🍘🍙🍚🍛🍜🍝🍠🍢🍣🍤🍥🥮🍡🥟🥠🥡🦀🦞🦐🦑🦪🍦🍧🍨🍩🍪🎂🍰🧁🍫🍬🍭🍮🍯🍼🥛☕🫖🍵🍶🍾🍷🍸🍹🍺🍻🥂🥃🫗🥤🧋🧃🧉🧊'
+		);
+		return [...Array(n)].map((_) => str.at(Math.floor(Math.random() * str.length))).join('');
+	};
+	const content: string = getRandomString(4);
+	const tags: string[][] = getTagsReply(event);
 	return [content, tags];
 };
 
