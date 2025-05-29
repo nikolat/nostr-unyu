@@ -1,8 +1,9 @@
 import { Mode, Signer } from './utils.js';
 import mb_strwidth from './mb_strwidth.js';
 import Parser from 'rss-parser';
-import { hexToBytes } from '@noble/hashes/utils';
 import type { Filter } from 'nostr-tools/filter';
+import { Relay } from 'nostr-tools/relay';
+import { hexToBytes } from 'nostr-tools/utils';
 import {
 	verifyEvent,
 	type EventTemplate,
@@ -12,7 +13,6 @@ import {
 import * as nip19 from 'nostr-tools/nip19';
 import { nip47 } from 'nostr-tools';
 import * as nip57 from 'nostr-tools/nip57';
-import { Relay } from 'nostr-tools/relay';
 
 const zapBroadcastRelays = [
 	'wss://relay-jp.nostr.wirednet.jp/',
@@ -863,7 +863,10 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (event.kind === 1) {
 		const nevent = 'nevent1qvzqqqqq9qqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejtksjfnx'; //カスタム絵文字の川
 		const content = `パブチャでやれ\nnostr:${nevent}`;
-		const tags = [...getTagsReply(event), ['q', nip19.decode(nevent).data.id]];
+		const tags = [
+			...getTagsReply(event),
+			['q', (nip19.decode(nevent).data as nip19.EventPointer).id]
+		];
 		return [content, tags];
 	}
 	let content: string;
@@ -1600,7 +1603,7 @@ const res_tenki = async (
 			const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 			content = `nostr:${npub_yabumi} ${text}の天気をご所望やで\nnostr:${quote}`;
 			tags = getTagsQuote(event);
-			tags.push(['p', nip19.decode(npub_yabumi).data]);
+			tags.push(['p', nip19.decode(npub_yabumi).data as string]);
 		} else {
 			tags = getTagsReply(event);
 		}
@@ -1883,7 +1886,7 @@ const res_rogubo = (event: NostrEvent): [string, string[][]] => {
 		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 		content = `nostr:${npub_yabumi} ${any(['別に欲しくはないんやけど、ログボくれんか', 'ログボって何やねん', 'ここでログボがもらえるって聞いたんやけど'])}\nnostr:${quote}`;
 		tags = getTagsQuote(event);
-		tags.push(['p', nip19.decode(npub_yabumi).data]);
+		tags.push(['p', nip19.decode(npub_yabumi).data as string]);
 	} else {
 		content = any(['ログボとかあらへん', '継続は力やな', '今日もログインしてえらいやで']);
 		tags = getTagsReply(event);
@@ -2039,7 +2042,11 @@ const res_mahojng = (event: NostrEvent): [string, string[][]] => {
 	const nevent = 'nevent1qvzqqqqq9qqzpjx4cfcf54ns6mmzrtyqyzkrun7rq4ayjcdp2vvl0sypsvy5qaerqcwu9c'; //Nostr麻雀開発部
 	const url_chiihou = 'https://nikolat.github.io/chiihou/';
 	const content = `nostr:${nevent}\n${url_chiihou}`;
-	const tags = [...getTagsReply(event), ['q', nip19.decode(nevent).data.id], ['r', url_chiihou]];
+	const tags = [
+		...getTagsReply(event),
+		['q', (nip19.decode(nevent).data as nip19.EventPointer).id],
+		['r', url_chiihou]
+	];
 	return [content, tags];
 };
 
@@ -2107,7 +2114,7 @@ const res_don = (event: NostrEvent): [string, string[][]] => {
 	const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
 	const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
 	content = `nostr:${npub_don} 呼ばれとるで\nnostr:${quote}`;
-	tags = [...getTagsQuote(event), ['p', nip19.decode(npub_don).data]];
+	tags = [...getTagsQuote(event), ['p', nip19.decode(npub_don).data as string]];
 	return [content, tags];
 };
 
@@ -2116,7 +2123,7 @@ const res_maguro = (event: NostrEvent): [string, string[][]] => {
 	let tags: string[][];
 	const note = 'note19ajxhqjvhqmvh56n6c6jdlwavrq5zhc84u6ffg06p4lu0glhem3sptg80h';
 	content = `nostr:${note}`;
-	const quoteTag = ['q', nip19.decode(note).data];
+	const quoteTag = ['q', nip19.decode(note).data as string];
 	tags = [...getTagsReply(event), quoteTag];
 	return [content, tags];
 };
@@ -2388,7 +2395,11 @@ const res_imadonnakanji = (event: NostrEvent): [string, string[][]] => {
 	const npub_wordcloud = 'npub14htwadwsnle0d227mptfy6r7pcwl7scs3dhwvnmagd8u7s5rg6vslde86r';
 	const url1 = 'https://sns.uwith.net/';
 	content = `nostr:${npub_wordcloud} どんな感じや？\n${url1}`;
-	tags = [...getTagsReply(event), ['p', nip19.decode(npub_wordcloud).data, ''], ['r', url1]];
+	tags = [
+		...getTagsReply(event),
+		['p', nip19.decode(npub_wordcloud).data as string, ''],
+		['r', url1]
+	];
 	return [content, tags];
 };
 
