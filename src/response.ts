@@ -588,10 +588,13 @@ const mode_zap = async (event: NostrEvent, signer: Signer): Promise<EventTemplat
 	if (parseInt(amount) < 39 * 1000) {
 		return null;
 	}
-	try {
-		await zapByNIP47(event9734, signer, 39, 'ありがとさん');
-	} catch (error) {
-		return null;
+	const zapEndPoint: string | null = await getZapEndPoint(event);
+	if (zapEndPoint !== null) {
+		try {
+			await zapByNIP47(zapEndPoint, event9734, signer, 39, 'ありがとさん');
+		} catch (error) {
+			return null;
+		}
 	}
 	return {
 		content: 'Zapありがとさん',
@@ -634,8 +637,12 @@ const res_zaptest = async (
 	if (event.pubkey !== nip19.decode(npub_don).data) {
 		return ['イタズラしたらあかんで', getTagsReply(event)];
 	}
+	const zapEndPoint: string | null = await getZapEndPoint(event);
+	if (zapEndPoint === null) {
+		return ['LNアドレスが設定されてないで', getTagsReply(event)];
+	}
 	try {
-		await zapByNIP47(event, signer, 1, 'Zapのテストやで');
+		await zapByNIP47(zapEndPoint, event, signer, 1, 'Zapのテストやで');
 	} catch (error) {
 		return ['何か失敗したみたいやで', getTagsReply(event)];
 	}
@@ -716,10 +723,16 @@ const res_ohayo = async (
 				]);
 			}
 		}
-		try {
-			await zapByNIP47(event, signer, sats, mes);
-		} catch (error) {
-			return [any(['zzz...', 'まだ寝ときや', 'もう朝やて？ワイは信じへんで']), getTagsReply(event)];
+		const zapEndPoint: string | null = await getZapEndPoint(event);
+		if (zapEndPoint !== null) {
+			try {
+				await zapByNIP47(zapEndPoint, event, signer, sats, mes);
+			} catch (error) {
+				return [
+					any(['zzz...', 'まだ寝ときや', 'もう朝やて？ワイは信じへんで']),
+					getTagsReply(event)
+				];
+			}
 		}
 	}
 	return [
@@ -728,7 +741,17 @@ const res_ohayo = async (
 	];
 };
 
+const getZapEndPoint = async (event: NostrEvent): Promise<string | null> => {
+	const evKind0: NostrEvent | undefined = await getKind0(event.pubkey);
+	if (evKind0 === undefined) {
+		return null;
+	}
+	const zapEndpoint: string | null = await nip57.getZapEndpoint(evKind0);
+	return zapEndpoint;
+};
+
 const zapByNIP47 = async (
+	zapEndpoint: string,
 	event: NostrEvent,
 	signer: Signer,
 	sats: number,
@@ -744,14 +767,6 @@ const zapByNIP47 = async (
 	const walletSeckey = searchParams.get('secret');
 	if (walletPubkey.length === 0 || walletRelay === null || walletSeckey === null) {
 		throw Error('NOSTR_WALLET_CONNECT is invalid connection string');
-	}
-	const evKind0 = await getKind0(event.pubkey);
-	if (evKind0 === undefined) {
-		throw Error('Cannot get kind 0 event');
-	}
-	const zapEndpoint = await nip57.getZapEndpoint(evKind0);
-	if (zapEndpoint === null) {
-		throw Error('Cannot get zap endpoint');
 	}
 
 	const lastZap = await getLastZap(event.pubkey);
