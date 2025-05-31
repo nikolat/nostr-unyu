@@ -360,9 +360,10 @@ const getResmap = (
 		[/あけおめ|あけまして|ことよろ/, res_akeome],
 		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
-		[/(ブクマ|ブックマーク)(を?呼んで|どこ).?$/, res_bukumadoko],
+		[/(ブクマ|ブックマーク|口寄せ|クチヨセ|kuchiyose)(を?呼んで|どこ).?$/iu, res_kuchiyose],
 		[/(ハイク|はいく)(を?呼んで|どこ).?$/u, res_haiku],
 		[/(るみるみ|ルミルミ|lumilumi|もの(さん)?のクライアント)(を?呼んで|どこ).?$/iu, res_lumilumi],
+		[/(長文エディタ|まきもの|マキモノ|巻物|MAKIMONO)(を?呼んで|どこ).?$/iu, res_makimono],
 		[/検索(を?呼んで|どこ).?$/u, res_kensaku],
 		[/麻雀(を?呼んで|どこ).?$/u, res_mahojng],
 		[/(パブ|ぱぶ)(リック)?(チャ|ちゃ|茶)(ット)?(を?呼んで|どこ).?$/u, res_pabucha],
@@ -2011,10 +2012,10 @@ const res_gyunyu = (event: NostrEvent): [string, string[][]] => {
 	];
 };
 
-const res_bukumadoko = (event: NostrEvent): [string, string[][]] => {
+const res_kuchiyose = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
-	const url = 'https://nostr-web-bookmark-trend.vercel.app/';
+	const url = 'https://kuchiyose.vercel.app/';
 	content = url;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
@@ -2032,7 +2033,16 @@ const res_haiku = (event: NostrEvent): [string, string[][]] => {
 const res_lumilumi = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
-	const url = 'https://lumilumi.vercel.app/';
+	const url = 'https://lumilumi.app/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
+};
+
+const res_makimono = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://makimono.lumilumi.app/';
 	content = url;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
