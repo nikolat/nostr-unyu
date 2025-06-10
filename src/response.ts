@@ -193,7 +193,7 @@ const selectResponse = async (
 			relays: pollRelays
 		});
 		res.content = `ブックマークしといたで\nnostr:${naddr}`;
-		res.tags.push(['a', `${kind}:${pubkey}:${identifier}`, pollRelays[0]]);
+		res.tags.push(['q', `${kind}:${pubkey}:${identifier}`, pollRelays[0]]);
 		return [kind39701, res];
 	}
 	if (/^\\!\[\*\]$/.test(res.content)) {
@@ -2341,7 +2341,7 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 		const d = resEvent.tags.find((tag) => tag.length >= 2 && tag[0] === 'd')?.at(1) ?? '';
 		const naddr: string = `nostr:${nip19.naddrEncode({ ...resEvent, identifier: d })}`;
 		naddrs.push(naddr);
-		tags.push(['a', `${resEvent.kind}:${resEvent.pubkey}:${d}`, emojiSearchRelay]);
+		tags.push(['q', `${resEvent.kind}:${resEvent.pubkey}:${d}`, emojiSearchRelay]);
 	}
 	const content = naddrs.join('\n');
 	tags.push(...getTagsReply(event));
