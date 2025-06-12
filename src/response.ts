@@ -2320,17 +2320,23 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 				.fill(undefined)
 				.map((_, i) => array.slice(i * number, (i + 1) * number));
 		};
+		const filterGroups = [];
 		for (const filterGroup of sliceByNumber(mergeFilterForAddressableEvents(filters, 30030), 10)) {
-			await getEvents(emojiSearchRelay, filterGroup, (ev: NostrEvent) => {
-				const emojiTags: string[][] = ev.tags.filter(isEmojiTag);
-				for (const emojiTagToSearch of emojiTagsToSearch) {
-					if (emojiTags.map((tag) => tag[2]).includes(emojiTagToSearch[2])) {
-						resEvents.push(ev);
-						break;
-					}
-				}
-			});
+			filterGroups.push(filterGroup);
 		}
+		await Promise.all(
+			filterGroups.map(async (filterGroup) => {
+				await getEvents(emojiSearchRelay, filterGroup, (ev: NostrEvent) => {
+					const emojiTags: string[][] = ev.tags.filter(isEmojiTag);
+					for (const emojiTagToSearch of emojiTagsToSearch) {
+						if (emojiTags.map((tag) => tag[2]).includes(emojiTagToSearch[2])) {
+							resEvents.push(ev);
+							break;
+						}
+					}
+				});
+			})
+		);
 	}
 	if (resEvents.length === 0) {
 		return ['見つからへん', getTagsReply(event)];
