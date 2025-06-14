@@ -13,19 +13,19 @@
 	"author": "",
 	"license": "CC0-1.0",
 	"dependencies": {
-		"nostr-tools": "^2.13.1",
+		"nostr-tools": "^2.15.0",
 		"rss-parser": "^3.13.0"
 	},
 	"devDependencies": {
 		"@types/chai": "^5.2.2",
 		"@types/mocha": "^10.0.10",
-		"@types/node": "^22.15.25",
-		"@vercel/node": "^5.2.0",
+		"@types/node": "^24.0.1",
+		"@vercel/node": "^5.2.2",
 		"chai": "^5.2.0",
-		"mocha": "^11.5.0",
+		"mocha": "^11.6.0",
 		"prettier": "^3.5.3",
 		"ts-node": "^10.9.2",
-		"tsx": "^4.19.4",
+		"tsx": "^4.20.3",
 		"typescript": "^5.8.3"
 	},
 	"type": "module",
