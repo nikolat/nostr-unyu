@@ -360,6 +360,10 @@ const getResmap = (
 		[/あけおめ|あけまして|ことよろ/, res_akeome],
 		[/お年玉/, res_otoshidama],
 		[/牛乳|ぎゅうにゅう/, res_gyunyu],
+		[
+			/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)ってgrokに聞いて$/iu,
+			res_grok
+		],
 		[/(ブクマ|ブックマーク|口寄せ|クチヨセ|kuchiyose)(を?呼んで|どこ).?$/iu, res_kuchiyose],
 		[/(ハイク|はいく)(を?呼んで|どこ).?$/u, res_haiku],
 		[/(るみるみ|ルミルミ|lumilumi|もの(さん)?のクライアント)(を?呼んで|どこ).?$/iu, res_lumilumi],
@@ -2010,6 +2014,35 @@ const res_gyunyu = (event: NostrEvent): [string, string[][]] => {
 		any(['牛乳は健康にええで🥛', 'カルシウム補給せぇ🥛', 'ワイの奢りや🥛']),
 		getTagsReply(event)
 	];
+};
+
+const res_grok = async (
+	event: NostrEvent,
+	mode: Mode,
+	regstr: RegExp,
+	signer: Signer
+): Promise<[string, string[][]]> => {
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const text = match[3];
+	const npub_grok = 'npub17usj0jh86ged3pt34r5j6ejzfar9s2q5dl3l84tq8ymhfj2wz08sxmkf8w';
+	const relay_grok = 'wss://relay.primal.net/';
+	const content: string = `nostr:${npub_grok} ${text}`;
+	const tags: string[][] = [];
+	const kind = 1;
+	const evetnTemplate: EventTemplate = {
+		content,
+		tags,
+		kind,
+		created_at: event.created_at + 1
+	};
+	const ev: VerifiedEvent = signer.finishEvent(evetnTemplate);
+	const gRelay = await Relay.connect(relay_grok);
+	await gRelay.publish(ev);
+	gRelay.close();
+	return [content, tags];
 };
 
 const res_kuchiyose = (event: NostrEvent): [string, string[][]] => {
