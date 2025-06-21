@@ -2019,8 +2019,7 @@ const res_gyunyu = (event: NostrEvent): [string, string[][]] => {
 const res_grok = async (
 	event: NostrEvent,
 	mode: Mode,
-	regstr: RegExp,
-	signer: Signer
+	regstr: RegExp
 ): Promise<[string, string[][]]> => {
 	const match = event.content.match(regstr);
 	if (match === null) {
@@ -2028,20 +2027,8 @@ const res_grok = async (
 	}
 	const text = match[3];
 	const npub_grok = 'npub17usj0jh86ged3pt34r5j6ejzfar9s2q5dl3l84tq8ymhfj2wz08sxmkf8w';
-	const relay_grok = 'wss://relay.primal.net/';
 	const content: string = `nostr:${npub_grok} ${text}`;
-	const tags: string[][] = [];
-	const kind = 1;
-	const evetnTemplate: EventTemplate = {
-		content,
-		tags,
-		kind,
-		created_at: event.created_at + 1
-	};
-	const ev: VerifiedEvent = signer.finishEvent(evetnTemplate);
-	const gRelay = await Relay.connect(relay_grok);
-	await gRelay.publish(ev);
-	gRelay.close();
+	const tags: string[][] = [...getTagsReply(event), ['p', nip19.decode(npub_grok).data]];
 	return [content, tags];
 };
 
