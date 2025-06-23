@@ -342,6 +342,7 @@ const getResmap = (
 		[/中身/, res_nakami],
 		[/誕生日/, res_tanjobi],
 		[/どんぐり/, res_donguri],
+		[/もじぴったん/, res_mojipittan],
 		[/時刻|時報|日時|何時/, res_jihou],
 		[/ログボ|ログインボーナス/, res_rogubo],
 		[/あなたの合計ログイン回数は(\d+)回です。/, res_get_rogubo],
@@ -1877,6 +1878,16 @@ const res_donguri = (event: NostrEvent): [string, string[][]] => {
 		]),
 		getTagsReply(event)
 	];
+};
+
+const res_mojipittan = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://youtu.be/nPzeEBLXlco';
+	content = url;
+	tags = getTagsReply(event);
+	tags.push(['r', url]);
+	return [content, tags];
 };
 
 const res_jihou = (event: NostrEvent): [string, string[][]] => {
