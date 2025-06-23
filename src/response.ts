@@ -2027,8 +2027,9 @@ const res_grok = async (
 	}
 	const text = match[3];
 	const npub_grok = 'npub17usj0jh86ged3pt34r5j6ejzfar9s2q5dl3l84tq8ymhfj2wz08sxmkf8w';
+	const hex_grok: string = nip19.decode(npub_grok).data as string;
 	const content: string = `nostr:${npub_grok} ${text}`;
-	const tags: string[][] = [...getTagsReply(event), ['p', nip19.decode(npub_grok).data]];
+	const tags: string[][] = [...getTagsReply(event), ['p', hex_grok]];
 	return [content, tags];
 };
 
