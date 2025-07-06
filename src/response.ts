@@ -333,6 +333,10 @@ const getResmap = (
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
 		[
+			/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)を短冊にして$/u,
+			res_tanzakunishite
+		],
+		[
 			/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)を絵文字にして$/u,
 			res_emojinishite
 		],
@@ -1660,12 +1664,51 @@ const res_aura = (event: NostrEvent): [string, string[][]] => {
 	return ['\\s[11]ありえへん……このワイが……', getTagsReply(event)];
 };
 
+const res_tanzakunishite = (
+	event: NostrEvent,
+	mode: Mode,
+	regstr: RegExp
+): [string, string[][]] => {
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const text = match[3];
+	const [hiraText, emoji_tags] = getResEmojinishite(Array.from(text).join('\n'));
+	let content = ':hukidasi_hidariue::hukidasi_yoko::hukidasi_migiue:\n';
+	for (const hira of hiraText.split('\n')) {
+		content += `:hukidasi_tate:${hira}:hukidasi_tate:\n`;
+	}
+	content += ':hukidasi_hidarisita::hukidasi_yoko::hukidasi_migisita:';
+	const emojis = [
+		'hukidasi_yoko',
+		'hukidasi_hidariue',
+		'hukidasi_migiue',
+		'hukidasi_tate',
+		'hukidasi_hidarisita',
+		'hukidasi_migisita'
+	];
+	for (const emoji of emojis) {
+		emoji_tags.push([
+			'emoji',
+			emoji,
+			`https://lokuyow.github.io/images/nostr/emoji/hukidasi/${emoji}.webp`
+		]);
+	}
+	return [content, [...getTagsReply(event), ...emoji_tags]];
+};
+
 const res_emojinishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
 	const match = event.content.match(regstr);
 	if (match === null) {
 		throw new Error();
 	}
 	const text = match[3];
+	const [content, emoji_tags] = getResEmojinishite(text);
+	return [content, [...getTagsReply(event), ...emoji_tags]];
+};
+
+const getResEmojinishite = (text: string): [string, string[][]] => {
 	const table = [
 		['あ', 'hira_001_a'],
 		['い', 'hira_002_i'],
@@ -1787,7 +1830,7 @@ const res_emojinishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [strin
 	for (const [k, v] of emojitaglist) {
 		emoji_tags.push(['emoji', k, v]);
 	}
-	return [content, [...getTagsReply(event), ...emoji_tags]];
+	return [content, emoji_tags];
 };
 
 const isEmojiTag = (tag: string[]) =>
