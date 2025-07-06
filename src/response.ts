@@ -733,6 +733,16 @@ const res_ohayo = async (
 				]);
 			}
 		}
+		if (month === 7 && day === 7) {
+			sats = 77;
+			mes = any([
+				'今日は七夕や、願い事があったら短冊に書くんやで',
+				'七夕も早起きとは感心やな。',
+				'天の川が見えるとええな',
+				'短冊に書く願い事は決まったんか？',
+				'七夕やし特別に77satsや'
+			]);
+		}
 		const zapEndPoint: string | null = await getZapEndPoint(event);
 		if (zapEndPoint !== null) {
 			try {
