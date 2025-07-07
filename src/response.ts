@@ -1684,7 +1684,31 @@ const res_tanzakunishite = (
 		throw new Error();
 	}
 	const text = match[3];
-	const [hiraText, emoji_tags] = getResEmojinishite(Array.from(text).join('\n'));
+	const textAry: string[] = [];
+	const emojiUrlMap: Map<string, string> = new Map<string, string>();
+	const isEmojiTag = (tag: string[]): boolean => {
+		return tag.length >= 3 && tag[0] === 'emoji' && /\w+/.test(tag[1]) && URL.canParse(tag[2]);
+	};
+	for (const tag of event.tags) {
+		if (isEmojiTag(tag)) {
+			emojiUrlMap.set(`:${tag[1]}:`, tag[2]);
+		}
+	}
+	if (emojiUrlMap.size > 0) {
+		const regMatchStr: string = `(${Array.from(emojiUrlMap.keys()).join('|')})`;
+		const regSplit = new RegExp(regMatchStr);
+		const plainTexts = text.split(regSplit);
+		for (const t of plainTexts) {
+			if (emojiUrlMap.has(t)) {
+				textAry.push(t);
+			} else {
+				textAry.push(...Array.from(t));
+			}
+		}
+	} else {
+		textAry.push(...Array.from(text));
+	}
+	const [hiraText, emoji_tags] = getResEmojinishite(textAry.join('\n'), event.tags);
 	let content = ':hukidasi_hidariue::hukidasi_yoko::hukidasi_migiue:\n';
 	for (const hira of hiraText.split('\n')) {
 		content += `:hukidasi_tate:${hira}:hukidasi_tate:\n`;
@@ -1714,11 +1738,11 @@ const res_emojinishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [strin
 		throw new Error();
 	}
 	const text = match[3];
-	const [content, emoji_tags] = getResEmojinishite(text);
+	const [content, emoji_tags] = getResEmojinishite(text, event.tags);
 	return [content, [...getTagsReply(event), ...emoji_tags]];
 };
 
-const getResEmojinishite = (text: string): [string, string[][]] => {
+const getResEmojinishite = (text: string, tags: string[][]): [string, string[][]] => {
 	const table = [
 		['あ', 'hira_001_a'],
 		['い', 'hira_002_i'],
@@ -1837,6 +1861,9 @@ const getResEmojinishite = (text: string): [string, string[][]] => {
 		content += addword;
 	}
 	const emoji_tags: string[][] = [];
+	for (const emojiTag of tags.filter(isEmojiTag)) {
+		emoji_tags.push(emojiTag);
+	}
 	for (const [k, v] of emojitaglist) {
 		emoji_tags.push(['emoji', k, v]);
 	}
