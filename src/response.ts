@@ -380,6 +380,7 @@ const getResmap = (
 		[/(しりとり|しりとリレー)(を?呼んで|どこ).?$/u, res_shiritoridoko],
 		[/削除.*(を?呼んで|どこ).?$/iu, res_deletion_tool],
 		[/(status|ステータス).*(を?呼んで|どこ).?$/iu, res_status],
+		[/(flappy|フラッピー|ふらっぴー)(を?呼んで|どこ).?$/iu, res_flappy],
 		[/やぶみ(ちゃ)?ん?(を?呼んで|どこ).?$/u, res_yabumin],
 		[/ぬるぽが?(を?呼んで|どこ).?$/u, res_nurupoga],
 		[/うにゅう(を?呼んで|どこ).?$/u, res_unyu],
@@ -2228,6 +2229,15 @@ const res_status = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const url = 'https://nostatus.vercel.app/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
+};
+
+const res_flappy = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://downisontheup.ca/';
 	content = url;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
