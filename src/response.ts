@@ -897,12 +897,11 @@ const getEvents = (
 
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	if (event.kind === 1) {
-		const nevent = 'nevent1qvzqqqqq9qqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejtksjfnx'; //カスタム絵文字の川
+		const nevent =
+			'nevent1qvzqqqqq9qpzpmzzcaj5rzeah8y940ln4z855wa72af4a6aac4zjypql55egcpsqqy88wumn8ghj77tpvf6jumt99uqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejta8d4mx'; //カスタム絵文字の川
+		const ep: nip19.EventPointer = nip19.decode(nevent).data;
 		const content = `パブチャでやれ\nnostr:${nevent}`;
-		const tags = [
-			...getTagsReply(event),
-			['q', (nip19.decode(nevent).data as nip19.EventPointer).id]
-		];
+		const tags = [...getTagsReply(event), ['q', ep.id, ep.relays?.at(0) ?? '', ep.author ?? '']];
 		return [content, tags];
 	}
 	let content: string;
@@ -2177,12 +2176,14 @@ const res_kensaku = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_mahojng = (event: NostrEvent): [string, string[][]] => {
-	const nevent = 'nevent1qvzqqqqq9qqzpjx4cfcf54ns6mmzrtyqyzkrun7rq4ayjcdp2vvl0sypsvy5qaerqcwu9c'; //Nostr麻雀開発部
+	const nevent =
+		'nevent1qvzqqqqq9qpzpylx3f0hhakntuxtz2ypvrjzandn894cpwmgdffgrxwlchjce6e9qy88wumn8ghj77tpvf6jumt99uqzpjx4cfcf54ns6mmzrtyqyzkrun7rq4ayjcdp2vvl0sypsvy5qaer7q56h9'; //Nostr麻雀開発部
+	const ep: nip19.EventPointer = nip19.decode(nevent).data;
 	const url_chiihou = 'https://nikolat.github.io/chiihou/';
 	const content = `nostr:${nevent}\n${url_chiihou}`;
 	const tags = [
 		...getTagsReply(event),
-		['q', (nip19.decode(nevent).data as nip19.EventPointer).id],
+		['q', ep.id, ep.relays?.at(0) ?? '', ep.author ?? ''],
 		['r', url_chiihou]
 	];
 	return [content, tags];
@@ -2268,9 +2269,11 @@ const res_don = (event: NostrEvent): [string, string[][]] => {
 const res_maguro = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
-	const note = 'note19ajxhqjvhqmvh56n6c6jdlwavrq5zhc84u6ffg06p4lu0glhem3sptg80h';
-	content = `nostr:${note}`;
-	const quoteTag = ['q', nip19.decode(note).data as string];
+	const nevent =
+		'nevent1qvzqqqqqqypzpvly86xv0ekl7gar8kfp8glfztvftvwrusjsys8qexwmal3sdz6lqy88wumn8ghj77tpvf6jumt99uqzqtmydwpyewpke0f48434ym7a6cxpg90s0te5jjsl5rtlc73l0nhrn4hzgu';
+	const ep: nip19.EventPointer = nip19.decode(nevent).data;
+	content = `nostr:${nevent}`;
+	const quoteTag = ['q', ep.id, ep.relays?.at(0) ?? '', ep.author ?? ''];
 	tags = [...getTagsReply(event), quoteTag];
 	return [content, tags];
 };
