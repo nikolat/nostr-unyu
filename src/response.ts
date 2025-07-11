@@ -1261,14 +1261,16 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	}
 	content = lines.join('\n');
 	if (isSummer) {
-		content = content.replaceAll('kubipaca_', 'kubipaca_summer_');
+		content = content
+			.replaceAll('kubipaca_', 'kubipaca_summer_')
+			.replaceAll('kubipaca_summer_null', 'kubipaca_summer_empty');
 	}
 	tags = [
 		...getTagsReply(event),
 		...Array.from(emoji).map((s) => [
 			'emoji',
 			isSummer ? s.replace('kubipaca_', 'kubipaca_summer_') : s,
-			`https://lokuyow.github.io/images/nostr/emoji/${isSummer ? 'kubipaca_summer' : s.endsWith('_gaming') ? 'kubipaca_gaming' : 'kubipaca'}/${isSummer ? s.replace('kubipaca_', 'kubipaca_summer_') : s}.webp`
+			`https://lokuyow.github.io/images/nostr/emoji/${isSummer ? 'kubipaca_summer' : s.endsWith('_gaming') ? 'kubipaca_gaming' : 'kubipaca'}/${isSummer ? s.replace('kubipaca_', 'kubipaca_summer_').replaceAll('kubipaca_summer_null', 'kubipaca_summer_empty') : s}.webp`
 		]),
 		...Array.from(emoji_seigen).map((s) => [
 			'emoji',
