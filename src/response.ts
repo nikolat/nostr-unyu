@@ -1269,7 +1269,11 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		...getTagsReply(event),
 		...Array.from(emoji).map((s) => [
 			'emoji',
-			isSummer ? s.replace('kubipaca_', 'kubipaca_summer_') : s,
+			isSummer
+				? s
+						.replace('kubipaca_', 'kubipaca_summer_')
+						.replaceAll('kubipaca_summer_null', 'kubipaca_summer_empty')
+				: s,
 			`https://lokuyow.github.io/images/nostr/emoji/${isSummer ? 'kubipaca_summer' : s.endsWith('_gaming') ? 'kubipaca_gaming' : 'kubipaca'}/${isSummer ? s.replace('kubipaca_', 'kubipaca_summer_').replaceAll('kubipaca_summer_null', 'kubipaca_summer_empty') : s}.webp`
 		]),
 		...Array.from(emoji_seigen).map((s) => [
