@@ -318,7 +318,7 @@ const getResmap = (
 		[/^\\s\[(\d+)\]$/, res_surfacetest],
 		[/update\srelay/, res_relayupdate],
 		[/おはよ/, res_ohayo],
-		[/アルパカ|🦙|ものパカ|モノパカ/, res_arupaka],
+		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
 		[/ケルベ[ロノ]ス/, res_kerubenos],
 		[/タイガー|🐯|🐅/u, res_tiger],
 		[/画像生成/, res_gazouseisei],
@@ -913,6 +913,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const isKerubenos = /ケルベ[ロノ]ス/.test(event.content);
 	const isBunretsu = /分裂|分散/.test(event.content);
 	const isMonopaka = /ものパカ|モノパカ/.test(event.content);
+	const isSummer = /夏|サマ|summer/i.test(event.content);
 	if (/みじかい|短い/.test(event.content)) {
 		retry_max = 0;
 	} else if (/ながい|長い/.test(event.content)) {
@@ -924,7 +925,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		}
 	}
 	let n = Math.min(
-		(event.content.match(/アルパカ|🦙|ものパカ|モノパカ/g) || []).length,
+		(event.content.match(/アルパカ|🦙|ものパカ|モノパカ|夏パカ/g) || []).length,
 		LIMIT_BODY
 	);
 	if (/-?\d+[匹体]/.test(event.content)) {
@@ -941,9 +942,11 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const finished: boolean[] = [];
 	const retry: number[] = [];
 	const gaming: boolean[] = [];
-	const matchesIterator = event.content.matchAll(/((ゲーミング|光|虹|明|🌈)?(アルパカ|🦙))/g);
+	const matchesIterator = event.content.matchAll(
+		/((ゲーミング|光|虹|明|🌈)?(アルパカ|🦙|ものパカ|モノパカ|夏パカ))/g
+	);
 	for (const match of matchesIterator) {
-		if (/(ゲーミング|光|虹|明|🌈)(アルパカ|🦙)/.test(match[0])) {
+		if (/(ゲーミング|光|虹|明|🌈)(アルパカ|🦙|ものパカ|モノパカ|夏パカ)/.test(match[0])) {
 			gaming.push(true);
 		} else {
 			gaming.push(false);
@@ -1257,12 +1260,15 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		emoji_seigen.add('seigen_seigen');
 	}
 	content = lines.join('\n');
+	if (isSummer) {
+		content = content.replaceAll('kubipaca_', 'kubipaca_summer_');
+	}
 	tags = [
 		...getTagsReply(event),
 		...Array.from(emoji).map((s) => [
 			'emoji',
-			s,
-			`https://lokuyow.github.io/images/nostr/emoji/${s.endsWith('_gaming') ? 'kubipaca_gaming' : 'kubipaca'}/${s}.webp`
+			isSummer ? s.replace('kubipaca_', 'kubipaca_summer_') : s,
+			`https://lokuyow.github.io/images/nostr/emoji/${isSummer ? 'kubipaca_summer' : s.endsWith('_gaming') ? 'kubipaca_gaming' : 'kubipaca'}/${isSummer ? s.replace('kubipaca_', 'kubipaca_summer_') : s}.webp`
 		]),
 		...Array.from(emoji_seigen).map((s) => [
 			'emoji',
