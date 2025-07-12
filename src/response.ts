@@ -26,6 +26,7 @@ const badgeRelays = [
 ];
 const pollRelays = ['wss://yabu.me/', 'wss://nostr.compile-error.net/'];
 const profileRelay = 'wss://yabu.me/';
+const shogiRelay = 'wss://yabu.me/';
 const zapCheckRelay = 'wss://yabu.me/';
 const emojiSearchRelay = 'wss://yabu.me/';
 
@@ -318,7 +319,11 @@ const getResmap = (
 		[/^\\s\[(\d+)\]$/, res_surfacetest],
 		[/update\srelay/, res_relayupdate],
 		[/おはよ/, res_ohayo],
-		[/将棋*.対局/, res_shogi],
+		[/将棋*.対局/, res_shogi_start],
+		[
+			/([▲△☗☖])([1-9])([ー-九])(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成)?$/,
+			res_shogi_turn
+		],
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
 		[/ケルベ[ロノ]ス/, res_kerubenos],
 		[/タイガー|🐯|🐅/u, res_tiger],
@@ -837,6 +842,43 @@ const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
 	]);
 };
 
+type Shogi = {
+	teban: 'sente' | 'gote';
+	banmen: string[][];
+	mochigoma: {
+		sente: string[];
+		gote: string[];
+	};
+};
+
+const getShogiData = async (pubkey: string): Promise<Shogi | undefined> => {
+	const event: NostrEvent | undefined = await getEvent(shogiRelay, [
+		{
+			kinds: [30078],
+			authors: [pubkey],
+			'#d': ['shogi']
+		}
+	]);
+	if (event === undefined) {
+		return undefined;
+	}
+	const data: Shogi = JSON.parse(event.content);
+	return data;
+};
+
+const setShogiData = async (signer: Signer, data: Shogi): Promise<void> => {
+	const wRelay = await Relay.connect(shogiRelay);
+	const eventTemplate: EventTemplate = {
+		kind: 30078,
+		tags: [['d', 'shogi']],
+		content: JSON.stringify(data),
+		created_at: Math.floor(Date.now() / 1000)
+	};
+	const event: VerifiedEvent = signer.finishEvent(eventTemplate);
+	await wRelay.publish(event);
+	wRelay.close();
+};
+
 const getLastZap = (pubkey: string): Promise<NostrEvent | undefined> => {
 	return getEvent(zapCheckRelay, [
 		{
@@ -896,58 +938,161 @@ const getEvents = (
 	});
 };
 
-const res_shogi = (event: NostrEvent): [string, string[][]] => {
-	const shokihaichi: string[][] = [
-		[
-			'white_lance',
-			'white_knight',
-			'white_silver',
-			'white_gold',
-			'white_king',
-			'white_gold',
-			'white_silver',
-			'white_knight',
-			'white_lance'
-		],
-		['', 'white_rook', '', '', '', '', '', 'white_bishop', ''],
-		[
-			'white_pawn',
-			'white_pawn',
-			'white_pawn',
-			'white_pawn',
-			'white_pawn',
-			'white_pawn',
-			'white_pawn',
-			'white_pawn',
-			'white_pawn'
-		],
-		['', '', '', '', '', '', '', '', ''],
-		['', '', '', '', '', '', '', '', ''],
-		['', '', '', '', '', '', '', '', ''],
-		[
-			'black_pawn',
-			'black_pawn',
-			'black_pawn',
-			'black_pawn',
-			'black_pawn',
-			'black_pawn',
-			'black_pawn',
-			'black_pawn',
-			'black_pawn'
-		],
-		['', 'black_bishop', '', '', '', '', '', 'black_rook', ''],
-		[
-			'black_lance',
-			'black_knight',
-			'black_silver',
-			'black_gold',
-			'black_king2',
-			'black_gold',
-			'black_silver',
-			'black_knight',
-			'black_lance'
-		]
-	];
+const shokihaichi: string[][] = [
+	[
+		'white_lance',
+		'white_knight',
+		'white_silver',
+		'white_gold',
+		'white_king',
+		'white_gold',
+		'white_silver',
+		'white_knight',
+		'white_lance'
+	],
+	['', 'white_rook', '', '', '', '', '', 'white_bishop', ''],
+	[
+		'white_pawn',
+		'white_pawn',
+		'white_pawn',
+		'white_pawn',
+		'white_pawn',
+		'white_pawn',
+		'white_pawn',
+		'white_pawn',
+		'white_pawn'
+	],
+	['', '', '', '', '', '', '', '', ''],
+	['', '', '', '', '', '', '', '', ''],
+	['', '', '', '', '', '', '', '', ''],
+	[
+		'black_pawn',
+		'black_pawn',
+		'black_pawn',
+		'black_pawn',
+		'black_pawn',
+		'black_pawn',
+		'black_pawn',
+		'black_pawn',
+		'black_pawn'
+	],
+	['', 'black_bishop', '', '', '', '', '', 'black_rook', ''],
+	[
+		'black_lance',
+		'black_knight',
+		'black_silver',
+		'black_gold',
+		'black_king2',
+		'black_gold',
+		'black_silver',
+		'black_knight',
+		'black_lance'
+	]
+];
+
+const res_shogi_start = async (
+	event: NostrEvent,
+	mode: Mode,
+	regstr: RegExp,
+	signer: Signer
+): Promise<[string, string[][]]> => {
+	const banmen: string[][] = shokihaichi;
+	const data: Shogi = {
+		banmen,
+		mochigoma: {
+			sente: [],
+			gote: []
+		},
+		teban: 'sente'
+	};
+	await setShogiData(signer, data);
+	return showBanmen(event, banmen);
+};
+
+const res_shogi_turn = async (
+	event: NostrEvent,
+	mode: Mode,
+	regstr: RegExp,
+	signer: Signer
+): Promise<[string, string[][]]> => {
+	const data: Shogi | undefined = await getShogiData(signer.getPublicKey());
+	if (data === undefined) {
+		return ['前回のデータが取得できへん', getTagsReply(event)];
+	}
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const teban: string = ['▲', '☗'].includes(match[1])
+		? 'sente'
+		: ['△', '☖'].includes(match[1])
+			? 'gote'
+			: '';
+	const x: number = Array.from('987654321').indexOf(match[2]);
+	const y: number = Array.from('一二三四五六七八九').indexOf(match[3]);
+	const koma: string | undefined = {
+		王: 'king',
+		玉: 'king2',
+		飛: 'rook',
+		角: 'bishop',
+		金: 'gold',
+		銀: 'silver',
+		桂: 'knight',
+		香: 'lance',
+		歩: 'pawn',
+		龍: 'dragon',
+		馬: 'horse',
+		成銀: 'prom_silver',
+		成桂: 'prom_knight',
+		成香: 'prom_lance',
+		と: 'prom_pawn'
+	}[match[4]];
+	if (teban === '' || x < 0 || 8 < x || y < 0 || 8 < y || koma === undefined) {
+		return ['なんかデータがおかしいで', getTagsReply(event)];
+	}
+	if (data.teban === 'sente' && teban === 'gote') {
+		return ['先手番やで', getTagsReply(event)];
+	}
+	if (data.teban === 'gote' && teban === 'sente') {
+		return ['後手番やで', getTagsReply(event)];
+	}
+	if (teban === 'sente') {
+		switch (koma) {
+			case 'pawn': {
+				if (data.banmen[x][y + 1] === 'black_pawn') {
+					data.banmen[x][y + 1] = '';
+					data.banmen[x][y] = 'black_pawn';
+				} else {
+					return [`そこに${match[3]}は動けへんやろ`, getTagsReply(event)];
+				}
+				break;
+			}
+			default: {
+				return ['まだ実装してへんて', getTagsReply(event)];
+			}
+		}
+	} else {
+		switch (koma) {
+			case 'pawn': {
+				if (data.banmen[x][y - 1] === 'white_pawn') {
+					data.banmen[x][y - 1] = '';
+					data.banmen[x][y] = 'white_pawn';
+				} else {
+					return [`そこに${match[3]}は動けへんやろ`, getTagsReply(event)];
+				}
+				break;
+			}
+			default: {
+				return ['まだ実装してへんて', getTagsReply(event)];
+			}
+		}
+	}
+	const banmen: string[][] = data.banmen;
+	await setShogiData(signer, data);
+	return showBanmen(event, banmen);
+};
+
+const showBanmen = (event: NostrEvent, banmen: string[][]): [string, string[][]] => {
 	let contentArray: string[] = [];
 	const emojiKubipaka: Set<string> = new Set<string>();
 	const emojiShogi: Set<string> = new Set<string>();
