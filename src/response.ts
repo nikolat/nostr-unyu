@@ -1071,6 +1071,7 @@ const res_shogi_turn = async (
 				return ['まだ実装してへんて', getTagsReply(event)];
 			}
 		}
+		data.teban = 'gote';
 	} else {
 		switch (koma) {
 			case 'pawn': {
@@ -1086,6 +1087,7 @@ const res_shogi_turn = async (
 				return ['まだ実装してへんて', getTagsReply(event)];
 			}
 		}
+		data.teban = 'sente';
 	}
 	const banmen: string[][] = data.banmen;
 	await setShogiData(signer, data);
