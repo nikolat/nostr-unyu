@@ -1031,6 +1031,7 @@ const res_shogi_turn = async (
 	const x: number = Array.from('987654321').indexOf(match[2]);
 	const y: number = Array.from('一二三四五六七八九').indexOf(match[3]);
 	const komaName: string = match[4];
+	const direction: string | undefined = match.at(5);
 	const koma: string | undefined = {
 		王: 'king',
 		玉: 'king2',
@@ -1086,6 +1087,29 @@ const res_shogi_turn = async (
 				}
 				break;
 			}
+			case 'knight': {
+				let isLeftOK = data.banmen[y + 2][x + 1] === 'black_knight';
+				let isRightOK = data.banmen[y + 2][x - 1] === 'black_knight';
+				if (isLeftOK && isRightOK) {
+					if (direction === '右') {
+						isLeftOK = false;
+					} else if (direction === '左') {
+						isRightOK = false;
+					} else {
+						return [`右と左どっちの${komaName}やねん`, getTagsReply(event)];
+					}
+				}
+				if (isLeftOK) {
+					data.banmen[y + 2][x + 1] = '';
+					data.banmen[y][x] = 'black_knight';
+				} else if (isRightOK) {
+					data.banmen[y + 2][x - 1] = '';
+					data.banmen[y][x] = 'black_knight';
+				} else {
+					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
+				}
+				break;
+			}
 			default: {
 				return ['まだ実装してへんて', getTagsReply(event)];
 			}
@@ -1117,6 +1141,29 @@ const res_shogi_turn = async (
 					if (i === 0) {
 						return [`どこに${komaName}がおんねん`, getTagsReply(event)];
 					}
+				}
+				break;
+			}
+			case 'knight': {
+				let isLeftOK = data.banmen[y - 2][x - 1] === 'black_knight';
+				let isRightOK = data.banmen[y - 2][x + 1] === 'black_knight';
+				if (isLeftOK && isRightOK) {
+					if (direction === '右') {
+						isLeftOK = false;
+					} else if (direction === '左') {
+						isRightOK = false;
+					} else {
+						return [`右と左どっちの${komaName}やねん`, getTagsReply(event)];
+					}
+				}
+				if (isLeftOK) {
+					data.banmen[y - 2][x - 1] = '';
+					data.banmen[y][x] = 'black_knight';
+				} else if (isRightOK) {
+					data.banmen[y - 2][x + 1] = '';
+					data.banmen[y][x] = 'black_knight';
+				} else {
+					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 				}
 				break;
 			}
