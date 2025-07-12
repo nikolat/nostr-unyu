@@ -1058,14 +1058,14 @@ const res_shogi_turn = async (
 	if (data.teban === 'gote' && teban === 'sente') {
 		return ['後手番やで', getTagsReply(event)];
 	}
-	const komaColor: string = teban === 'sente' ? `black_${koma}` : `white_${koma}`;
-	const d: number = teban === 'sente' ? 1 : -1;
 	if (
 		(teban === 'sente' && data.banmen[y][x].startsWith('black_')) ||
 		(teban === 'gote' && data.banmen[y][x].startsWith('white_'))
 	) {
 		return ['味方がおって移動できへんて', getTagsReply(event)];
 	}
+	const komaColor: string = teban === 'sente' ? `black_${koma}` : `white_${koma}`;
+	const d: number = teban === 'sente' ? 1 : -1;
 	switch (koma) {
 		case 'pawn': {
 			if (data.banmen[y + d][x] === komaColor) {
@@ -1092,8 +1092,8 @@ const res_shogi_turn = async (
 			break;
 		}
 		case 'knight': {
-			let isLeftOK = data.banmen[y + 2 * d][x + d] === komaColor;
-			let isRightOK = data.banmen[y + 2 * d][x - d] === komaColor;
+			let isLeftOK = data.banmen[y + 2 * d][x - d] === komaColor;
+			let isRightOK = data.banmen[y + 2 * d][x + d] === komaColor;
 			if (isLeftOK && isRightOK) {
 				if (direction === '右') {
 					isLeftOK = false;
@@ -1104,9 +1104,9 @@ const res_shogi_turn = async (
 				}
 			}
 			if (isLeftOK) {
-				data.banmen[y + 2 * d][x + d] = '';
-			} else if (isRightOK) {
 				data.banmen[y + 2 * d][x - d] = '';
+			} else if (isRightOK) {
+				data.banmen[y + 2 * d][x + d] = '';
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
@@ -1114,11 +1114,11 @@ const res_shogi_turn = async (
 			break;
 		}
 		case 'silver': {
-			let isLeftUpOK = data.banmen[y - d][x + d] === komaColor;
-			let isRightUpOK = data.banmen[y - d][x - d] === komaColor;
-			let isLeftDownOK = data.banmen[y + d][x + d] === komaColor;
+			let isLeftUpOK = data.banmen[y - d][x - d] === komaColor;
+			let isRightUpOK = data.banmen[y - d][x + d] === komaColor;
+			let isLeftDownOK = data.banmen[y + d][x - d] === komaColor;
 			let isDownOK = data.banmen[y + d][x] === komaColor;
-			let isRightDownOK = data.banmen[y + d][x - d] === komaColor;
+			let isRightDownOK = data.banmen[y + d][x + d] === komaColor;
 			if (direction === '右') {
 				isLeftUpOK = false;
 				isLeftDownOK = false;
@@ -1142,15 +1142,67 @@ const res_shogi_turn = async (
 				isRightDownOK = false;
 			}
 			if (isLeftUpOK) {
-				data.banmen[y - d][x + d] = '';
-			} else if (isRightUpOK) {
 				data.banmen[y - d][x - d] = '';
+			} else if (isRightUpOK) {
+				data.banmen[y - d][x + d] = '';
 			} else if (isLeftDownOK) {
-				data.banmen[y + d][x + d] = '';
+				data.banmen[y + d][x - d] = '';
 			} else if (isDownOK) {
 				data.banmen[y + d][x] = '';
 			} else if (isRightDownOK) {
+				data.banmen[y + d][x + d] = '';
+			} else {
+				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
+			}
+			data.banmen[y][x] = komaColor;
+			break;
+		}
+		case 'gold': {
+			let isUpOK = data.banmen[y - d][x] === komaColor;
+			let isLeftOK = data.banmen[y][x - d] === komaColor;
+			let isRightOK = data.banmen[y][x + d] === komaColor;
+			let isLeftDownOK = data.banmen[y + d][x - d] === komaColor;
+			let isDownOK = data.banmen[y + d][x] === komaColor;
+			let isRightDownOK = data.banmen[y + d][x + d] === komaColor;
+			if (direction === '右') {
+				isUpOK = false;
+				isLeftOK = false;
+				isLeftDownOK = false;
+				isDownOK = false;
+			} else if (direction === '左') {
+				isUpOK = false;
+				isRightOK = false;
+				isRightDownOK = false;
+				isDownOK = false;
+			} else if (direction === '上') {
+				isUpOK = false;
+				isLeftOK = false;
+				isRightOK = false;
+			} else if (direction === '引') {
+				isLeftOK = false;
+				isRightOK = false;
+				isLeftDownOK = false;
+				isDownOK = false;
+				isRightDownOK = false;
+			} else if (direction === '直') {
+				isUpOK = false;
+				isLeftOK = false;
+				isRightOK = false;
+				isLeftDownOK = false;
+				isRightDownOK = false;
+			}
+			if (isUpOK) {
+				data.banmen[y - d][x] = '';
+			} else if (isLeftOK) {
+				data.banmen[y][x - d] = '';
+			} else if (isRightOK) {
+				data.banmen[y][x + d] = '';
+			} else if (isLeftDownOK) {
 				data.banmen[y + d][x - d] = '';
+			} else if (isDownOK) {
+				data.banmen[y + d][x] = '';
+			} else if (isRightDownOK) {
+				data.banmen[y + d][x + d] = '';
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
