@@ -1034,6 +1034,9 @@ const res_shogi = (event: NostrEvent): [string, string[][]] => {
 		'kubi_yoko',
 		'kubi_uehidari'
 	];
+	for (const e of a) {
+		emojiKubipaka.add(e);
+	}
 	contentArray.push(a.map((e) => `:kubipaca_summer_${e}:`).join(''));
 	const content: string = contentArray.join('\n');
 	const tags = [
