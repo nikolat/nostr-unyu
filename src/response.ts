@@ -1145,8 +1145,8 @@ const res_shogi_turn = async (
 				break;
 			}
 			case 'knight': {
-				let isLeftOK = data.banmen[y - 2][x - 1] === 'black_knight';
-				let isRightOK = data.banmen[y - 2][x + 1] === 'black_knight';
+				let isLeftOK = data.banmen[y - 2][x - 1] === 'white_knight';
+				let isRightOK = data.banmen[y - 2][x + 1] === 'white_knight';
 				if (isLeftOK && isRightOK) {
 					if (direction === '右') {
 						isLeftOK = false;
@@ -1158,10 +1158,10 @@ const res_shogi_turn = async (
 				}
 				if (isLeftOK) {
 					data.banmen[y - 2][x - 1] = '';
-					data.banmen[y][x] = 'black_knight';
+					data.banmen[y][x] = 'white_knight';
 				} else if (isRightOK) {
 					data.banmen[y - 2][x + 1] = '';
-					data.banmen[y][x] = 'black_knight';
+					data.banmen[y][x] = 'white_knight';
 				} else {
 					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 				}
