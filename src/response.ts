@@ -1289,6 +1289,90 @@ const res_shogi_turn = async (
 			data.banmen[y][x] = komaColor;
 			break;
 		}
+		case 'rook': {
+			let isUpOK = false;
+			let isDownOK = false;
+			let isRightOK = false;
+			let isLeftOK = false;
+			let nUp: number = 99;
+			let nDown: number = 99;
+			let nRight: number = 99;
+			let nLeft: number = 99;
+			for (let i = 1; 0 <= y - i * d && y - i * d < 9; i++) {
+				const t = data.banmen[y - i * d][x];
+				if (t === komaColor) {
+					isUpOK = true;
+					nUp = i;
+					break;
+				} else if (t !== '') {
+					isUpOK = false;
+					break;
+				}
+			}
+			for (let i = 1; 0 <= y + i * d && y + i * d < 9; i++) {
+				const t = data.banmen[y + i * d][x];
+				if (t === komaColor) {
+					isDownOK = true;
+					nDown = i;
+					break;
+				} else if (t !== '') {
+					isDownOK = false;
+					break;
+				}
+			}
+			for (let i = 1; 0 <= x - i * d && x - i * d < 9; i++) {
+				const t = data.banmen[y][x - i * d];
+				if (t === komaColor) {
+					isLeftOK = true;
+					nLeft = i;
+					break;
+				} else if (t !== '') {
+					isLeftOK = false;
+					break;
+				}
+			}
+			for (let i = 1; 0 <= x + i * d && x + i * d < 9; i++) {
+				const t = data.banmen[y][x + i * d];
+				if (t === komaColor) {
+					isRightOK = true;
+					nRight = i;
+					break;
+				} else if (t !== '') {
+					isRightOK = false;
+					break;
+				}
+			}
+			if (direction === '右') {
+				isUpOK = false;
+				isDownOK = false;
+				isLeftOK = false;
+			} else if (direction === '左') {
+				isUpOK = false;
+				isDownOK = false;
+				isRightOK = false;
+			} else if (direction === '上') {
+				isUpOK = false;
+				isLeftOK = false;
+				isRightOK = false;
+			} else if (direction === '引') {
+				isDownOK = false;
+				isLeftOK = false;
+				isRightOK = false;
+			}
+			if (isUpOK) {
+				data.banmen[y - nUp * d][x] = '';
+			} else if (isDownOK) {
+				data.banmen[y + nDown * d][x] = '';
+			} else if (isLeftOK) {
+				data.banmen[y][x - nLeft * d] = '';
+			} else if (isRightOK) {
+				data.banmen[y][x + nRight * d] = '';
+			} else {
+				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
+			}
+			data.banmen[y][x] = komaColor;
+			break;
+		}
 		default: {
 			return ['まだ実装してへんて', getTagsReply(event)];
 		}
