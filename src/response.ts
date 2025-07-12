@@ -938,13 +938,13 @@ const res_shogi = (event: NostrEvent): [string, string[][]] => {
 		['', 'black_bishop', '', '', '', '', '', 'black_rook', ''],
 		[
 			'black_lance',
-			'white_knight',
+			'black_knight',
 			'black_silver',
 			'black_gold',
 			'black_king2',
 			'black_gold',
 			'black_silver',
-			'white_knight',
+			'black_knight',
 			'black_lance'
 		]
 	];
