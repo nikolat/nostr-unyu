@@ -1058,15 +1058,16 @@ const res_shogi_turn = async (
 	if (data.teban === 'gote' && teban === 'sente') {
 		return ['後手番やで', getTagsReply(event)];
 	}
+	const komaColor: string = teban === 'sente' ? `black_${koma}` : `white_${koma}`;
 	if (teban === 'sente') {
 		if (data.banmen[y][x].startsWith('black_')) {
 			return ['味方がおって移動できへんて', getTagsReply(event)];
 		}
 		switch (koma) {
 			case 'pawn': {
-				if (data.banmen[y + 1][x] === 'black_pawn') {
+				if (data.banmen[y + 1][x] === komaColor) {
 					data.banmen[y + 1][x] = '';
-					data.banmen[y][x] = 'black_pawn';
+					data.banmen[y][x] = komaColor;
 				} else {
 					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 				}
@@ -1074,22 +1075,22 @@ const res_shogi_turn = async (
 			}
 			case 'lance': {
 				for (let i = y + 1; i < 9; i++) {
-					if (data.banmen[i][x] === 'black_lance') {
+					if (data.banmen[i][x] === komaColor) {
 						data.banmen[i][x] = '';
-						data.banmen[y][x] = 'black_lance';
+						data.banmen[y][x] = komaColor;
 						break;
 					} else if (data.banmen[i][x] !== '') {
-						return ['飛び越えて移動はできへんて', getTagsReply(event)];
+						return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 					}
 					if (i === 8) {
-						return [`どこに${komaName}がおんねん`, getTagsReply(event)];
+						return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 					}
 				}
 				break;
 			}
 			case 'knight': {
-				let isLeftOK = data.banmen[y + 2][x + 1] === 'black_knight';
-				let isRightOK = data.banmen[y + 2][x - 1] === 'black_knight';
+				let isLeftOK = data.banmen[y + 2][x + 1] === komaColor;
+				let isRightOK = data.banmen[y + 2][x - 1] === komaColor;
 				if (isLeftOK && isRightOK) {
 					if (direction === '右') {
 						isLeftOK = false;
@@ -1101,13 +1102,56 @@ const res_shogi_turn = async (
 				}
 				if (isLeftOK) {
 					data.banmen[y + 2][x + 1] = '';
-					data.banmen[y][x] = 'black_knight';
 				} else if (isRightOK) {
 					data.banmen[y + 2][x - 1] = '';
-					data.banmen[y][x] = 'black_knight';
 				} else {
 					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 				}
+				data.banmen[y][x] = komaColor;
+				break;
+			}
+			case 'silver': {
+				let isLeftUpOK = data.banmen[y - 1][x + 1] === komaColor;
+				let isRightUpOK = data.banmen[y - 1][x - 1] === komaColor;
+				let isLeftDownOK = data.banmen[y + 1][x + 1] === komaColor;
+				let isDownOK = data.banmen[y + 1][x] === komaColor;
+				let isRightDownOK = data.banmen[y + 1][x - 1] === komaColor;
+				if (direction === '右') {
+					isLeftUpOK = false;
+					isLeftDownOK = false;
+					isDownOK = false;
+				} else if (direction === '左') {
+					isRightUpOK = false;
+					isRightDownOK = false;
+					isDownOK = false;
+				} else if (direction === '上') {
+					isLeftUpOK = false;
+					isRightUpOK = false;
+					isDownOK = false;
+				} else if (direction === '引') {
+					isLeftDownOK = false;
+					isDownOK = false;
+					isRightDownOK = false;
+				} else if (direction === '直') {
+					isLeftUpOK = false;
+					isRightUpOK = false;
+					isLeftDownOK = false;
+					isRightDownOK = false;
+				}
+				if (isLeftUpOK) {
+					data.banmen[y - 1][x + 1] = '';
+				} else if (isRightUpOK) {
+					data.banmen[y - 1][x - 1] = '';
+				} else if (isLeftDownOK) {
+					data.banmen[y + 1][x + 1] = '';
+				} else if (isDownOK) {
+					data.banmen[y + 1][x] = '';
+				} else if (isRightDownOK) {
+					data.banmen[y + 1][x - 1] = '';
+				} else {
+					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
+				}
+				data.banmen[y][x] = komaColor;
 				break;
 			}
 			default: {
@@ -1121,9 +1165,9 @@ const res_shogi_turn = async (
 		}
 		switch (koma) {
 			case 'pawn': {
-				if (data.banmen[y - 1][x] === 'white_pawn') {
+				if (data.banmen[y - 1][x] === komaColor) {
 					data.banmen[y - 1][x] = '';
-					data.banmen[y][x] = 'white_pawn';
+					data.banmen[y][x] = komaColor;
 				} else {
 					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 				}
@@ -1131,22 +1175,22 @@ const res_shogi_turn = async (
 			}
 			case 'lance': {
 				for (let i = y - 1; i >= 0; i--) {
-					if (data.banmen[i][x] === 'white_lance') {
+					if (data.banmen[i][x] === komaColor) {
 						data.banmen[i][x] = '';
-						data.banmen[y][x] = 'white_lance';
+						data.banmen[y][x] = komaColor;
 						break;
 					} else if (data.banmen[i][x] !== '') {
-						return ['飛び越えて移動はできへんて', getTagsReply(event)];
+						return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 					}
 					if (i === 0) {
-						return [`どこに${komaName}がおんねん`, getTagsReply(event)];
+						return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 					}
 				}
 				break;
 			}
 			case 'knight': {
-				let isLeftOK = data.banmen[y - 2][x - 1] === 'white_knight';
-				let isRightOK = data.banmen[y - 2][x + 1] === 'white_knight';
+				let isLeftOK = data.banmen[y - 2][x - 1] === komaColor;
+				let isRightOK = data.banmen[y - 2][x + 1] === komaColor;
 				if (isLeftOK && isRightOK) {
 					if (direction === '右') {
 						isLeftOK = false;
@@ -1158,13 +1202,56 @@ const res_shogi_turn = async (
 				}
 				if (isLeftOK) {
 					data.banmen[y - 2][x - 1] = '';
-					data.banmen[y][x] = 'white_knight';
 				} else if (isRightOK) {
 					data.banmen[y - 2][x + 1] = '';
-					data.banmen[y][x] = 'white_knight';
 				} else {
 					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 				}
+				data.banmen[y][x] = komaColor;
+				break;
+			}
+			case 'silver': {
+				let isLeftUpOK = data.banmen[y + 1][x - 1] === komaColor;
+				let isRightUpOK = data.banmen[y + 1][x + 1] === komaColor;
+				let isLeftDownOK = data.banmen[y - 1][x - 1] === komaColor;
+				let isDownOK = data.banmen[y - 1][x] === komaColor;
+				let isRightDownOK = data.banmen[y - 1][x + 1] === komaColor;
+				if (direction === '右') {
+					isLeftUpOK = false;
+					isLeftDownOK = false;
+					isDownOK = false;
+				} else if (direction === '左') {
+					isRightUpOK = false;
+					isRightDownOK = false;
+					isDownOK = false;
+				} else if (direction === '上') {
+					isLeftUpOK = false;
+					isRightUpOK = false;
+					isDownOK = false;
+				} else if (direction === '引') {
+					isLeftDownOK = false;
+					isDownOK = false;
+					isRightDownOK = false;
+				} else if (direction === '直') {
+					isLeftUpOK = false;
+					isRightUpOK = false;
+					isLeftDownOK = false;
+					isRightDownOK = false;
+				}
+				if (isLeftUpOK) {
+					data.banmen[y + 1][x - 1] = '';
+				} else if (isRightUpOK) {
+					data.banmen[y + 1][x + 1] = '';
+				} else if (isLeftDownOK) {
+					data.banmen[y - 1][x - 1] = '';
+				} else if (isDownOK) {
+					data.banmen[y - 1][x] = '';
+				} else if (isRightDownOK) {
+					data.banmen[y - 1][x + 1] = '';
+				} else {
+					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
+				}
+				data.banmen[y][x] = komaColor;
 				break;
 			}
 			default: {
