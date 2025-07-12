@@ -1209,6 +1209,86 @@ const res_shogi_turn = async (
 			data.banmen[y][x] = komaColor;
 			break;
 		}
+		case 'bishop': {
+			let isLeftUpOK = false;
+			let isRightUpOK = false;
+			let isLeftDownOK = false;
+			let isRightDownOK = false;
+			let nLeftUp: number = 99;
+			let nRightUp: number = 99;
+			let nLeftDown: number = 99;
+			let nRightDown: number = 99;
+			for (let i = 1; 0 <= y - i * d && y - i * d < 9 && 0 <= x - i * d && x - i * d < 9; i++) {
+				const t = data.banmen[y - i * d][x - i * d];
+				if (t === komaColor) {
+					isLeftUpOK = true;
+					nLeftUp = i;
+					break;
+				} else if (t !== '') {
+					isLeftUpOK = false;
+					break;
+				}
+			}
+			for (let i = 1; 0 <= y - i * d && y - i * d < 9 && 0 <= x + i * d && x + i * d < 9; i++) {
+				const t = data.banmen[y - i * d][x + i * d];
+				if (t === komaColor) {
+					isRightUpOK = true;
+					nRightUp = i;
+					break;
+				} else if (t !== '') {
+					isRightUpOK = false;
+					break;
+				}
+			}
+			for (let i = 1; 0 <= y + i * d && y + i * d < 9 && 0 <= x - i * d && x - i * d < 9; i++) {
+				const t = data.banmen[y + i * d][x - i * d];
+				if (t === komaColor) {
+					isLeftDownOK = true;
+					nLeftDown = i;
+					break;
+				} else if (t !== '') {
+					isLeftDownOK = false;
+					break;
+				}
+			}
+			for (let i = 1; 0 <= y + i * d && y + i * d < 9 && 0 <= x + i * d && x + i * d < 9; i++) {
+				const t = data.banmen[y + i * d][x + i * d];
+				if (t === komaColor) {
+					isRightDownOK = true;
+					nRightDown = i;
+					break;
+				} else if (t !== '') {
+					isRightDownOK = false;
+					break;
+				}
+			}
+			if (direction === '右') {
+				isLeftUpOK = false;
+				isLeftDownOK = false;
+			} else if (direction === '左') {
+				isRightUpOK = false;
+				isRightDownOK = false;
+			} else if (direction === '上') {
+				isLeftUpOK = false;
+				isRightUpOK = false;
+			} else if (direction === '引') {
+				isLeftDownOK = false;
+				isRightDownOK = false;
+			}
+			if (isLeftUpOK) {
+				data.banmen[y - nLeftUp * d][x - nLeftUp * d] = '';
+			} else if (isRightUpOK) {
+				data.banmen[y - nRightUp * d][x + nRightUp * d] = '';
+			} else if (isLeftDownOK) {
+				data.banmen[y + nLeftDown * d][x - nLeftDown * d] = '';
+			} else if (isRightDownOK) {
+				data.banmen[y + nRightDown * d][x + nRightDown * d] = '';
+			} else {
+				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
+			}
+			data.banmen[y][x] = komaColor;
+			break;
+		}
 		default: {
 			return ['まだ実装してへんて', getTagsReply(event)];
 		}
