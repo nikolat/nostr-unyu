@@ -959,47 +959,47 @@ const res_shogi = (event: NostrEvent): [string, string[][]] => {
 		if (isFirstLine) {
 			isFirstLine = false;
 			a = [
-				'migisita',
-				'yoko',
+				'kubi_migisita',
+				'kubi_yoko',
 				'kubi_T',
-				'yoko',
+				'kubi_yoko',
 				'kubi_T',
-				'yoko',
+				'kubi_yoko',
 				'kubi_T',
-				'yoko',
+				'kubi_yoko',
 				'kubi_T',
-				'yoko',
+				'kubi_yoko',
 				'kubi_T',
-				'yoko',
+				'kubi_yoko',
 				'kubi_T',
-				'yoko',
+				'kubi_yoko',
 				'kubi_T',
-				'yoko',
+				'kubi_yoko',
 				'kubi_T',
-				'yoko',
-				'hidarisita'
+				'kubi_yoko',
+				'kubi_hidarisita'
 			].map((e) => `kubipaca_summer_${e}`);
 		} else {
 			a = [
-				'hidariT',
-				'yoko',
+				'kubi_hidariT',
+				'kubi_yoko',
 				'kubi_juji',
-				'yoko',
+				'kubi_yoko',
 				'kubi_juji',
-				'yoko',
+				'kubi_yoko',
 				'kubi_juji',
-				'yoko',
+				'kubi_yoko',
 				'kubi_juji',
-				'yoko',
+				'kubi_yoko',
 				'kubi_juji',
-				'yoko',
+				'kubi_yoko',
 				'kubi_juji',
-				'yoko',
+				'kubi_yoko',
 				'kubi_juji',
-				'yoko',
+				'kubi_yoko',
 				'kubi_juji',
-				'yoko',
-				'migiT'
+				'kubi_yoko',
+				'kubi_migiT'
 			].map((e) => `kubipaca_summer_${e}`);
 		}
 		for (const e of a) {
@@ -1014,25 +1014,25 @@ const res_shogi = (event: NostrEvent): [string, string[][]] => {
 		);
 	}
 	const a = [
-		'uemigi',
-		'yoko',
+		'kubi_uemigi',
+		'kubi_yoko',
 		'kubi_gyakuT',
-		'yoko',
+		'kubi_yoko',
 		'kubi_gyakuT',
-		'yoko',
+		'kubi_yoko',
 		'kubi_gyakuT',
-		'yoko',
+		'kubi_yoko',
 		'kubi_gyakuT',
-		'yoko',
+		'kubi_yoko',
 		'kubi_gyakuT',
-		'yoko',
+		'kubi_yoko',
 		'kubi_gyakuT',
-		'yoko',
+		'kubi_yoko',
 		'kubi_gyakuT',
-		'yoko',
+		'kubi_yoko',
 		'kubi_gyakuT',
-		'yoko',
-		'uehidari'
+		'kubi_yoko',
+		'kubi_uehidari'
 	];
 	contentArray.push(a.map((e) => `:kubipaca_summer_kubi_${e}:`).join(''));
 	const content: string = contentArray.join('\n');
