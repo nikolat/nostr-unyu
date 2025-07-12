@@ -842,12 +842,15 @@ const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
 	]);
 };
 
+type Teban = 'sente' | 'gote';
+type Koma = 'pawn' | 'lance' | 'knight' | 'silver' | 'gold' | 'bishop' | 'rook' | 'king' | 'king2';
+
 type Shogi = {
-	teban: 'sente' | 'gote';
+	teban: Teban;
 	banmen: string[][];
 	mochigoma: {
-		sente: string[];
-		gote: string[];
+		sente: Koma[];
+		gote: Koma[];
 	};
 };
 
@@ -1006,7 +1009,7 @@ const res_shogi_start = async (
 		teban: 'sente'
 	};
 	await setShogiData(signer, data);
-	return showBanmen(event, banmen);
+	return showBanmen(event, data);
 };
 
 const res_shogi_turn = async (
@@ -1023,11 +1026,11 @@ const res_shogi_turn = async (
 	if (match === null) {
 		throw new Error();
 	}
-	const teban: string = ['▲', '☗'].includes(match[1])
+	const teban: Teban | undefined = ['▲', '☗'].includes(match[1])
 		? 'sente'
 		: ['△', '☖'].includes(match[1])
 			? 'gote'
-			: '';
+			: undefined;
 	const x: number = Array.from('987654321').indexOf(match[2]);
 	const y: number = Array.from('一二三四五六七八九').indexOf(match[3]);
 	const komaName: string = match[4];
@@ -1049,7 +1052,7 @@ const res_shogi_turn = async (
 		成香: 'prom_lance',
 		と: 'prom_pawn'
 	}[komaName];
-	if (teban === '' || x < 0 || 8 < x || y < 0 || 8 < y || koma === undefined) {
+	if (teban === undefined || x < 0 || 8 < x || y < 0 || 8 < y || koma === undefined) {
 		return ['なんかデータがおかしいで', getTagsReply(event)];
 	}
 	if (data.teban === 'sente' && teban === 'gote') {
@@ -1070,23 +1073,23 @@ const res_shogi_turn = async (
 		case 'pawn': {
 			if (data.banmen[y + d][x] === komaColor) {
 				data.banmen[y + d][x] = '';
-				data.banmen[y][x] = komaColor;
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
 			break;
 		}
 		case 'lance': {
+			let isOk = false;
 			for (let i = y + d; 0 <= i && i < 9; i += d) {
 				if (data.banmen[i][x] === komaColor) {
 					data.banmen[i][x] = '';
-					data.banmen[y][x] = komaColor;
+					isOk = true;
 					break;
 				} else if (data.banmen[i][x] !== '') {
 					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 				}
 			}
-			if (data.banmen[y][x] !== komaColor) {
+			if (!isOk) {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
 			break;
@@ -1110,7 +1113,6 @@ const res_shogi_turn = async (
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
-			data.banmen[y][x] = komaColor;
 			break;
 		}
 		case 'silver': {
@@ -1154,7 +1156,6 @@ const res_shogi_turn = async (
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
-			data.banmen[y][x] = komaColor;
 			break;
 		}
 		case 'gold': {
@@ -1206,7 +1207,6 @@ const res_shogi_turn = async (
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
-			data.banmen[y][x] = komaColor;
 			break;
 		}
 		case 'bishop': {
@@ -1286,7 +1286,6 @@ const res_shogi_turn = async (
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
-			data.banmen[y][x] = komaColor;
 			break;
 		}
 		case 'rook': {
@@ -1370,7 +1369,6 @@ const res_shogi_turn = async (
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
-			data.banmen[y][x] = komaColor;
 			break;
 		}
 		case 'king':
@@ -1394,7 +1392,6 @@ const res_shogi_turn = async (
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
-			data.banmen[y][x] = komaColor;
 			break;
 		}
 		default: {
@@ -1402,23 +1399,36 @@ const res_shogi_turn = async (
 		}
 	}
 	if (teban === 'sente') {
+		if (data.banmen[y][x] !== '') {
+			data.mochigoma.sente.push(data.banmen[y][x].replace('white_', '') as Koma);
+		}
 		data.teban = 'gote';
 	} else {
+		if (data.banmen[y][x] !== '') {
+			data.mochigoma.gote.push(data.banmen[y][x].replace('black_', '') as Koma);
+		}
 		data.teban = 'sente';
 	}
-	const banmen: string[][] = data.banmen;
+	data.banmen[y][x] = komaColor;
 	await setShogiData(signer, data);
-	return showBanmen(event, banmen);
+	return showBanmen(event, data);
 };
 
-const showBanmen = (event: NostrEvent, banmen: string[][]): [string, string[][]] => {
+const showBanmen = (event: NostrEvent, data: Shogi): [string, string[][]] => {
 	let contentArray: string[] = [];
 	const emojiKubipaka: Set<string> = new Set<string>();
 	const emojiShogi: Set<string> = new Set<string>();
 	emojiKubipaka.add('kubipaca_summer_kubi');
 	emojiKubipaka.add('kubipaca_summer_empty');
 	let isFirstLine: boolean = true;
-	for (const line of banmen) {
+	if (data.mochigoma.gote.length > 0) {
+		const white = data.mochigoma.gote.map((e) => `white_${e}`);
+		contentArray.push(white.map((e) => `:${e}:`).join(''));
+		for (const koma of white) {
+			emojiShogi.add(koma);
+		}
+	}
+	for (const line of data.banmen) {
 		let a: string[];
 		if (isFirstLine) {
 			isFirstLine = false;
@@ -1502,6 +1512,13 @@ const showBanmen = (event: NostrEvent, banmen: string[][]): [string, string[][]]
 		emojiKubipaka.add(e);
 	}
 	contentArray.push(a.map((e) => `:${e}:`).join(''));
+	if (data.mochigoma.sente.length > 0) {
+		const black = data.mochigoma.gote.map((e) => `black_${e}`);
+		contentArray.push(black.map((e) => `:${e}:`).join(''));
+		for (const koma of black) {
+			emojiShogi.add(koma);
+		}
+	}
 	const content: string = contentArray.join('\n');
 	const tags = [
 		...getTagsReply(event),
