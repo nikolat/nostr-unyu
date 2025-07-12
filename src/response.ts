@@ -1373,6 +1373,30 @@ const res_shogi_turn = async (
 			data.banmen[y][x] = komaColor;
 			break;
 		}
+		case 'king':
+		case 'king2': {
+			if (data.banmen[y - d][x - d] === komaColor) {
+				data.banmen[y - d][x - d] = '';
+			} else if (data.banmen[y - d][x] === komaColor) {
+				data.banmen[y - d][x] = '';
+			} else if (data.banmen[y - d][x + d] === komaColor) {
+				data.banmen[y - d][x + d] = '';
+			} else if (data.banmen[y][x - d] === komaColor) {
+				data.banmen[y][x - d] = '';
+			} else if (data.banmen[y][x + d] === komaColor) {
+				data.banmen[y][x + d] = '';
+			} else if (data.banmen[y + d][x - d] === komaColor) {
+				data.banmen[y + d][x - d] = '';
+			} else if (data.banmen[y + d][x] === komaColor) {
+				data.banmen[y + d][x] = '';
+			} else if (data.banmen[y + d][x + d] === komaColor) {
+				data.banmen[y + d][x + d] = '';
+			} else {
+				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
+			}
+			data.banmen[y][x] = komaColor;
+			break;
+		}
 		default: {
 			return ['まだ実装してへんて', getTagsReply(event)];
 		}
