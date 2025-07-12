@@ -1513,7 +1513,7 @@ const showBanmen = (event: NostrEvent, data: Shogi): [string, string[][]] => {
 	}
 	contentArray.push(a.map((e) => `:${e}:`).join(''));
 	if (data.mochigoma.sente.length > 0) {
-		const black = data.mochigoma.gote.map((e) => `black_${e}`);
+		const black = data.mochigoma.sente.map((e) => `black_${e}`);
 		contentArray.push(black.map((e) => `:${e}:`).join(''));
 		for (const koma of black) {
 			emojiShogi.add(koma);
