@@ -318,6 +318,7 @@ const getResmap = (
 		[/^\\s\[(\d+)\]$/, res_surfacetest],
 		[/update\srelay/, res_relayupdate],
 		[/おはよ/, res_ohayo],
+		[/将棋*.対局/, res_shogi],
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
 		[/ケルベ[ロノ]ス/, res_kerubenos],
 		[/タイガー|🐯|🐅/u, res_tiger],
@@ -893,6 +894,162 @@ const getEvents = (
 		};
 		const sub = relay.subscribe(filters, { onevent, oneose });
 	});
+};
+
+const res_shogi = (event: NostrEvent): [string, string[][]] => {
+	const shokihaichi: string[][] = [
+		[
+			'white_lance',
+			'white_knight',
+			'white_silver',
+			'white_gold',
+			'white_king',
+			'white_gold',
+			'white_silver',
+			'white_knight',
+			'white_lance'
+		],
+		['', 'white_rook', '', '', '', '', '', 'white_bishop', ''],
+		[
+			'white_pawn',
+			'white_pawn',
+			'white_pawn',
+			'white_pawn',
+			'white_pawn',
+			'white_pawn',
+			'white_pawn',
+			'white_pawn',
+			'white_pawn'
+		],
+		['', '', '', '', '', '', '', '', ''],
+		['', '', '', '', '', '', '', '', ''],
+		['', '', '', '', '', '', '', '', ''],
+		[
+			'black_pawn',
+			'black_pawn',
+			'black_pawn',
+			'black_pawn',
+			'black_pawn',
+			'black_pawn',
+			'black_pawn',
+			'black_pawn',
+			'black_pawn'
+		],
+		['', 'black_bishop', '', '', '', '', '', 'black_rook', ''],
+		[
+			'black_lance',
+			'white_knight',
+			'black_silver',
+			'black_gold',
+			'black_king2',
+			'black_gold',
+			'black_silver',
+			'white_knight',
+			'black_lance'
+		]
+	];
+	let contentArray: string[] = [];
+	const emojiKubipaka: Set<string> = new Set<string>();
+	const emojiShogi: Set<string> = new Set<string>();
+	emojiKubipaka.add('kubipaca_summer_kubi');
+	emojiKubipaka.add('kubipaca_summer_empty');
+	let isFirstLine: boolean = true;
+	for (const line of shokihaichi) {
+		let a: string[];
+		if (isFirstLine) {
+			isFirstLine = false;
+			a = [
+				'migisita',
+				'yoko',
+				'kubi_T',
+				'yoko',
+				'kubi_T',
+				'yoko',
+				'kubi_T',
+				'yoko',
+				'kubi_T',
+				'yoko',
+				'kubi_T',
+				'yoko',
+				'kubi_T',
+				'yoko',
+				'kubi_T',
+				'yoko',
+				'kubi_T',
+				'yoko',
+				'hidarisita'
+			].map((e) => `kubipaca_summer_${e}`);
+		} else {
+			a = [
+				'hidariT',
+				'yoko',
+				'kubi_juji',
+				'yoko',
+				'kubi_juji',
+				'yoko',
+				'kubi_juji',
+				'yoko',
+				'kubi_juji',
+				'yoko',
+				'kubi_juji',
+				'yoko',
+				'kubi_juji',
+				'yoko',
+				'kubi_juji',
+				'yoko',
+				'kubi_juji',
+				'yoko',
+				'migiT'
+			].map((e) => `kubipaca_summer_${e}`);
+		}
+		for (const e of a) {
+			emojiKubipaka.add(e);
+		}
+		for (const e of line.filter((e) => e.length > 0)) {
+			emojiShogi.add(e);
+		}
+		contentArray.push(a.map((e) => `:${e}:`).join(''));
+		contentArray.push(
+			`:kubipaca_summer_kubi:${line.map((e) => (e === '' ? ':kubipaca_summer_empty:' : `:${e}:`)).join(':kubipaca_summer_kubi:')}:kubipaca_summer_kubi:`
+		);
+	}
+	const a = [
+		'uemigi',
+		'yoko',
+		'kubi_gyakuT',
+		'yoko',
+		'kubi_gyakuT',
+		'yoko',
+		'kubi_gyakuT',
+		'yoko',
+		'kubi_gyakuT',
+		'yoko',
+		'kubi_gyakuT',
+		'yoko',
+		'kubi_gyakuT',
+		'yoko',
+		'kubi_gyakuT',
+		'yoko',
+		'kubi_gyakuT',
+		'yoko',
+		'uehidari'
+	];
+	contentArray.push(a.map((e) => `:kubipaca_summer_kubi_${e}:`).join(''));
+	const content: string = contentArray.join('\n');
+	const tags = [
+		...getTagsReply(event),
+		...Array.from(emojiKubipaka).map((s) => [
+			'emoji',
+			s,
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`
+		]),
+		...Array.from(emojiShogi).map((s) => [
+			'emoji',
+			s,
+			`https://nikolat.github.io/image/shogi/${s}.png`
+		])
+	];
+	return [content, tags];
 };
 
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
