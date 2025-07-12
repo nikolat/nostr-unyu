@@ -1033,11 +1033,11 @@ const res_shogi = (event: NostrEvent): [string, string[][]] => {
 		'kubi_gyakuT',
 		'kubi_yoko',
 		'kubi_uehidari'
-	];
+	].map((e) => `kubipaca_summer_${e}`);
 	for (const e of a) {
 		emojiKubipaka.add(e);
 	}
-	contentArray.push(a.map((e) => `:kubipaca_summer_${e}:`).join(''));
+	contentArray.push(a.map((e) => `:${e}:`).join(''));
 	const content: string = contentArray.join('\n');
 	const tags = [
 		...getTagsReply(event),
