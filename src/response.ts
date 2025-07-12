@@ -1059,11 +1059,11 @@ const res_shogi_turn = async (
 	if (teban === 'sente') {
 		switch (koma) {
 			case 'pawn': {
-				if (data.banmen[x][y + 1] === 'black_pawn') {
-					data.banmen[x][y + 1] = '';
-					data.banmen[x][y] = 'black_pawn';
+				if (data.banmen[y + 1][x] === 'black_pawn') {
+					data.banmen[y + 1][x] = '';
+					data.banmen[y][x] = 'black_pawn';
 				} else {
-					return [`そこに${match[3]}は動けへんやろ`, getTagsReply(event)];
+					return [`そこに${match[4]}は動けへんやろ`, getTagsReply(event)];
 				}
 				break;
 			}
@@ -1074,11 +1074,11 @@ const res_shogi_turn = async (
 	} else {
 		switch (koma) {
 			case 'pawn': {
-				if (data.banmen[x][y - 1] === 'white_pawn') {
-					data.banmen[x][y - 1] = '';
-					data.banmen[x][y] = 'white_pawn';
+				if (data.banmen[y - 1][x] === 'white_pawn') {
+					data.banmen[y - 1][x] = '';
+					data.banmen[y][x] = 'white_pawn';
 				} else {
-					return [`そこに${match[3]}は動けへんやろ`, getTagsReply(event)];
+					return [`そこに${match[4]}は動けへんやろ`, getTagsReply(event)];
 				}
 				break;
 			}
@@ -1099,7 +1099,7 @@ const showBanmen = (event: NostrEvent, banmen: string[][]): [string, string[][]]
 	emojiKubipaka.add('kubipaca_summer_kubi');
 	emojiKubipaka.add('kubipaca_summer_empty');
 	let isFirstLine: boolean = true;
-	for (const line of shokihaichi) {
+	for (const line of banmen) {
 		let a: string[];
 		if (isFirstLine) {
 			isFirstLine = false;
