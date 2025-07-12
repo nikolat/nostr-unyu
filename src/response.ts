@@ -1030,6 +1030,7 @@ const res_shogi_turn = async (
 			: '';
 	const x: number = Array.from('987654321').indexOf(match[2]);
 	const y: number = Array.from('一二三四五六七八九').indexOf(match[3]);
+	const komaName: string = match[4];
 	const koma: string | undefined = {
 		王: 'king',
 		玉: 'king2',
@@ -1046,7 +1047,7 @@ const res_shogi_turn = async (
 		成桂: 'prom_knight',
 		成香: 'prom_lance',
 		と: 'prom_pawn'
-	}[match[4]];
+	}[komaName];
 	if (teban === '' || x < 0 || 8 < x || y < 0 || 8 < y || koma === undefined) {
 		return ['なんかデータがおかしいで', getTagsReply(event)];
 	}
@@ -1057,13 +1058,31 @@ const res_shogi_turn = async (
 		return ['後手番やで', getTagsReply(event)];
 	}
 	if (teban === 'sente') {
+		if (data.banmen[y][x].startsWith('black_')) {
+			return ['味方がおって移動できへんて', getTagsReply(event)];
+		}
 		switch (koma) {
 			case 'pawn': {
 				if (data.banmen[y + 1][x] === 'black_pawn') {
 					data.banmen[y + 1][x] = '';
 					data.banmen[y][x] = 'black_pawn';
 				} else {
-					return [`そこに${match[4]}は動けへんやろ`, getTagsReply(event)];
+					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
+				}
+				break;
+			}
+			case 'lance': {
+				for (let i = y + 1; i < 9; i++) {
+					if (data.banmen[i][x] === 'black_lance') {
+						data.banmen[i][x] = '';
+						data.banmen[y][x] = 'black_lance';
+						break;
+					} else if (data.banmen[i][x] !== '') {
+						return ['飛び越えて移動はできへんて', getTagsReply(event)];
+					}
+					if (i === 8) {
+						return [`どこに${komaName}がおんねん`, getTagsReply(event)];
+					}
 				}
 				break;
 			}
@@ -1073,13 +1092,31 @@ const res_shogi_turn = async (
 		}
 		data.teban = 'gote';
 	} else {
+		if (data.banmen[y][x].startsWith('white_')) {
+			return ['味方がおって移動できへんて', getTagsReply(event)];
+		}
 		switch (koma) {
 			case 'pawn': {
 				if (data.banmen[y - 1][x] === 'white_pawn') {
 					data.banmen[y - 1][x] = '';
 					data.banmen[y][x] = 'white_pawn';
 				} else {
-					return [`そこに${match[4]}は動けへんやろ`, getTagsReply(event)];
+					return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
+				}
+				break;
+			}
+			case 'lance': {
+				for (let i = y - 1; i >= 0; i--) {
+					if (data.banmen[i][x] === 'white_lance') {
+						data.banmen[i][x] = '';
+						data.banmen[y][x] = 'white_lance';
+						break;
+					} else if (data.banmen[i][x] !== '') {
+						return ['飛び越えて移動はできへんて', getTagsReply(event)];
+					}
+					if (i === 0) {
+						return [`どこに${komaName}がおんねん`, getTagsReply(event)];
+					}
 				}
 				break;
 			}
