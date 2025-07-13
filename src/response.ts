@@ -843,14 +843,24 @@ const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
 };
 
 type Teban = 'sente' | 'gote';
-type Koma = 'pawn' | 'lance' | 'knight' | 'silver' | 'gold' | 'bishop' | 'rook' | 'king' | 'king2';
+type KomaNarazu =
+	| 'pawn'
+	| 'lance'
+	| 'knight'
+	| 'silver'
+	| 'gold'
+	| 'bishop'
+	| 'rook'
+	| 'king'
+	| 'king2';
+type KomaNari = 'prom_pawn' | 'prom_lance' | 'prom_knight' | 'prom_silver' | 'horse' | 'dragon';
 
 type Shogi = {
 	teban: Teban;
 	banmen: string[][];
 	mochigoma: {
-		sente: Koma[];
-		gote: Koma[];
+		sente: KomaNarazu[];
+		gote: KomaNarazu[];
 	};
 };
 
@@ -1012,7 +1022,7 @@ const res_shogi_start = async (
 	return showBanmen(event, data);
 };
 
-const getNari = (koma: string): string => {
+const getNari = (koma: KomaNarazu): KomaNari => {
 	switch (koma) {
 		case 'pawn':
 		case 'lance':
@@ -1028,7 +1038,7 @@ const getNari = (koma: string): string => {
 	}
 };
 
-const getNariMoto = (koma: string): string => {
+const getNariMoto = (koma: KomaNarazu | KomaNari): KomaNarazu => {
 	switch (koma) {
 		case 'prom_pawn':
 			return 'pawn';
@@ -1445,12 +1455,14 @@ const res_shogi_turn = async (
 	}
 	if (teban === 'sente') {
 		if (data.banmen[y][x] !== '') {
-			data.mochigoma.sente.push(getNariMoto(data.banmen[y][x].replace('white_', '')) as Koma);
+			const komaBase = data.banmen[y][x].replace('white_', '') as KomaNarazu | KomaNari;
+			data.mochigoma.sente.push(getNariMoto(komaBase));
 		}
 		data.teban = 'gote';
 	} else {
 		if (data.banmen[y][x] !== '') {
-			data.mochigoma.gote.push(getNariMoto(data.banmen[y][x].replace('black_', '')) as Koma);
+			const komaBase = data.banmen[y][x].replace('black_', '') as KomaNarazu | KomaNari;
+			data.mochigoma.gote.push(getNariMoto(komaBase));
 		}
 		data.teban = 'sente';
 	}
