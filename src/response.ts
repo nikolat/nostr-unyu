@@ -1114,9 +1114,10 @@ const res_shogi_turn = async (
 		return ['味方がおって移動できへんて', getTagsReply(event)];
 	}
 	const komaColor: string = teban === 'sente' ? `black_${koma}` : `white_${koma}`;
-	const canNari: boolean =
+	let canNari: boolean =
 		((teban === 'sente' && y < 3) || (teban === 'gote' && 5 < y)) &&
 		['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'].includes(koma);
+	let pointMovedFrom: number[] | undefined;
 	const d: number = teban === 'sente' ? 1 : -1;
 	switch (koma) {
 		case 'pawn': {
@@ -1193,14 +1194,19 @@ const res_shogi_turn = async (
 				isRightDownOK = false;
 			}
 			if (isLeftUpOK) {
+				pointMovedFrom = [y - d, x - d];
 				data.banmen[y - d][x - d] = '';
 			} else if (isRightUpOK) {
+				pointMovedFrom = [y - d, x + d];
 				data.banmen[y - d][x + d] = '';
 			} else if (isLeftDownOK) {
+				pointMovedFrom = [y + d, x - d];
 				data.banmen[y + d][x - d] = '';
 			} else if (isDownOK) {
+				pointMovedFrom = [y + d, x];
 				data.banmen[y + d][x] = '';
 			} else if (isRightDownOK) {
+				pointMovedFrom = [y + d, x + d];
 				data.banmen[y + d][x + d] = '';
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
@@ -1325,12 +1331,16 @@ const res_shogi_turn = async (
 				isRightDownOK = false;
 			}
 			if (isLeftUpOK) {
+				pointMovedFrom = [y - nLeftUp * d, x - nLeftUp * d];
 				data.banmen[y - nLeftUp * d][x - nLeftUp * d] = '';
 			} else if (isRightUpOK) {
+				pointMovedFrom = [y - nRightUp * d, x + nRightUp * d];
 				data.banmen[y - nRightUp * d][x + nRightUp * d] = '';
 			} else if (isLeftDownOK) {
+				pointMovedFrom = [y + nLeftDown * d, x - nLeftDown * d];
 				data.banmen[y + nLeftDown * d][x - nLeftDown * d] = '';
 			} else if (isRightDownOK) {
+				pointMovedFrom = [y + nRightDown * d, x + nRightDown * d];
 				data.banmen[y + nRightDown * d][x + nRightDown * d] = '';
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
@@ -1408,12 +1418,16 @@ const res_shogi_turn = async (
 				isRightOK = false;
 			}
 			if (isUpOK) {
+				pointMovedFrom = [y - nUp * d, x];
 				data.banmen[y - nUp * d][x] = '';
 			} else if (isDownOK) {
+				pointMovedFrom = [y + nDown * d, x];
 				data.banmen[y + nDown * d][x] = '';
 			} else if (isLeftOK) {
+				pointMovedFrom = [y, x - nLeft * d];
 				data.banmen[y][x - nLeft * d] = '';
 			} else if (isRightOK) {
+				pointMovedFrom = [y, x + nRight * d];
 				data.banmen[y][x + nRight * d] = '';
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
@@ -1447,6 +1461,12 @@ const res_shogi_turn = async (
 			return ['まだ実装してへんて', getTagsReply(event)];
 		}
 	}
+	//相手の陣地から移動した場合も成れる
+	canNari =
+		canNari ||
+		(pointMovedFrom !== undefined &&
+			((teban === 'sente' && pointMovedFrom[0] < 3) ||
+				(teban === 'gote' && 5 < pointMovedFrom[0])));
 	if (canNari && narifunari === undefined) {
 		return ['成か不成かはっきりせえ', getTagsReply(event)];
 	}
