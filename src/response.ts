@@ -1396,9 +1396,9 @@ const res_shogi_turn = async (
 				pointMovedFrom = [y + nRightDown * d, x + nRightDown * d];
 				data.banmen[y + nRightDown * d][x + nRightDown * d] = '';
 			} else if (isUpOK) {
-				data.banmen[y + d][x] = '';
-			} else if (isDownOK) {
 				data.banmen[y - d][x] = '';
+			} else if (isDownOK) {
+				data.banmen[y + d][x] = '';
 			} else if (isLeftOK) {
 				data.banmen[y][x - d] = '';
 			} else if (isRightOK) {
