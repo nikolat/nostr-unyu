@@ -321,7 +321,7 @@ const getResmap = (
 		[/おはよ/, res_ohayo],
 		[/将棋*.対局/, res_shogi_start],
 		[
-			/([▲△☗☖])([1-9])([一二三四五六七八九])(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成)?$/,
+			/([▲△☗☖])?([1-9])([一二三四五六七八九])(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成)?$/,
 			res_shogi_turn
 		],
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
@@ -1071,11 +1071,13 @@ const res_shogi_turn = async (
 	if (match === null) {
 		throw new Error();
 	}
-	const teban: Teban | undefined = ['▲', '☗'].includes(match[1])
+	const teban: Teban = ['▲', '☗'].includes(match[1])
 		? 'sente'
 		: ['△', '☖'].includes(match[1])
 			? 'gote'
-			: undefined;
+			: data.teban === 'sente'
+				? 'sente'
+				: 'gote';
 	const x: number = Array.from('987654321').indexOf(match[2]);
 	const y: number = Array.from('一二三四五六七八九').indexOf(match[3]);
 	const komaName: string = match[4];
@@ -1098,7 +1100,7 @@ const res_shogi_turn = async (
 		成香: 'prom_lance',
 		と: 'prom_pawn'
 	}[komaName] as KomaNarazu | KomaNari | undefined;
-	if (teban === undefined || x < 0 || 8 < x || y < 0 || 8 < y || koma === undefined) {
+	if (x < 0 || 8 < x || y < 0 || 8 < y || koma === undefined) {
 		return ['なんかデータがおかしいで', getTagsReply(event)];
 	}
 	if (data.teban === 'sente' && teban === 'gote') {
