@@ -1012,6 +1012,41 @@ const res_shogi_start = async (
 	return showBanmen(event, data);
 };
 
+const getNari = (koma: string): string => {
+	switch (koma) {
+		case 'pawn':
+		case 'lance':
+		case 'knight':
+		case 'silver':
+			return `prom_${koma}`;
+		case 'bishop':
+			return 'horse';
+		case 'rook':
+			return 'dragon';
+		default:
+			throw new TypeError(`unexpected: ${koma}`);
+	}
+};
+
+const getNariMoto = (koma: string): string => {
+	switch (koma) {
+		case 'prom_pawn':
+			return 'pawn';
+		case 'prom_lance':
+			return 'lance';
+		case 'prom_knight':
+			return 'knight';
+		case 'prom_silver':
+			return 'silver';
+		case 'horse':
+			return 'bishop';
+		case 'dragon':
+			return 'rook';
+		default:
+			return koma;
+	}
+};
+
 const res_shogi_turn = async (
 	event: NostrEvent,
 	mode: Mode,
@@ -1035,6 +1070,7 @@ const res_shogi_turn = async (
 	const y: number = Array.from('一二三四五六七八九').indexOf(match[3]);
 	const komaName: string = match[4];
 	const direction: string | undefined = match.at(5);
+	const narifunari: string | undefined = match.at(6);
 	const koma: string | undefined = {
 		王: 'king',
 		玉: 'king2',
@@ -1068,6 +1104,9 @@ const res_shogi_turn = async (
 		return ['味方がおって移動できへんて', getTagsReply(event)];
 	}
 	const komaColor: string = teban === 'sente' ? `black_${koma}` : `white_${koma}`;
+	const canNari: boolean =
+		((teban === 'sente' && y < 3) || (teban === 'gote' && 5 < y)) &&
+		['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'].includes(koma);
 	const d: number = teban === 'sente' ? 1 : -1;
 	switch (koma) {
 		case 'pawn': {
@@ -1398,18 +1437,30 @@ const res_shogi_turn = async (
 			return ['まだ実装してへんて', getTagsReply(event)];
 		}
 	}
+	if (canNari && narifunari === undefined) {
+		return ['成か不成かはっきりせえ', getTagsReply(event)];
+	}
+	if (!canNari && narifunari === '成') {
+		return ['成れへん', getTagsReply(event)];
+	}
 	if (teban === 'sente') {
 		if (data.banmen[y][x] !== '') {
-			data.mochigoma.sente.push(data.banmen[y][x].replace('white_', '') as Koma);
+			data.mochigoma.sente.push(getNariMoto(data.banmen[y][x].replace('white_', '')) as Koma);
 		}
 		data.teban = 'gote';
 	} else {
 		if (data.banmen[y][x] !== '') {
-			data.mochigoma.gote.push(data.banmen[y][x].replace('black_', '') as Koma);
+			data.mochigoma.gote.push(getNariMoto(data.banmen[y][x].replace('black_', '')) as Koma);
 		}
 		data.teban = 'sente';
 	}
-	data.banmen[y][x] = komaColor;
+	if (narifunari === '成') {
+		const nariKomaColor: string =
+			teban === 'sente' ? `black_${getNari(koma)}` : `white_${getNari(koma)}`;
+		data.banmen[y][x] = nariKomaColor;
+	} else {
+		data.banmen[y][x] = komaColor;
+	}
 	await setShogiData(signer, data);
 	return showBanmen(event, data);
 };
