@@ -1250,6 +1250,11 @@ const res_shogi_turn = async (
 				isRightOK = false;
 				isLeftDownOK = false;
 				isRightDownOK = false;
+			} else if (direction === '寄') {
+				isUpOK = false;
+				isLeftDownOK = false;
+				isDownOK = false;
+				isRightDownOK = false;
 			}
 			if (isUpOK) {
 				data.banmen[y - d][x] = '';
@@ -1268,7 +1273,8 @@ const res_shogi_turn = async (
 			}
 			break;
 		}
-		case 'bishop': {
+		case 'bishop':
+		case 'horse': {
 			let isLeftUpOK = false;
 			let isRightUpOK = false;
 			let isLeftDownOK = false;
@@ -1321,18 +1327,53 @@ const res_shogi_turn = async (
 					break;
 				}
 			}
+			//馬限定
+			let isUpOK = false;
+			let isDownOK = false;
+			let isRightOK = false;
+			let isLeftOK = false;
+			if (koma === 'horse') {
+				if (data.banmen[y - d][x] === komaColor) {
+					isUpOK = true;
+				} else if (data.banmen[y + d][x] === komaColor) {
+					isDownOK = true;
+				} else if (data.banmen[y][x - d] === komaColor) {
+					isLeftOK = true;
+				} else if (data.banmen[y][x + d] === komaColor) {
+					isRightOK = true;
+				}
+			}
 			if (direction === '右') {
 				isLeftUpOK = false;
 				isLeftDownOK = false;
+				isUpOK = false;
+				isDownOK = false;
+				isLeftOK = false;
 			} else if (direction === '左') {
 				isRightUpOK = false;
 				isRightDownOK = false;
-			} else if (direction === '上') {
+				isUpOK = false;
+				isDownOK = false;
+				isRightOK = false;
+			} else if (direction === '上' || direction === '直') {
 				isLeftUpOK = false;
 				isRightUpOK = false;
+				isUpOK = false;
+				isLeftOK = false;
+				isRightOK = false;
 			} else if (direction === '引') {
 				isLeftDownOK = false;
 				isRightDownOK = false;
+				isUpOK = false;
+				isDownOK = false;
+				isRightOK = false;
+			} else if (direction === '寄') {
+				isLeftUpOK = false;
+				isRightUpOK = false;
+				isLeftDownOK = false;
+				isRightDownOK = false;
+				isUpOK = false;
+				isDownOK = false;
 			}
 			if (isLeftUpOK) {
 				pointMovedFrom = [y - nLeftUp * d, x - nLeftUp * d];
@@ -1346,6 +1387,14 @@ const res_shogi_turn = async (
 			} else if (isRightDownOK) {
 				pointMovedFrom = [y + nRightDown * d, x + nRightDown * d];
 				data.banmen[y + nRightDown * d][x + nRightDown * d] = '';
+			} else if (isUpOK) {
+				data.banmen[y + d][x] = '';
+			} else if (isDownOK) {
+				data.banmen[y - d][x] = '';
+			} else if (isLeftOK) {
+				data.banmen[y][x - d] = '';
+			} else if (isRightOK) {
+				data.banmen[y][x + d] = '';
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
