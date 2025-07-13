@@ -321,7 +321,7 @@ const getResmap = (
 		[/おはよ/, res_ohayo],
 		[/将棋*.対局/, res_shogi_start],
 		[
-			/([▲△☗☖])([1-9])([一二三四五六七八九])(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成)?$/,
+			/([▲△☗☖])([1-9])([一二三四五六七八九])(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成|打)?$/,
 			res_shogi_turn
 		],
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
@@ -1080,7 +1080,7 @@ const res_shogi_turn = async (
 	const y: number = Array.from('一二三四五六七八九').indexOf(match[3]);
 	const komaName: string = match[4];
 	const direction: string | undefined = match.at(5);
-	const narifunari: string | undefined = match.at(6);
+	const narifunariutsu: string | undefined = match.at(6);
 	const koma: KomaNarazu | KomaNari | undefined = {
 		王: 'king',
 		玉: 'king2',
@@ -1114,6 +1114,27 @@ const res_shogi_turn = async (
 		return ['味方がおって移動できへんて', getTagsReply(event)];
 	}
 	const komaColor: string = teban === 'sente' ? `black_${koma}` : `white_${koma}`;
+	//打
+	if (narifunariutsu === '打') {
+		const mochigoma: KomaNarazu[] = data.mochigoma[teban];
+		const komanarazu = koma as KomaNarazu;
+		if (!mochigoma.includes(komanarazu)) {
+			return [`${komaName}なんか持ってへんがな`, getTagsReply(event)];
+		}
+		if (data.banmen[y][x] !== '') {
+			return ['そこには置けへんて', getTagsReply(event)];
+		}
+		const index = mochigoma.indexOf(komanarazu);
+		data.mochigoma[teban].splice(index, 1);
+		if (teban === 'sente') {
+			data.teban = 'gote';
+		} else {
+			data.teban = 'sente';
+		}
+		data.banmen[y][x] = komaColor;
+		await setShogiData(signer, data);
+		return showBanmen(event, data);
+	}
 	let canNari: boolean =
 		((teban === 'sente' && y < 3) || (teban === 'gote' && 5 < y)) &&
 		['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'].includes(koma);
@@ -1570,10 +1591,10 @@ const res_shogi_turn = async (
 			((teban === 'sente' && pointMovedFrom[0] < 3) ||
 				(teban === 'gote' && 5 < pointMovedFrom[0])) &&
 			['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'].includes(koma));
-	if (canNari && narifunari === undefined) {
+	if (canNari && narifunariutsu === undefined) {
 		return ['成か不成かはっきりせえ', getTagsReply(event)];
 	}
-	if (!canNari && narifunari === '成') {
+	if (!canNari && narifunariutsu === '成') {
 		return ['成れへん', getTagsReply(event)];
 	}
 	if (teban === 'sente') {
@@ -1589,7 +1610,7 @@ const res_shogi_turn = async (
 		}
 		data.teban = 'sente';
 	}
-	if (narifunari === '成') {
+	if (narifunariutsu === '成') {
 		const nariKomaColor: string =
 			teban === 'sente'
 				? `black_${getNari(koma as KomaNarazu)}`
