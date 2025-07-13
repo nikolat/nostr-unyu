@@ -321,7 +321,7 @@ const getResmap = (
 		[/おはよ/, res_ohayo],
 		[/将棋*.対局/, res_shogi_start],
 		[
-			/([▲△☗☖])([1-9])([一二三四五六七八九])(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成|打)?$/,
+			/([▲△☗☖])([1-9])([一二三四五六七八九])(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成)?$/,
 			res_shogi_turn
 		],
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
@@ -1080,7 +1080,7 @@ const res_shogi_turn = async (
 	const y: number = Array.from('一二三四五六七八九').indexOf(match[3]);
 	const komaName: string = match[4];
 	const direction: string | undefined = match.at(5);
-	const narifunariutsu: string | undefined = match.at(6);
+	const narifunari: string | undefined = match.at(6);
 	const koma: KomaNarazu | KomaNari | undefined = {
 		王: 'king',
 		玉: 'king2',
@@ -1115,7 +1115,7 @@ const res_shogi_turn = async (
 	}
 	const komaColor: string = teban === 'sente' ? `black_${koma}` : `white_${koma}`;
 	//打
-	if (narifunariutsu === '打') {
+	if (direction === '打') {
 		const mochigoma: KomaNarazu[] = data.mochigoma[teban];
 		const komanarazu = koma as KomaNarazu;
 		if (!mochigoma.includes(komanarazu)) {
@@ -1166,8 +1166,8 @@ const res_shogi_turn = async (
 			break;
 		}
 		case 'knight': {
-			let isLeftOK = data.banmen[y + 2 * d][x - d] === komaColor;
-			let isRightOK = data.banmen[y + 2 * d][x + d] === komaColor;
+			let isLeftOK = data.banmen[y + 2 * d]?.at(x - d) === komaColor;
+			let isRightOK = data.banmen[y + 2 * d]?.at(x + d) === komaColor;
 			if (isLeftOK && isRightOK) {
 				if (direction === '右') {
 					isLeftOK = false;
@@ -1187,11 +1187,11 @@ const res_shogi_turn = async (
 			break;
 		}
 		case 'silver': {
-			let isLeftUpOK = data.banmen[y - d][x - d] === komaColor;
-			let isRightUpOK = data.banmen[y - d][x + d] === komaColor;
-			let isLeftDownOK = data.banmen[y + d][x - d] === komaColor;
-			let isDownOK = data.banmen[y + d][x] === komaColor;
-			let isRightDownOK = data.banmen[y + d][x + d] === komaColor;
+			let isLeftUpOK = data.banmen[y - d]?.at(x - d) === komaColor;
+			let isRightUpOK = data.banmen[y - d]?.at(x + d) === komaColor;
+			let isLeftDownOK = data.banmen[y + d]?.at(x - d) === komaColor;
+			let isDownOK = data.banmen[y + d]?.at(x) === komaColor;
+			let isRightDownOK = data.banmen[y + d]?.at(x + d) === komaColor;
 			if (direction === '右') {
 				isLeftUpOK = false;
 				isLeftDownOK = false;
@@ -1239,12 +1239,12 @@ const res_shogi_turn = async (
 		case 'prom_lance':
 		case 'prom_knight':
 		case 'prom_silver': {
-			let isUpOK = data.banmen[y - d][x] === komaColor;
-			let isLeftOK = data.banmen[y][x - d] === komaColor;
-			let isRightOK = data.banmen[y][x + d] === komaColor;
-			let isLeftDownOK = data.banmen[y + d][x - d] === komaColor;
-			let isDownOK = data.banmen[y + d][x] === komaColor;
-			let isRightDownOK = data.banmen[y + d][x + d] === komaColor;
+			let isUpOK = data.banmen[y - d]?.at(x) === komaColor;
+			let isLeftOK = data.banmen[y]?.at(x - d) === komaColor;
+			let isRightOK = data.banmen[y]?.at(x + d) === komaColor;
+			let isLeftDownOK = data.banmen[y + d]?.at(x - d) === komaColor;
+			let isDownOK = data.banmen[y + d]?.at(x) === komaColor;
+			let isRightDownOK = data.banmen[y + d]?.at(x + d) === komaColor;
 			if (direction === '右') {
 				isUpOK = false;
 				isLeftOK = false;
@@ -1354,13 +1354,13 @@ const res_shogi_turn = async (
 			let isRightOK = false;
 			let isLeftOK = false;
 			if (koma === 'horse') {
-				if (data.banmen[y - d][x] === komaColor) {
+				if (data.banmen[y - d]?.at(x) === komaColor) {
 					isUpOK = true;
-				} else if (data.banmen[y + d][x] === komaColor) {
+				} else if (data.banmen[y + d]?.at(x) === komaColor) {
 					isDownOK = true;
-				} else if (data.banmen[y][x - d] === komaColor) {
+				} else if (data.banmen[y]?.at(x - d) === komaColor) {
 					isLeftOK = true;
-				} else if (data.banmen[y][x + d] === komaColor) {
+				} else if (data.banmen[y]?.at(x + d) === komaColor) {
 					isRightOK = true;
 				}
 			}
@@ -1489,13 +1489,13 @@ const res_shogi_turn = async (
 			let isLeftDownOK = false;
 			let isRightDownOK = false;
 			if (koma === 'dragon') {
-				if (data.banmen[y - d][x - d] === komaColor) {
+				if (data.banmen[y - d]?.at(x - d) === komaColor) {
 					isLeftUpOK = true;
-				} else if (data.banmen[y - d][x + d] === komaColor) {
+				} else if (data.banmen[y - d]?.at(x + d) === komaColor) {
 					isRightUpOK = true;
-				} else if (data.banmen[y + d][x - d] === komaColor) {
+				} else if (data.banmen[y + d]?.at(x - d) === komaColor) {
 					isLeftDownOK = true;
-				} else if (data.banmen[y + d][x + d] === komaColor) {
+				} else if (data.banmen[y + d]?.at(x + d) === komaColor) {
 					isRightDownOK = true;
 				}
 			}
@@ -1559,21 +1559,21 @@ const res_shogi_turn = async (
 		}
 		case 'king':
 		case 'king2': {
-			if (data.banmen[y - d][x - d] === komaColor) {
+			if (data.banmen[y - d]?.at(x - d) === komaColor) {
 				data.banmen[y - d][x - d] = '';
-			} else if (data.banmen[y - d][x] === komaColor) {
+			} else if (data.banmen[y - d]?.at(x) === komaColor) {
 				data.banmen[y - d][x] = '';
-			} else if (data.banmen[y - d][x + d] === komaColor) {
+			} else if (data.banmen[y - d]?.at(x + d) === komaColor) {
 				data.banmen[y - d][x + d] = '';
-			} else if (data.banmen[y][x - d] === komaColor) {
+			} else if (data.banmen[y]?.at(x - d) === komaColor) {
 				data.banmen[y][x - d] = '';
-			} else if (data.banmen[y][x + d] === komaColor) {
+			} else if (data.banmen[y]?.at(x + d) === komaColor) {
 				data.banmen[y][x + d] = '';
-			} else if (data.banmen[y + d][x - d] === komaColor) {
+			} else if (data.banmen[y + d]?.at(x - d) === komaColor) {
 				data.banmen[y + d][x - d] = '';
-			} else if (data.banmen[y + d][x] === komaColor) {
+			} else if (data.banmen[y + d]?.at(x) === komaColor) {
 				data.banmen[y + d][x] = '';
-			} else if (data.banmen[y + d][x + d] === komaColor) {
+			} else if (data.banmen[y + d]?.at(x + d) === komaColor) {
 				data.banmen[y + d][x + d] = '';
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
@@ -1591,10 +1591,10 @@ const res_shogi_turn = async (
 			((teban === 'sente' && pointMovedFrom[0] < 3) ||
 				(teban === 'gote' && 5 < pointMovedFrom[0])) &&
 			['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'].includes(koma));
-	if (canNari && narifunariutsu === undefined) {
+	if (canNari && narifunari === undefined) {
 		return ['成か不成かはっきりせえ', getTagsReply(event)];
 	}
-	if (!canNari && narifunariutsu === '成') {
+	if (!canNari && narifunari === '成') {
 		return ['成れへん', getTagsReply(event)];
 	}
 	if (teban === 'sente') {
@@ -1610,7 +1610,7 @@ const res_shogi_turn = async (
 		}
 		data.teban = 'sente';
 	}
-	if (narifunariutsu === '成') {
+	if (narifunari === '成') {
 		const nariKomaColor: string =
 			teban === 'sente'
 				? `black_${getNari(koma as KomaNarazu)}`
