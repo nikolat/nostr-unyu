@@ -1081,7 +1081,7 @@ const res_shogi_turn = async (
 	const komaName: string = match[4];
 	const direction: string | undefined = match.at(5);
 	const narifunari: string | undefined = match.at(6);
-	const koma: string | undefined = {
+	const koma: KomaNarazu | KomaNari | undefined = {
 		王: 'king',
 		玉: 'king2',
 		飛: 'rook',
@@ -1097,7 +1097,7 @@ const res_shogi_turn = async (
 		成桂: 'prom_knight',
 		成香: 'prom_lance',
 		と: 'prom_pawn'
-	}[komaName];
+	}[komaName] as KomaNarazu | KomaNari | undefined;
 	if (teban === undefined || x < 0 || 8 < x || y < 0 || 8 < y || koma === undefined) {
 		return ['なんかデータがおかしいで', getTagsReply(event)];
 	}
@@ -1213,7 +1213,11 @@ const res_shogi_turn = async (
 			}
 			break;
 		}
-		case 'gold': {
+		case 'gold':
+		case 'prom_pawn':
+		case 'prom_lance':
+		case 'prom_knight':
+		case 'prom_silver': {
 			let isUpOK = data.banmen[y - d][x] === komaColor;
 			let isLeftOK = data.banmen[y][x - d] === komaColor;
 			let isRightOK = data.banmen[y][x + d] === komaColor;
@@ -1488,7 +1492,9 @@ const res_shogi_turn = async (
 	}
 	if (narifunari === '成') {
 		const nariKomaColor: string =
-			teban === 'sente' ? `black_${getNari(koma)}` : `white_${getNari(koma)}`;
+			teban === 'sente'
+				? `black_${getNari(koma as KomaNarazu)}`
+				: `white_${getNari(koma as KomaNarazu)}`;
 		data.banmen[y][x] = nariKomaColor;
 	} else {
 		data.banmen[y][x] = komaColor;
