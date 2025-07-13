@@ -1355,12 +1355,20 @@ const res_shogi_turn = async (
 				isUpOK = false;
 				isDownOK = false;
 				isRightOK = false;
-			} else if (direction === '上' || direction === '直') {
+			} else if (direction === '上') {
 				isLeftUpOK = false;
 				isRightUpOK = false;
 				isUpOK = false;
 				isLeftOK = false;
 				isRightOK = false;
+			} else if (direction === '直') {
+				isLeftUpOK = false;
+				isRightUpOK = false;
+				isUpOK = false;
+				isLeftOK = false;
+				isRightOK = false;
+				isLeftDownOK = false;
+				isRightDownOK = false;
 			} else if (direction === '引') {
 				isLeftDownOK = false;
 				isRightDownOK = false;
@@ -1400,7 +1408,8 @@ const res_shogi_turn = async (
 			}
 			break;
 		}
-		case 'rook': {
+		case 'rook':
+		case 'dragon': {
 			let isUpOK = false;
 			let isDownOK = false;
 			let isRightOK = false;
@@ -1453,22 +1462,54 @@ const res_shogi_turn = async (
 					break;
 				}
 			}
+			//龍限定
+			let isLeftUpOK = false;
+			let isRightUpOK = false;
+			let isLeftDownOK = false;
+			let isRightDownOK = false;
+			if (koma === 'dragon') {
+				if (data.banmen[y - d][x - d] === komaColor) {
+					isLeftUpOK = true;
+				} else if (data.banmen[y - d][x + d] === komaColor) {
+					isRightUpOK = true;
+				} else if (data.banmen[y + d][x - d] === komaColor) {
+					isLeftDownOK = true;
+				} else if (data.banmen[y + d][x + d] === komaColor) {
+					isRightDownOK = true;
+				}
+			}
 			if (direction === '右') {
 				isUpOK = false;
 				isDownOK = false;
 				isLeftOK = false;
+				isLeftUpOK = false;
+				isLeftDownOK = false;
 			} else if (direction === '左') {
 				isUpOK = false;
 				isDownOK = false;
 				isRightOK = false;
+				isRightUpOK = false;
+				isRightDownOK = false;
 			} else if (direction === '上') {
 				isUpOK = false;
 				isLeftOK = false;
 				isRightOK = false;
+				isLeftUpOK = false;
+				isRightUpOK = false;
+			} else if (direction === '直') {
+				isUpOK = false;
+				isLeftOK = false;
+				isRightOK = false;
+				isLeftUpOK = false;
+				isRightUpOK = false;
+				isLeftDownOK = false;
+				isRightDownOK = false;
 			} else if (direction === '引') {
 				isDownOK = false;
 				isLeftOK = false;
 				isRightOK = false;
+				isLeftDownOK = false;
+				isRightDownOK = false;
 			}
 			if (isUpOK) {
 				pointMovedFrom = [y - nUp * d, x];
@@ -1482,6 +1523,14 @@ const res_shogi_turn = async (
 			} else if (isRightOK) {
 				pointMovedFrom = [y, x + nRight * d];
 				data.banmen[y][x + nRight * d] = '';
+			} else if (isLeftUpOK) {
+				data.banmen[y - d][x - d] = '';
+			} else if (isRightUpOK) {
+				data.banmen[y - d][x + d] = '';
+			} else if (isLeftDownOK) {
+				data.banmen[y + d][x - d] = '';
+			} else if (isRightDownOK) {
+				data.banmen[y + d][x + d] = '';
 			} else {
 				return [`そこに${komaName}は動けへんやろ`, getTagsReply(event)];
 			}
