@@ -1568,7 +1568,8 @@ const res_shogi_turn = async (
 		canNari ||
 		(pointMovedFrom !== undefined &&
 			((teban === 'sente' && pointMovedFrom[0] < 3) ||
-				(teban === 'gote' && 5 < pointMovedFrom[0])));
+				(teban === 'gote' && 5 < pointMovedFrom[0])) &&
+			['pawn', 'lance', 'knight', 'silver', 'bishop', 'rook'].includes(koma));
 	if (canNari && narifunari === undefined) {
 		return ['成か不成かはっきりせえ', getTagsReply(event)];
 	}
