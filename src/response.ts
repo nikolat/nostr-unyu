@@ -1634,7 +1634,7 @@ const showBanmen = (event: NostrEvent, data: Shogi): [string, string[][]] => {
 	let isFirstLine: boolean = true;
 	if (data.mochigoma.gote.length > 0) {
 		const white = data.mochigoma.gote.map((e) => `white_${e}`);
-		contentArray.push(white.map((e) => `:${e}:`).join(''));
+		contentArray.push(white.map((e) => `:shogi_${e}:`).join(''));
 		for (const koma of white) {
 			emojiShogi.add(koma);
 		}
@@ -1695,7 +1695,7 @@ const showBanmen = (event: NostrEvent, data: Shogi): [string, string[][]] => {
 		}
 		contentArray.push(a.map((e) => `:${e}:`).join(''));
 		contentArray.push(
-			`:kubipaca_summer_kubi:${line.map((e) => (e === '' ? ':kubipaca_summer_empty:' : `:${e}:`)).join(':kubipaca_summer_kubi:')}:kubipaca_summer_kubi:`
+			`:kubipaca_summer_kubi:${line.map((e) => (e === '' ? ':kubipaca_summer_empty:' : `:shogi_${e}:`)).join(':kubipaca_summer_kubi:')}:kubipaca_summer_kubi:`
 		);
 	}
 	const a = [
@@ -1725,7 +1725,7 @@ const showBanmen = (event: NostrEvent, data: Shogi): [string, string[][]] => {
 	contentArray.push(a.map((e) => `:${e}:`).join(''));
 	if (data.mochigoma.sente.length > 0) {
 		const black = data.mochigoma.sente.map((e) => `black_${e}`);
-		contentArray.push(black.map((e) => `:${e}:`).join(''));
+		contentArray.push(black.map((e) => `:shogi_${e}:`).join(''));
 		for (const koma of black) {
 			emojiShogi.add(koma);
 		}
@@ -1740,7 +1740,7 @@ const showBanmen = (event: NostrEvent, data: Shogi): [string, string[][]] => {
 		]),
 		...Array.from(emojiShogi).map((s) => [
 			'emoji',
-			s,
+			`shogi_${s}`,
 			`https://nikolat.github.io/image/shogi/${s}.png`
 		])
 	];
