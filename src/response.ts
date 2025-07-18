@@ -375,6 +375,7 @@ const getResmap = (
 			/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)ってgrokに聞いて$/iu,
 			res_grok
 		],
+		[/マルコフ.*(を?呼んで|どこ).?$/u, res_markov_quiz],
 		[/(ブクマ|ブックマーク|口寄せ|クチヨセ|kuchiyose)(を?呼んで|どこ).?$/iu, res_kuchiyose],
 		[/(ハイク|はいく)(を?呼んで|どこ).?$/u, res_haiku],
 		[/(るみるみ|ルミルミ|lumilumi|もの(さん)?のクライアント)(を?呼んで|どこ).?$/iu, res_lumilumi],
@@ -2985,6 +2986,15 @@ const res_grok = async (
 	const hex_grok: string = nip19.decode(npub_grok).data as string;
 	const content: string = `nostr:${npub_grok} ${text}`;
 	const tags: string[][] = [...getTagsReply(event), ['p', hex_grok]];
+	return [content, tags];
+};
+
+const res_markov_quiz = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://tiltpapa.github.io/markov-quiz/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
 };
 
