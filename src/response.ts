@@ -3112,7 +3112,7 @@ const res_status = (event: NostrEvent): [string, string[][]] => {
 const res_flappy = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
-	const url = 'https://downisontheup.ca/';
+	const url = 'https://flappy-nostrich.vercel.app/';
 	content = url;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
