@@ -346,6 +346,10 @@ const getResmap = (
 			/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)を絵文字にして$/u,
 			res_emojinishite
 		],
+		[
+			/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)を(CW|warning|ワーニング|わーにんぐ|nip36)にして$/iu,
+			res_cwnishite
+		],
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
 		[/(ブクマ|ブックマーク)して/, res_bukuma],
 		[/ニュース/, res_news],
@@ -2737,6 +2741,15 @@ const getResEmojinishite = (text: string, tags: string[][]): [string, string[][]
 
 const isEmojiTag = (tag: string[]) =>
 	tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2]);
+
+const res_cwnishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const content = match[3];
+	return [content, [...getTagsReply(event), ['content-warning', 'CWのテストやで']]];
+};
 
 const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
 	let content: string;
