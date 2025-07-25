@@ -2339,9 +2339,7 @@ const getPollEventTemplate = (event: NostrEvent, relaysToWrite: string[]): Event
 		['polltype', pollType],
 		['endsAt', String(pollEndsAt)]
 	];
-	const emojiTags: string[][] = event.tags.filter(
-		(tag) => tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2])
-	);
+	const emojiTags: string[][] = event.tags.filter(isEmojiTag);
 	if (emojiTags.length > 0) {
 		pollTags.push(...emojiTags);
 	}
@@ -2555,9 +2553,6 @@ const res_tanzakunishite = (
 	const text = match[3];
 	const textAry: string[] = [];
 	const emojiUrlMap: Map<string, string> = new Map<string, string>();
-	const isEmojiTag = (tag: string[]): boolean => {
-		return tag.length >= 3 && tag[0] === 'emoji' && /\w+/.test(tag[1]) && URL.canParse(tag[2]);
-	};
 	for (const tag of event.tags) {
 		if (isEmojiTag(tag)) {
 			emojiUrlMap.set(`:${tag[1]}:`, tag[2]);
@@ -2748,7 +2743,8 @@ const res_cwnishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, 
 		throw new Error();
 	}
 	const content = match[3];
-	return [content, [...getTagsReply(event), ['content-warning', 'CWのテストやで']]];
+	const emojiTags: string[][] = event.tags.filter(isEmojiTag);
+	return [content, [...getTagsReply(event), ...emojiTags, ['content-warning', 'CWのテストやで']]];
 };
 
 const res_okutte = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
