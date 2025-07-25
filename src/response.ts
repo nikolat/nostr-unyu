@@ -322,7 +322,7 @@ const getResmap = (
 		[/将棋*.対局/, res_shogi_start],
 		[/盤面/, res_shogi_banmen],
 		[
-			/([▲△☗☖])?([1-9])([一二三四五六七八九])(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成)?$/,
+			/([▲△☗☖])?(([1-9])([一二三四五六七八九])|同)(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成)?$/,
 			res_shogi_turn
 		],
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
@@ -863,6 +863,10 @@ type KomaNari = 'prom_pawn' | 'prom_lance' | 'prom_knight' | 'prom_silver' | 'ho
 
 type Shogi = {
 	teban: Teban;
+	previous_turn: {
+		x: number;
+		y: number;
+	} | null;
 	banmen: string[][];
 	mochigoma: {
 		sente: KomaNarazu[];
@@ -1018,6 +1022,7 @@ const res_shogi_start = async (
 	const banmen: string[][] = shokihaichi;
 	const data: Shogi = {
 		banmen,
+		previous_turn: null,
 		mochigoma: {
 			sente: [],
 			gote: []
@@ -1103,11 +1108,19 @@ const res_shogi_turn = async (
 			: data.teban === 'sente'
 				? 'sente'
 				: 'gote';
-	const x: number = Array.from('987654321').indexOf(match[2]);
-	const y: number = Array.from('一二三四五六七八九').indexOf(match[3]);
-	const komaName: string = match[4];
-	const direction: string | undefined = match.at(5);
-	const narifunari: string | undefined = match.at(6);
+	const isDou: boolean = match[2] === '同';
+	let x: number;
+	let y: number;
+	if (isDou && data.previous_turn !== null) {
+		x = data.previous_turn.x;
+		y = data.previous_turn.y;
+	} else {
+		x = Array.from('987654321').indexOf(match[3]);
+		y = Array.from('一二三四五六七八九').indexOf(match[4]);
+	}
+	const komaName: string = match[5];
+	const direction: string | undefined = match.at(6);
+	const narifunari: string | undefined = match.at(7);
 	const koma: KomaNarazu | KomaNari | undefined = {
 		王: 'king',
 		玉: 'king2',
@@ -1159,6 +1172,7 @@ const res_shogi_turn = async (
 			data.teban = 'sente';
 		}
 		data.banmen[y][x] = komaColor;
+		data.previous_turn = { x, y };
 		await setShogiData(signer, data);
 		return showBanmen(event, data);
 	}
@@ -1646,6 +1660,7 @@ const res_shogi_turn = async (
 	} else {
 		data.banmen[y][x] = komaColor;
 	}
+	data.previous_turn = { x, y };
 	await setShogiData(signer, data);
 	return showBanmen(event, data);
 };
