@@ -320,6 +320,7 @@ const getResmap = (
 		[/update\srelay/, res_relayupdate],
 		[/おはよ/, res_ohayo],
 		[/将棋*.対局/, res_shogi_start],
+		[/盤面/, res_shogi_banmen],
 		[
 			/([▲△☗☖])?([1-9])([一二三四五六七八九])(王|玉|飛|角|金|銀|桂|香|歩|龍|馬|成銀|成桂|成香|と)([打右左上引直寄])?(成|不成)?$/,
 			res_shogi_turn
@@ -1060,6 +1061,25 @@ const getNariMoto = (koma: KomaNarazu | KomaNari): KomaNarazu => {
 		default:
 			return koma;
 	}
+};
+
+const res_shogi_banmen = async (
+	event: NostrEvent,
+	mode: Mode,
+	regstr: RegExp,
+	signer: Signer
+): Promise<[string, string[][]]> => {
+	const data: Shogi | undefined = await getShogiData(signer.getPublicKey());
+	if (data === undefined) {
+		return ['前回のデータが取得できへん', getTagsReply(event)];
+	}
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const teban: string = data.teban === 'sente' ? '【先手番】' : '【後手番】';
+	const [content, tags] = showBanmen(event, data);
+	return [`${teban}\n${content}`, tags];
 };
 
 const res_shogi_turn = async (
