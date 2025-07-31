@@ -3329,7 +3329,18 @@ const res_emoji_search = async (event: NostrEvent): Promise<[string, string[][]]
 	for (const qTag of qTags) {
 		const id = qTag[1];
 		const relay = URL.canParse(qTag[2]) ? qTag[2] : emojiSearchRelay;
-		const quotedEvent: NostrEvent | undefined = await getEvent(relay, [{ ids: [id] }]);
+		let quotedEvent: NostrEvent | undefined;
+		try {
+			quotedEvent = await getEvent(relay, [{ ids: [id] }]);
+		} catch (error) {
+			if (relay !== emojiSearchRelay) {
+				try {
+					quotedEvent = await getEvent(emojiSearchRelay, [{ ids: [id] }]);
+				} catch (error) {
+					continue;
+				}
+			}
+		}
 		if (quotedEvent !== undefined) {
 			quotedEvents.push(quotedEvent);
 		}
