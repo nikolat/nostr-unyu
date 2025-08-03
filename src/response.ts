@@ -423,6 +423,7 @@ const getResmap = (
 		[/スクラップボックス|Scrapbox|wikiみたいな/i, res_scrapbox],
 		[/再起動/, res_saikidou],
 		[/えんいー/, res_enii],
+		[/へばな/, res_hebana],
 		[/伺か/, res_ukagaka],
 		[/[呼よ](んだだけ|んでみた)|(何|なん)でもない/, res_yondadake],
 		[/ヘルプ|へるぷ|help|(助|たす)けて|(教|おし)えて|手伝って/i, res_help],
@@ -3501,6 +3502,10 @@ const res_saikidou = (event: NostrEvent): [string, string[][]] => {
 
 const res_enii = (event: NostrEvent): [string, string[][]] => {
 	return ['\\s[10]' + any(['ほい、えんいー', 'ほな、またな', 'おつかれ']), getTagsReply(event)];
+};
+
+const res_hebana = (event: NostrEvent): [string, string[][]] => {
+	return ['へばな', getTagsReply(event)];
 };
 
 const res_ukagaka = (event: NostrEvent): [string, string[][]] => {
