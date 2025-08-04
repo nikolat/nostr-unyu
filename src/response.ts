@@ -816,12 +816,21 @@ const zapByNIP47 = async (
 	}
 
 	const amount = sats * 1000;
-	const zapRequest = nip57.makeZapRequest({
-		event,
-		amount,
-		comment: zapComment,
-		relays: zapBroadcastRelays
-	});
+	const params =
+		event.kind === 9734
+			? {
+					pubkey: event.pubkey,
+					amount,
+					comment: zapComment,
+					relays: zapBroadcastRelays
+				}
+			: {
+					event,
+					amount,
+					comment: zapComment,
+					relays: zapBroadcastRelays
+				};
+	const zapRequest = nip57.makeZapRequest(params);
 	const zapRequestEvent = signer.finishEvent(zapRequest);
 	const encoded = encodeURI(JSON.stringify(zapRequestEvent));
 
