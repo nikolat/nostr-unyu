@@ -315,6 +315,7 @@ const getResmap = (
 			signer: Signer
 		) => Promise<[string, string[][]]> | [string, string[][]] | null
 	][] = [
+		[/プロフィールzapテスト$/i, res_profilezaptest],
 		[/zapテスト$/i, res_zaptest],
 		[/^\\s\[(\d+)\]$/, res_surfacetest],
 		[/update\srelay/, res_relayupdate],
@@ -651,6 +652,28 @@ const res_relayupdate = (event: NostrEvent): [string, string[][]] => {
 	return [content, tags];
 };
 
+const res_profilezaptest = async (
+	event: NostrEvent,
+	mode: Mode,
+	regstr: RegExp,
+	signer: Signer
+): Promise<[string, string[][]]> => {
+	const npub_don = 'npub1dv9xpnlnajj69vjstn9n7ufnmppzq3wtaaq085kxrz0mpw2jul2qjy6uhz';
+	if (event.pubkey !== nip19.decode(npub_don).data) {
+		return ['イタズラしたらあかんで', getTagsReply(event)];
+	}
+	const zapEndPoint: string | null = await getZapEndPoint(event);
+	if (zapEndPoint === null) {
+		return ['LNアドレスが設定されてないで', getTagsReply(event)];
+	}
+	try {
+		await zapByNIP47(zapEndPoint, event.pubkey, signer, 1, 'Zapのテストやで');
+	} catch (error) {
+		return ['何か失敗したみたいやで', getTagsReply(event)];
+	}
+	return ['1sat届いたはずやで', getTagsReply(event)];
+};
+
 const res_zaptest = async (
 	event: NostrEvent,
 	mode: Mode,
@@ -786,7 +809,7 @@ const getZapEndPoint = async (event: NostrEvent): Promise<string | null> => {
 
 const zapByNIP47 = async (
 	zapEndpoint: string,
-	event: NostrEvent,
+	target: NostrEvent | string,
 	signer: Signer,
 	sats: number,
 	zapComment: string
@@ -802,8 +825,8 @@ const zapByNIP47 = async (
 	if (walletPubkey.length === 0 || walletRelay === null || walletSeckey === null) {
 		throw Error('NOSTR_WALLET_CONNECT is invalid connection string');
 	}
-
-	const lastZap = await getLastZap(event.pubkey);
+	const pubkey: string = typeof target === 'string' ? target : target.pubkey;
+	const lastZap = await getLastZap(pubkey);
 	if (lastZap !== undefined && Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10) {
 		//10分以内に誰かからZapをもらっている
 		const evKind9734 = JSON.parse(
@@ -817,15 +840,15 @@ const zapByNIP47 = async (
 
 	const amount = sats * 1000;
 	const params =
-		event.kind === 9734
+		typeof target === 'string' || target.kind === 9734
 			? {
-					pubkey: event.pubkey,
+					pubkey,
 					amount,
 					comment: zapComment,
 					relays: zapBroadcastRelays
 				}
 			: {
-					event,
+					event: target,
 					amount,
 					comment: zapComment,
 					relays: zapBroadcastRelays
