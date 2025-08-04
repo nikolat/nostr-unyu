@@ -817,8 +817,7 @@ const zapByNIP47 = async (
 
 	const amount = sats * 1000;
 	const zapRequest = nip57.makeZapRequest({
-		profile: event.pubkey,
-		event: event.kind == 9734 ? null : event.id,
+		event,
 		amount,
 		comment: zapComment,
 		relays: zapBroadcastRelays
