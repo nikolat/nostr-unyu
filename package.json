@@ -13,14 +13,14 @@
 	"author": "",
 	"license": "CC0-1.0",
 	"dependencies": {
-		"nostr-tools": "^2.16.1",
+		"nostr-tools": "^2.16.2",
 		"rss-parser": "^3.13.0"
 	},
 	"devDependencies": {
 		"@types/chai": "^5.2.2",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^24.2.0",
-		"@vercel/node": "^5.3.10",
+		"@vercel/node": "^5.3.11",
 		"chai": "^5.2.1",
 		"mocha": "^11.7.1",
 		"prettier": "^3.6.2",
