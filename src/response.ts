@@ -2345,10 +2345,12 @@ const getBadgeEventTemplate = (event: NostrEvent): EventTemplate => {
 };
 
 const getOthersBadgeEventTemplate = (event: NostrEvent): EventTemplate => {
-	const aTag = event.tags.find((tag) => tag.length >= 2 && tag[0] === 'a');
-	if (aTag === undefined) {
+	const qTag = event.tags.find((tag) => tag.length >= 2 && tag[0] === 'q');
+	if (qTag === undefined) {
 		return getBadgeEventTemplate(event);
 	}
+	const aTag = [...qTag];
+	aTag[0] = 'a';
 	const badgeEvent: EventTemplate = {
 		kind: 8,
 		tags: [aTag, ['p', event.pubkey]],
