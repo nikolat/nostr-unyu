@@ -525,7 +525,10 @@ const mode_fav = (event: NostrEvent): EventTemplate | null => {
 		return {
 			content: '⭐',
 			kind: 17,
-			tags: [rTag],
+			tags: [
+				['i', rTag[1]],
+				['k', 'web']
+			],
 			created_at: event.created_at + 1
 		};
 	}
