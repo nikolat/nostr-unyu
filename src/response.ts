@@ -112,7 +112,7 @@ const selectResponse = async (
 					about: `うにゅうやで\n※自動返信BOTです\n管理者: nostr:${npub_don}\nアイコン: nostr:${npub_awayuki} さん`,
 					bot: true,
 					display_name: 'うにゅう',
-					lud16: 'crispythumb58@walletofsatoshi.com',
+					lud16: 'nikolat@coinos.io',
 					name: 'unyu',
 					nip05: 'unyu@nikolat.github.io',
 					picture: `https://nikolat.github.io/avatar/unyu-${surface}.png`,
