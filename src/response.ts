@@ -232,6 +232,20 @@ const selectResponse = async (
 		res.tags.push(['q', pollEventSigned.id, pollRelays[0], pollEventSigned.pubkey]);
 		return [pollEvent, res];
 	}
+	if (/^\\_b$/.test(res.content)) {
+		const g: string = event.content.split(' ').at(1)!;
+		const kind20000: EventTemplate = {
+			content: '邪魔するで',
+			kind: 20000,
+			tags: [
+				['g', g],
+				['n', 'うにゅう'],
+				['t', 'teleport']
+			],
+			created_at: event.created_at + 1
+		};
+		return [kind20000];
+	}
 	return [res];
 };
 
@@ -359,6 +373,7 @@ const getResmap = (
 		[/誕生日/, res_tanjobi],
 		[/どんぐり/, res_donguri],
 		[/もじぴったん/, res_mojipittan],
+		[/(びっちゃ|bitchat) [a-z0-9]{2,}$/i, res_bitchat],
 		[/時刻|時報|日時|何時/, res_jihou],
 		[/ログボ|ログインボーナス/, res_rogubo],
 		[/あなたの合計ログイン回数は(\d+)回です。/, res_get_rogubo],
@@ -2914,6 +2929,16 @@ const res_mojipittan = (event: NostrEvent): [string, string[][]] => {
 	tags = getTagsReply(event);
 	tags.push(['r', url]);
 	return [content, tags];
+};
+
+const res_bitchat = (event: NostrEvent): [string, string[][]] => {
+	const g: string | undefined = event.content.split(' ').at(1);
+	if (g === undefined) {
+		const content = 'gタグはどこや';
+		const tags = getTagsReply(event);
+		return [content, tags];
+	}
+	return ['\\_b', getTagsReply(event)];
 };
 
 const res_jihou = (event: NostrEvent): [string, string[][]] => {
