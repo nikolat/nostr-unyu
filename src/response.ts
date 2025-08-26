@@ -39,12 +39,12 @@ export const getResponseEvent = async (
 		//自分自身の投稿には反応しない
 		return null;
 	}
-	const res = await selectResponse(requestEvent, mode, signer);
+	const res: EventTemplate[] | null = await selectResponse(requestEvent, mode, signer);
 	if (res === null) {
 		//反応しないことを選択
 		return null;
 	}
-	const events = res.map((r) => signer.finishEvent(r));
+	const events: VerifiedEvent[] = res.map((r) => signer.finishEvent(r));
 	return events;
 };
 
@@ -281,6 +281,8 @@ const isAllowedToPost = (event: NostrEvent) => {
 			throw new TypeError('root is not found');
 		}
 	} else if (event.kind === 9735) {
+		return true;
+	} else if (event.kind === 20000) {
 		return true;
 	}
 	throw new TypeError(`kind ${event.kind} is not supported`);
@@ -4055,6 +4057,13 @@ const getTagsAirrep = (event: NostrEvent): string[][] => {
 };
 
 const getTagsReply = (event: NostrEvent, addPTag: boolean = true): string[][] => {
+	if (event.kind === 20000) {
+		return [
+			...event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'g'),
+			['n', 'うにゅう'],
+			['t', 'teleport']
+		];
+	}
 	const tagsReply: string[][] = [];
 	const tagRoot = event.tags.find(
 		(tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root'
