@@ -4057,13 +4057,6 @@ const getTagsAirrep = (event: NostrEvent): string[][] => {
 };
 
 const getTagsReply = (event: NostrEvent, addPTag: boolean = true): string[][] => {
-	if (event.kind === 20000) {
-		return [
-			...event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'g'),
-			['n', 'うにゅう'],
-			['t', 'teleport']
-		];
-	}
 	const tagsReply: string[][] = [];
 	const tagRoot = event.tags.find(
 		(tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root'
@@ -4081,6 +4074,12 @@ const getTagsReply = (event: NostrEvent, addPTag: boolean = true): string[][] =>
 			tagsReply.push(tag);
 		}
 		tagsReply.push(['p', event.pubkey]);
+	}
+	if (event.kind === 20000) {
+		tagsReply.push(...event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'g'), [
+			'n',
+			'うにゅう(bot)'
+		]);
 	}
 	return tagsReply;
 };
