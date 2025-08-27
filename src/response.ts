@@ -239,8 +239,7 @@ const selectResponse = async (
 			kind: 20000,
 			tags: [
 				['g', g],
-				['n', 'うにゅう'],
-				['t', 'teleport']
+				['n', 'うにゅう(bot)']
 			],
 			created_at: event.created_at + 1
 		};
