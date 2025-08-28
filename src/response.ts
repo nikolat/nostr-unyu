@@ -239,7 +239,8 @@ const selectResponse = async (
 			kind: 20000,
 			tags: [
 				['g', g],
-				['n', 'うにゅう(bot)']
+				['n', 'うにゅう(bot)'],
+				['t', 'teleport']
 			],
 			created_at: event.created_at + 1
 		};
@@ -4076,10 +4077,11 @@ const getTagsReply = (event: NostrEvent, addPTag: boolean = true): string[][] =>
 		tagsReply.push(['p', event.pubkey]);
 	}
 	if (event.kind === 20000) {
-		tagsReply.push(...event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'g'), [
-			'n',
-			'うにゅう(bot)'
-		]);
+		tagsReply.push(
+			...event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'g'),
+			['n', 'うにゅう(bot)'],
+			['t', 'teleport']
+		);
 	}
 	return tagsReply;
 };
