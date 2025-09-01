@@ -309,7 +309,7 @@ const getResmap = (
 	][] = [
 		[/いいの?か?(？|\?)$/, res_iiyo],
 		[/\\e$/, res_enyee],
-		[/^うにゅう画像$/, res_unyupic],
+		[/^うにゅう画像(\s*)(-?\d*)$/, res_unyupic],
 		[/^うにゅう漫画$/, res_unyucomic],
 		[/^ちくわ大明神$/, res_chikuwa],
 		[/(ほめて|褒めて|のでえらい|えらいので).?$|^えらいので/u, res_igyo],
@@ -3698,7 +3698,12 @@ const res_enyee = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 	return [content, tags];
 };
 
-const res_unyupic = (event: NostrEvent): [string, string[][]] => {
+const res_unyupic = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const no: number = parseInt(match[2]);
 	let content: string;
 	let tags: string[][];
 	const notes = [
@@ -3741,7 +3746,17 @@ const res_unyupic = (event: NostrEvent): [string, string[][]] => {
 		'note1l5s0w5a8s3jl5ppl535ckvpy3fxrtcxly49lveyslz6j7ng0fa6s48p6pc',
 		'note1zrwukw5j4sqru65ejlxxdazrzy68zatjkwvf4uj8zkqvnaf7yrjqhxtv2w'
 	];
-	const note = any(notes);
+	let note: string;
+	if (isNaN(no)) {
+		note = any(notes);
+	} else {
+		const note_no: string | undefined = notes.at(no);
+		if (note_no === undefined) {
+			return [`${no}なんてあらへん`, getTagsReply(event)];
+		} else {
+			note = note_no;
+		}
+	}
 	const dr = nip19.decode(note);
 	if (dr.type !== 'note') {
 		throw new TypeError(`${note} is not note`);
