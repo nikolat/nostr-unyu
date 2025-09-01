@@ -374,6 +374,7 @@ const getResmap = (
 		[/中身/, res_nakami],
 		[/誕生日/, res_tanjobi],
 		[/どんぐり/, res_donguri],
+		[/ゼリー$/, res_jelly],
 		[/もじぴったん/, res_mojipittan],
 		[/(びっちゃ|bitchat) [a-z0-9]{2,}$/i, res_bitchat],
 		[/時刻|時報|日時|何時/, res_jihou],
@@ -2921,6 +2922,12 @@ const res_donguri = (event: NostrEvent): [string, string[][]] => {
 		]),
 		getTagsReply(event)
 	];
+};
+
+const res_jelly = (event: NostrEvent, mode: Mode): [string, string[][]] => {
+	const ev: NostrEvent = { ...event };
+	ev.content = 'うにゅう画像 33';
+	return res_unyupic(ev, mode, /^うにゅう画像(\s*)(-?\d*)$/);
 };
 
 const res_mojipittan = (event: NostrEvent): [string, string[][]] => {
