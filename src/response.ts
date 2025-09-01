@@ -3761,7 +3761,8 @@ const res_unyupic = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, st
 	if (dr.type !== 'note') {
 		throw new TypeError(`${note} is not note`);
 	}
-	content = `#うにゅう画像\nnostr:${note}`;
+	const i: number = notes.indexOf(note);
+	content = `#うにゅう画像 No.${i}\nnostr:${note}`;
 	const quoteTag = ['q', dr.data];
 	tags = getTagsReply(event);
 	tags.push(quoteTag);
