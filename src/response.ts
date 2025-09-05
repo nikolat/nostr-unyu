@@ -345,6 +345,7 @@ const getResmap = (
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
 		[/ケルベ[ロノ]ス/, res_kerubenos],
 		[/タイガー|🐯|🐅/u, res_tiger],
+		[/俺達に制限/, res_seigen],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
 		[/バッジ$/, res_badge],
@@ -2308,6 +2309,26 @@ const res_tiger = (event: NostrEvent): [string, string[][]] => {
 	const url_base = 'https://raw.githubusercontent.com/shibayamap/Custom_emoji/main/';
 	const tags: string[][] = [
 		...tigers.map((t) => ['emoji', t, `${url_base}${t}.webp`]),
+		...getTagsReply(event)
+	];
+	return [content, tags];
+};
+
+const res_seigen = (event: NostrEvent): [string, string[][]] => {
+	const shuffle = (array: string[]) => {
+		for (let i = array.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
+		}
+		return array;
+	};
+	const seigens = ['aru', 'ga', 'ha', 'nai', 'ni', 'niha', 'nimo', 'oretachi', 'seigen', 'niwa'];
+	const seigens_shuffle = shuffle(seigens.map((t) => `seigen_${t}`)).slice(0, 5);
+	const seigens_shuffle_for_content = seigens_shuffle.map((t) => `:${t}:`);
+	const content: string = seigens_shuffle_for_content.join('');
+	const url_base = 'https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/';
+	const tags: string[][] = [
+		...seigens_shuffle.map((t) => ['emoji', t, `${url_base}${t}.png`]),
 		...getTagsReply(event)
 	];
 	return [content, tags];
