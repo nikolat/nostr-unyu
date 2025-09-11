@@ -3953,10 +3953,10 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 	const emoji_tags = event.tags.filter(isEmojiTag);
 	tags = [...getTags(event, mode), ...emoji_tags];
 	if (/(潰して|縮めて)[^るた]?$/u.test(event.content)) {
-		content = `🫸${text.replace(/[^\S\n\r]|[-ーｰ―–]/gu, '')}🫷`;
+		content = `🫸${text.replace(/[^\S\n\r]|[-ーｰ―–一]/gu, '')}🫷`;
 	} else if (/(伸ばして|広げて)[^るた]?$/u.test(event.content)) {
-		if (/[-ー]/.test(text)) {
-			content = text.replace(/([-ー])/gu, '$1$1');
+		if (/[-ー一]/.test(text)) {
+			content = text.replace(/([-ー一])/gu, '$1$1');
 		} else {
 			content = `${Array.from(text).join(' ')}`;
 		}
