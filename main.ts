@@ -1,7 +1,8 @@
 //curl --json @test/fixtures/input.json https://nostr-unyu.vercel.app/api/normal
 import { readFile } from 'node:fs/promises';
 import { generateSecretKey, type NostrEvent } from 'nostr-tools/pure';
-import { Mode, Signer } from './src/utils.js';
+import { PlainKeySigner as Signer } from 'nostr-tools/signer';
+import { Mode } from './src/utils.js';
 import { getResponseEvent } from './src/response.js';
 
 const main = async () => {

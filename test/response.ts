@@ -2,7 +2,8 @@ import { readFile } from 'node:fs/promises';
 import { it } from 'mocha';
 import { assert } from 'chai';
 import { generateSecretKey, getPublicKey, type NostrEvent } from 'nostr-tools/pure';
-import { Mode, Signer } from '../src/utils.js';
+import { PlainKeySigner as Signer } from 'nostr-tools/signer';
+import { Mode } from '../src/utils.js';
 import { getResponseEvent } from '../src/response.js';
 
 it('get response with JSON file', async () => {

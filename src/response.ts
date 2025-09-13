@@ -1,4 +1,4 @@
-import { Mode, Signer } from './utils.js';
+import { Mode } from './utils.js';
 import mb_strwidth from './mb_strwidth.js';
 import Parser from 'rss-parser';
 import type { Filter } from 'nostr-tools/filter';
@@ -10,6 +10,7 @@ import {
 	type NostrEvent,
 	type VerifiedEvent
 } from 'nostr-tools/pure';
+import type { Signer } from 'nostr-tools/signer';
 import * as nip19 from 'nostr-tools/nip19';
 import { nip47 } from 'nostr-tools';
 import * as nip57 from 'nostr-tools/nip57';
@@ -35,7 +36,7 @@ export const getResponseEvent = async (
 	signer: Signer,
 	mode: Mode
 ): Promise<VerifiedEvent[] | null> => {
-	if (requestEvent.pubkey === signer.getPublicKey()) {
+	if (requestEvent.pubkey === (await signer.getPublicKey())) {
 		//自分自身の投稿には反応しない
 		return null;
 	}
@@ -44,7 +45,9 @@ export const getResponseEvent = async (
 		//反応しないことを選択
 		return null;
 	}
-	const events: VerifiedEvent[] = res.map((r) => signer.finishEvent(r));
+	const events: VerifiedEvent[] = await Promise.all(
+		res.map(async (r) => await signer.signEvent(r))
+	);
 	return events;
 };
 
@@ -175,7 +178,7 @@ const selectResponse = async (
 			)
 		);
 		const identifier = r.replace(/^https?:\/\//, '');
-		const pubkey = signer.getPublicKey();
+		const pubkey = await signer.getPublicKey();
 		const kind = 39701;
 		const kind39701: EventTemplate = {
 			content: '',
@@ -206,7 +209,7 @@ const selectResponse = async (
 		} else {
 			return null;
 		}
-		const badgeEventSigned: VerifiedEvent = signer.finishEvent(badgeEvent);
+		const badgeEventSigned: VerifiedEvent = await signer.signEvent(badgeEvent);
 		const nevent: string = nip19.neventEncode({
 			...badgeEventSigned,
 			author: badgeEventSigned.pubkey,
@@ -222,7 +225,7 @@ const selectResponse = async (
 	}
 	if (/^\\__q$/.test(res.content)) {
 		const pollEvent: EventTemplate = getPollEventTemplate(event, pollRelays);
-		const pollEventSigned: VerifiedEvent = signer.finishEvent(pollEvent);
+		const pollEventSigned: VerifiedEvent = await signer.signEvent(pollEvent);
 		const nevent: string = nip19.neventEncode({
 			...pollEventSigned,
 			author: pollEventSigned.pubkey,
@@ -603,7 +606,7 @@ const mode_zap = async (event: NostrEvent, signer: Signer): Promise<EventTemplat
 		return null;
 	}
 	//kind9735の検証
-	const evKind0 = await getKind0(signer.getPublicKey());
+	const evKind0 = await getKind0(await signer.getPublicKey());
 	if (evKind0 === undefined) {
 		throw Error('Cannot get kind 0 event');
 	}
@@ -877,7 +880,7 @@ const zapByNIP47 = async (
 					relays: zapBroadcastRelays
 				};
 	const zapRequest = nip57.makeZapRequest(params);
-	const zapRequestEvent = signer.finishEvent(zapRequest);
+	const zapRequestEvent = await signer.signEvent(zapRequest);
 	const encoded = encodeURI(JSON.stringify(zapRequestEvent));
 
 	const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
@@ -952,7 +955,7 @@ const setShogiData = async (signer: Signer, data: Shogi): Promise<void> => {
 		content: JSON.stringify(data),
 		created_at: Math.floor(Date.now() / 1000)
 	};
-	const event: VerifiedEvent = signer.finishEvent(eventTemplate);
+	const event: VerifiedEvent = await signer.signEvent(eventTemplate);
 	await wRelay.publish(event);
 	wRelay.close();
 };
@@ -1129,7 +1132,7 @@ const res_shogi_banmen = async (
 	regstr: RegExp,
 	signer: Signer
 ): Promise<[string, string[][]]> => {
-	const data: Shogi | undefined = await getShogiData(signer.getPublicKey());
+	const data: Shogi | undefined = await getShogiData(await signer.getPublicKey());
 	if (data === undefined) {
 		return ['前回のデータが取得できへん', getTagsReply(event)];
 	}
@@ -1148,7 +1151,7 @@ const res_shogi_turn = async (
 	regstr: RegExp,
 	signer: Signer
 ): Promise<[string, string[][]]> => {
-	const data: Shogi | undefined = await getShogiData(signer.getPublicKey());
+	const data: Shogi | undefined = await getShogiData(await signer.getPublicKey());
 	if (data === undefined) {
 		return ['前回のデータが取得できへん', getTagsReply(event)];
 	}
