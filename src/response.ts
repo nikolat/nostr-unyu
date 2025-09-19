@@ -358,6 +358,7 @@ const getResmap = (
 		[/いいスタート|イースター島/, res_iisutato],
 		[/占って|占い/, res_uranai],
 		[/カレーの材料/, res_curry],
+		[/タツノオトシゴの絵文字/, res_tatsunootoshigo],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
 		[
@@ -2564,6 +2565,33 @@ const res_curry = (event: NostrEvent): [string, string[][]] => {
 		return [...Array(n)].map((_) => str.at(Math.floor(Math.random() * str.length))).join('');
 	};
 	const content: string = getRandomString(4);
+	const tags: string[][] = getTagsReply(event);
+	return [content, tags];
+};
+
+const res_tatsunootoshigo = (event: NostrEvent): [string, string[][]] => {
+	const getRandomStringArray = (n: number): string[] => {
+		const str = Array.from('🦑🦞🦐🦀🐠🐡🐟🐬🦈🐳🦄🐉');
+		return [...Array(n)]
+			.map((_) => str.at(Math.floor(Math.random() * str.length)))
+			.filter((s) => s !== undefined);
+	};
+	const ary: string[] = getRandomStringArray(Math.floor(Math.random() * 9 + 1));
+	let content: string = '';
+	for (const s of ary.slice(0, -2)) {
+		content +=
+			s +
+			any([
+				'……やなくて',
+				'……もちゃうし',
+				'……とみせかけて',
+				'……なわけあらへんし',
+				'……はワイの趣味ちゃうし',
+				'……は昨日食ったし'
+			]) +
+			'\n';
+	}
+	content += ary.at(-1) + 'やで';
 	const tags: string[][] = getTagsReply(event);
 	return [content, tags];
 };
