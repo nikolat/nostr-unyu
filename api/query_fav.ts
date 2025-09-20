@@ -1,16 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { EventTemplate, VerifiedEvent } from 'nostr-tools/pure';
-import { SimplePool, useWebSocketImplementation } from 'nostr-tools/pool';
+import { SimplePool } from 'nostr-tools/pool';
 import * as nip19 from 'nostr-tools/nip19';
-import { Signer } from '../src/utils.js';
-import WebSocket from 'ws';
-useWebSocketImplementation(WebSocket);
+import { PlainKeySigner as Signer } from 'nostr-tools/signer';
 
 const defaultRelays = [
 	'wss://relay-jp.nostr.wirednet.jp',
 	'wss://relay.nostr.wirednet.jp',
-	'wss://yabu.me',
-	'wss://nostr-relay.nokotaro.com'
+	'wss://yabu.me'
 ];
 
 export default async function (request: VercelRequest, response: VercelResponse) {
@@ -92,7 +89,7 @@ export default async function (request: VercelRequest, response: VercelResponse)
 		tags,
 		content
 	};
-	const newEvent: VerifiedEvent = signer.finishEvent(baseEvent);
+	const newEvent: VerifiedEvent = await signer.signEvent(baseEvent);
 	const pool = new SimplePool();
 	await Promise.any(pool.publish(defaultRelays, newEvent));
 

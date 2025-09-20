@@ -1,17 +1,14 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import type { NostrEvent } from 'nostr-tools/pure';
-import { SimplePool, useWebSocketImplementation } from 'nostr-tools/pool';
+import type { NostrEvent, VerifiedEvent } from 'nostr-tools/pure';
+import { SimplePool } from 'nostr-tools/pool';
 import * as nip19 from 'nostr-tools/nip19';
 import * as nip57 from 'nostr-tools/nip57';
-import { Signer } from '../src/utils.js';
-import WebSocket from 'ws';
-useWebSocketImplementation(WebSocket);
+import { PlainKeySigner as Signer } from 'nostr-tools/signer';
 
 const defaultRelays = [
 	'wss://relay-jp.nostr.wirednet.jp',
 	'wss://relay.nostr.wirednet.jp',
-	'wss://yabu.me',
-	'wss://nostr-relay.nokotaro.com'
+	'wss://yabu.me'
 ];
 
 export default async function (request: VercelRequest, response: VercelResponse) {
@@ -36,6 +33,7 @@ export default async function (request: VercelRequest, response: VercelResponse)
 		note = null,
 		nevent = null,
 		pubkey = null,
+		kind = null,
 		npub = null,
 		sats = '50',
 		comment = ''
@@ -45,6 +43,7 @@ export default async function (request: VercelRequest, response: VercelResponse)
 		!(typeof note === 'string' || note === null) ||
 		!(typeof nevent === 'string' || nevent === null) ||
 		!(typeof pubkey === 'string' || pubkey === null) ||
+		!(typeof kind === 'string' || kind === null) ||
 		!(typeof npub === 'string' || npub === null) ||
 		typeof sats !== 'string' ||
 		typeof comment !== 'string'
@@ -57,6 +56,7 @@ export default async function (request: VercelRequest, response: VercelResponse)
 	}
 	let zap_target_id = id;
 	let zap_target_pubkey = pubkey;
+	let zap_target_kind: number = kind !== null && /\d+/.test(kind) ? parseInt(kind) : 1;
 	if (note !== null) {
 		const dr = nip19.decode(note);
 		if (dr.type === 'note') {
@@ -70,6 +70,9 @@ export default async function (request: VercelRequest, response: VercelResponse)
 			if (dr.data.author !== undefined) {
 				zap_target_pubkey = dr.data.author;
 			}
+			if (dr.data.kind !== undefined) {
+				zap_target_kind = dr.data.kind;
+			}
 		}
 	}
 	if (npub !== null) {
@@ -80,6 +83,9 @@ export default async function (request: VercelRequest, response: VercelResponse)
 	}
 	if (zap_target_pubkey === null) {
 		return response.status(403).json({ error: 'pubkey is null' });
+	}
+	if (zap_target_id === null) {
+		return response.status(403).json({ error: 'id is null' });
 	}
 	//kind0からZapエンドポイントを取得
 	const pool = new SimplePool();
@@ -93,14 +99,23 @@ export default async function (request: VercelRequest, response: VercelResponse)
 
 	//Zapイベントの署名
 	const amount = sats_int * 1000;
-	const zapRequest = nip57.makeZapRequest({
-		profile: zap_target_pubkey,
-		event: zap_target_id,
+	const event: NostrEvent = {
+		id: zap_target_id,
+		pubkey: zap_target_pubkey,
+		kind: zap_target_kind,
+		content: 'dummy',
+		created_at: 0,
+		tags: [],
+		sig: 'dummy'
+	};
+	const params = {
+		event,
 		amount,
 		comment,
 		relays: defaultRelays
-	});
-	const zapRequestEvent = signer.finishEvent(zapRequest);
+	};
+	const zapRequest = nip57.makeZapRequest(params);
+	const zapRequestEvent: VerifiedEvent = await signer.signEvent(zapRequest);
 
 	//invoiceの取得
 	const encoded = encodeURI(JSON.stringify(zapRequestEvent));
@@ -121,12 +136,10 @@ const getKind0 = async (
 ): Promise<NostrEvent> => {
 	return new Promise(async (resolve) => {
 		let r: NostrEvent;
-		const filters = [
-			{
-				kinds: [0],
-				authors: [pubkey]
-			}
-		];
+		const filter = {
+			kinds: [0],
+			authors: [pubkey]
+		};
 		const onevent = async (ev: NostrEvent) => {
 			if (r === undefined || r.created_at < ev.created_at) {
 				r = ev;
@@ -136,6 +149,6 @@ const getKind0 = async (
 			sub.close();
 			resolve(r);
 		};
-		const sub = pool.subscribeMany(relays, filters, { onevent, oneose });
+		const sub = pool.subscribeMany(relays, filter, { onevent, oneose });
 	});
 };
