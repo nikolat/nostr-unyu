@@ -438,6 +438,7 @@ const getResmap = (
 		[/絵文字.*(を?呼んで|どこ).?$/iu, res_emoji],
 		[/伺か民?(を?呼んで|どこ).?$/u, res_ukagakamin],
 		[/絵文字(を?探して|教えて)/iu, res_emoji_search],
+		[/カチャン|ｶﾁｬﾝ|💥🔥/u, res_kachan],
 		[/宇和さん/, res_uwasan],
 		[/ファクトチェック/, res_factcheck],
 		[/キャラサイ|くま(ざ|ざ)わ/u, res_charasai],
@@ -3567,6 +3568,10 @@ const mergeFilterForAddressableEvents = (filterdToMerge: Filter[], kind: number)
 		newFilters.push(filter);
 	}
 	return newFilters;
+};
+
+const res_kachan = (event: NostrEvent): [string, string[][]] => {
+	return ['ｶﾁｬﾝ💥🔥ｶﾁｬﾝ', getTagsReply(event)];
 };
 
 const res_uwasan = (event: NostrEvent): [string, string[][]] => {
