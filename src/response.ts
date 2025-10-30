@@ -348,6 +348,7 @@ const getResmap = (
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
 		[/ケルベ[ロノ]ス/, res_kerubenos],
 		[/タイガー|🐯|🐅/u, res_tiger],
+		[/クマダス|🐻/u, res_bear],
 		[/俺達に制限/, res_seigen],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
@@ -2317,6 +2318,15 @@ const res_tiger = (event: NostrEvent): [string, string[][]] => {
 		...tigers.map((t) => ['emoji', t, `${url_base}${t}.webp`]),
 		...getTagsReply(event)
 	];
+	return [content, tags];
+};
+
+const res_bear = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://kumadas.net/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
 };
 
