@@ -376,6 +376,7 @@ const getResmap = (
 		],
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
 		[/(ブクマ|ブックマーク)して/, res_bukuma],
+		[/馬券|予想して/, res_keiba],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
 		[/誕生日/, res_tanjobi],
@@ -2928,6 +2929,20 @@ const res_bukuma = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	const tags: string[][] = getTagsReply(event);
 	content = '\\b';
+	return [content, tags];
+};
+
+const res_keiba = (event: NostrEvent): [string, string[][]] => {
+	const f = () => Math.floor(Math.random() * 18 + 1);
+	const n1: number = f();
+	const n2: number = f();
+	const n3: number = f();
+	const content: string = any([
+		`何とは言わんが、ワイの好きな数字は${n1}やな`,
+		`よくわからんけど今朝 ${n1}-${n2}-${n3} っていう数字列の夢を見たで`,
+		`33-4`
+	]);
+	const tags: string[][] = getTagsReply(event);
 	return [content, tags];
 };
 
