@@ -2270,10 +2270,6 @@ const res_slot = (event: NostrEvent): [string, string[][]] => {
 				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/e413d45c53f7c903088ef7ee8a2ebb147e2486bd5504dd698667eaf69a947379.webp'
 			],
 			[
-				'drillhair',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/0cdf813fb53b647e7ae2d897c3086061ce8eb4bbbe119869aeda25ebd1089dce.webp'
-			],
-			[
 				'green_piman',
 				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/5f9cbd1650150c3fbe64d38b11a1769e07a72ad7ee4ea563aabbdb68bff8997b.webp'
 			],
