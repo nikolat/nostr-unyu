@@ -2307,6 +2307,7 @@ const res_slot = (event: NostrEvent): [string, string[][]] => {
 		'kubipaca_summer_kubi_yoko',
 		'kubipaca_summer_kubi_T',
 		'kubipaca_summer_kubi_hidarisita',
+		'kubipaca_summer_kubi',
 		'kubipaca_summer_kubi_uemigi',
 		'kubipaca_summer_kubi_gyakuT',
 		'kubipaca_summer_kubi_uehidari'
