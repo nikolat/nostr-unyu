@@ -346,6 +346,7 @@ const getResmap = (
 			res_shogi_turn
 		],
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
+		[/スロット/, res_slot],
 		[/ケルベ[ロノ]ス/, res_kerubenos],
 		[/タイガー|🐯|🐅/u, res_tiger],
 		[/クマダス|🐻/u, res_bear],
@@ -2240,6 +2241,88 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			'emoji',
 			s,
 			`https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/${s}.webp`
+		])
+	];
+	return [content, tags];
+};
+
+const res_slot = (event: NostrEvent): [string, string[][]] => {
+	const getImage = (): [string, string] => {
+		const r: Map<string, string> = new Map([
+			[
+				'wakame',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/1a656f3d22d289ffaf7cc49f2e75b80fe7b47bc4e37bea9c3a26f7c485401a78.webp'
+			],
+			[
+				'donguri',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/5c13be7d82c1c0fc885d8256e19ff2d924f604aef2aafff9129bac967e01c2a5.webp'
+			],
+			[
+				'nan',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4d0bf4959bf1d2ff7ec4084a8d1c15ee4866a3c0189bb4f0930b60e93b79e8de.webp'
+			],
+			[
+				'kagami_mochi',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/ae4e2d0aa7b0bbaab2ba70183537c0026f28c31e3073ed621de0b56d9abdf047.webp'
+			],
+			[
+				'drill',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/e413d45c53f7c903088ef7ee8a2ebb147e2486bd5504dd698667eaf69a947379.webp'
+			],
+			[
+				'drillhair',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/0cdf813fb53b647e7ae2d897c3086061ce8eb4bbbe119869aeda25ebd1089dce.webp'
+			],
+			[
+				'green_piman',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/5f9cbd1650150c3fbe64d38b11a1769e07a72ad7ee4ea563aabbdb68bff8997b.webp'
+			],
+			[
+				'yellow_piman',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4db46434171be71a9b482a09afa91e46971b821b6284c0b13c986a721d8079a5.webp'
+			],
+			[
+				'red_piman',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/823516d937c751cbcb4cc9f72c683cf16f425e1cea5ea83f8344b5a298de1408.webp'
+			],
+			[
+				'kyabetu',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/633a6ce843a27decbde123709787029ea78636a1949c32811b799dc3d97361f5.webp'
+			],
+			[
+				'colocolo',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/014db72c2b23cdc1dabd380a3b2f2e1006a7a888a978428402158d5c03286d36.webp'
+			],
+			[
+				'negi',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/d2ef5a469735c945f867f9c86738d1b53bc18428deabce6ef9afe4a2984e202f.webp'
+			]
+		]);
+		return Array.from(r)[Math.floor(Math.random() * r.size)];
+	};
+	const slot: [string, string][] = [getImage(), getImage(), getImage()];
+	const imageEmojiMap: Map<string, string> = new Map<string, string>(slot.map((e) => [e[0], e[1]]));
+	const emoji = [
+		'kubipaca_summer_kubi_migisita',
+		'kubipaca_summer_kubi_yoko',
+		'kubipaca_summer_kubi_T',
+		'kubipaca_summer_kubi_hidarisita',
+		'kubipaca_summer_kubi_uemigi',
+		'kubipaca_summer_kubi_gyakuT',
+		'kubipaca_summer_kubi_uehidari'
+	];
+	const content: string = [
+		':kubipaca_summer_kubi_migisita::kubipaca_summer_kubi_yoko::kubipaca_summer_kubi_T::kubipaca_summer_kubi_yoko::kubipaca_summer_kubi_T::kubipaca_summer_kubi_yoko::kubipaca_summer_kubi_hidarisita:',
+		`:kubipaca_summer_kubi:${slot.map((e) => `:${e[0]}:`).join(':kubipaca_summer_kubi:')}:kubipaca_summer_kubi:`,
+		':kubipaca_summer_kubi_uemigi::kubipaca_summer_kubi_yoko::kubipaca_summer_kubi_gyakuT::kubipaca_summer_kubi_yoko::kubipaca_summer_kubi_gyakuT::kubipaca_summer_kubi_yoko::kubipaca_summer_kubi_uehidari:'
+	].join('\n');
+	const tags = [
+		...getTagsReply(event),
+		...Array.from(imageEmojiMap.entries()).map((e) => ['emoji', e[0], e[1]]),
+		...emoji.map((s) => [
+			'emoji',
+			s,
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`
 		])
 	];
 	return [content, tags];
