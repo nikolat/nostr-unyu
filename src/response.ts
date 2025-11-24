@@ -351,6 +351,7 @@ const getResmap = (
 		[/タイガー|🐯|🐅/u, res_tiger],
 		[/クマダス|🐻/u, res_bear],
 		[/俺達に制限/, res_seigen],
+		[/ミシシッピアカミミガメ/, res_akamimigame],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
 		[/バッジ$/, res_badge],
@@ -2427,6 +2428,26 @@ const res_seigen = (event: NostrEvent): [string, string[][]] => {
 	const url_base = 'https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/';
 	const tags: string[][] = [
 		...seigens_shuffle.map((t) => ['emoji', t, `${url_base}${t}.png`]),
+		...getTagsReply(event)
+	];
+	return [content, tags];
+};
+
+const res_akamimigame = (event: NostrEvent): [string, string[][]] => {
+	const shuffle = (array: string[]) => {
+		for (let i = array.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
+		}
+		return array;
+	};
+	const kames = ['aka', 'demi', 'game', 'kku', 'kusa', 'mi', 'mimi', 'misi', 'pi', 'ppi', 'si'];
+	const kames_shuffle = shuffle(kames.map((t) => `kame_${t}`)).slice(0, 6);
+	const kames_shuffle_for_content = kames_shuffle.map((t) => `:${t}:`);
+	const content: string = kames_shuffle_for_content.join('');
+	const url_base = 'https://raw.githubusercontent.com/uchijo/my-emoji/main/kame_set/';
+	const tags: string[][] = [
+		...kames_shuffle.map((t) => ['emoji', t, `${url_base}${t}.png`]),
 		...getTagsReply(event)
 	];
 	return [content, tags];
