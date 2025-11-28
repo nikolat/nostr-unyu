@@ -2264,6 +2264,10 @@ const res_slot = (event: NostrEvent): [string, string[][]] => {
 				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4d0bf4959bf1d2ff7ec4084a8d1c15ee4866a3c0189bb4f0930b60e93b79e8de.webp'
 			],
 			[
+				'uni',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/64edaf193e60541431b74442ee07bf4d4b5afd1ecdf35bb580349abd988e32d7.webp'
+			],
+			[
 				'kagami_mochi',
 				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/ae4e2d0aa7b0bbaab2ba70183537c0026f28c31e3073ed621de0b56d9abdf047.webp'
 			],
