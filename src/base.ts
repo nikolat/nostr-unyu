@@ -2,8 +2,8 @@ import type { VercelResponse } from '@vercel/node';
 import { type NostrEvent, type VerifiedEvent, validateEvent, verifyEvent } from 'nostr-tools/pure';
 import { PlainKeySigner as Signer } from 'nostr-tools/signer';
 import * as nip19 from 'nostr-tools/nip19';
-import { Mode } from './utils.js';
-import { getResponseEvent } from './response.js';
+import { Mode } from './utils.ts';
+import { getResponseEvent } from './response.ts';
 
 //入力イベントを検証するかどうか(デバッグ時は無効化した方が楽)
 const verifyInputEvent = true;

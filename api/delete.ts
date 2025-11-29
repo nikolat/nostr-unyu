@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { buffer, Mode } from '../src/utils.js';
-import { base } from '../src/base.js';
+import { buffer, Mode } from '../src/utils.ts';
+import { base } from '../src/base.ts';
 
 const mode: Mode = Mode.Delete;
 

@@ -2,8 +2,8 @@
 import { readFile } from 'node:fs/promises';
 import { generateSecretKey, type NostrEvent } from 'nostr-tools/pure';
 import { PlainKeySigner as Signer } from 'nostr-tools/signer';
-import { Mode } from './src/utils.js';
-import { getResponseEvent } from './src/response.js';
+import { Mode } from './src/utils.ts';
+import { getResponseEvent } from './src/response.ts';
 
 const main = async () => {
 	const text = await readFile('./test/fixtures/input.json', {

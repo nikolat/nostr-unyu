@@ -1,5 +1,5 @@
-import { Mode } from './utils.js';
-import mb_strwidth from './mb_strwidth.js';
+import { Mode } from './utils.ts';
+import mb_strwidth from './mb_strwidth.ts';
 import Parser from 'rss-parser';
 import type { Filter } from 'nostr-tools/filter';
 import { Relay } from 'nostr-tools/relay';

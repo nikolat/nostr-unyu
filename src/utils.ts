@@ -1,13 +1,15 @@
 import type { Readable } from 'node:stream';
 import { Buffer } from 'node:buffer';
 
-export const enum Mode {
-	Normal,
-	Reply,
-	Fav,
-	Zap,
-	Delete
-}
+export const Mode = {
+	Normal: 0,
+	Reply: 1,
+	Fav: 2,
+	Zap: 3,
+	Delete: 4
+} as const;
+
+export type Mode = (typeof Mode)[keyof typeof Mode];
 
 export const buffer = async (readable: Readable) => {
 	const chunks: Uint8Array[] = [];

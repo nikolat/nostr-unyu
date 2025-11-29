@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "main.ts",
 	"scripts": {
-		"dev": "npx tsx main.ts",
+		"dev": "node main.ts",
 		"test": "mocha -r ts-node/register \"test/**/*.ts\"",
 		"lint": "prettier --check .",
 		"format": "prettier --write ."
@@ -13,23 +13,21 @@
 	"author": "",
 	"license": "CC0-1.0",
 	"dependencies": {
-		"nostr-tools": "^2.18.0",
+		"nostr-tools": "^2.18.2",
 		"rss-parser": "^3.13.0"
 	},
 	"devDependencies": {
 		"@types/chai": "^5.2.3",
 		"@types/mocha": "^10.0.10",
 		"@types/node": "^24.10.1",
-		"@vercel/node": "^5.5.9",
+		"@vercel/node": "^5.5.13",
 		"chai": "^6.2.1",
 		"mocha": "^11.7.5",
-		"prettier": "^3.6.2",
-		"ts-node": "^10.9.2",
-		"tsx": "^4.20.6",
-		"typescript": "^5.9.3"
+		"prettier": "^3.7.2",
+		"ts-node": "^10.9.2"
 	},
 	"type": "module",
 	"engines": {
-		"node": "22.x"
+		"node": "24.x"
 	}
 }
