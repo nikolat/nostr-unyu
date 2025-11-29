@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "main.ts",
 	"scripts": {
-		"dev": "node main.ts",
+		"dev": "npx tsx main.ts",
 		"test": "mocha -r ts-node/register \"test/**/*.ts\"",
 		"lint": "prettier --check .",
 		"format": "prettier --write ."
@@ -24,7 +24,8 @@
 		"chai": "^6.2.1",
 		"mocha": "^11.7.5",
 		"prettier": "^3.7.2",
-		"ts-node": "^10.9.2"
+		"ts-node": "^10.9.2",
+		"tsx": "^4.20.6"
 	},
 	"type": "module",
 	"engines": {
