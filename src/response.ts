@@ -2510,9 +2510,11 @@ const res_imanokibun = async (event: NostrEvent): Promise<[string, string[][]]> 
 	}
 	const emojis: [string, string][] = Array.from(emojiMap.entries());
 	const emoji16: [string, string][] = [];
+	const eomji16Map: Map<string, string> = new Map<string, string>();
 	for (let i = 0; i < 16; i++) {
 		const r = Math.floor(Math.random() * emojis.length);
 		emoji16.push(emojis[r]);
+		eomji16Map.set(...emojis[r]);
 	}
 	const content: string = [0, 4, 8, 12]
 		.map((i) =>
@@ -2522,7 +2524,10 @@ const res_imanokibun = async (event: NostrEvent): Promise<[string, string[][]]> 
 				.join('')
 		)
 		.join('\n');
-	const tags: string[][] = [...emoji16.map((t) => ['emoji', t[0], t[1]]), ...getTagsReply(event)];
+	const tags: string[][] = [
+		...Array.from(eomji16Map.entries()).map((t) => ['emoji', t[0], t[1]]),
+		...getTagsReply(event)
+	];
 	return [content, tags];
 };
 
