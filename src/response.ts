@@ -2505,6 +2505,9 @@ const res_imanokibun = async (event: NostrEvent): Promise<[string, string[][]]> 
 			emojiMap.set(tag[1], tag[2]);
 		}
 	}
+	if (emojiMap.size === 0) {
+		return ['なんとも言えん気分やな', getTagsReply(event)];
+	}
 	const emojis: [string, string][] = Array.from(emojiMap.entries());
 	const emoji16: [string, string][] = [];
 	for (let i = 0; i < 16; i++) {
