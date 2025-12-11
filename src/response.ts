@@ -352,6 +352,7 @@ const getResmap = (
 		[/クマダス|🐻/u, res_bear],
 		[/俺達に制限/, res_seigen],
 		[/ミシシッピアカミミガメ/, res_akamimigame],
+		[/(今|いま)の(気分|きぶん)/, res_imanokibun],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
 		[/バッジ$/, res_badge],
@@ -2454,6 +2455,71 @@ const res_akamimigame = (event: NostrEvent): [string, string[][]] => {
 		...kames_shuffle.map((t) => ['emoji', t, `${url_base}${t}.png`]),
 		...getTagsReply(event)
 	];
+	return [content, tags];
+};
+
+const getEvents30030 = async (pubkey: string): Promise<NostrEvent[]> => {
+	const resEvents: NostrEvent[] = [];
+	const event10030: NostrEvent | undefined = await getEvent(emojiSearchRelay, [
+		{ kinds: [10030], authors: [pubkey] }
+	]);
+	if (event10030 === undefined) {
+		return [];
+	}
+	const aTags = event10030.tags.filter((tag) => tag.length >= 2 && tag[0] === 'a');
+	const filters: Filter[] = [];
+	for (const aTag of aTags) {
+		const aid = aTag[1];
+		const [kind, pubkey, d] = aid.split(':');
+		const filter: Filter = { kinds: [parseInt(kind)], authors: [pubkey] };
+		if (d !== undefined) {
+			filter['#d'] = [d];
+		}
+		filters.push(filter);
+	}
+	const sliceByNumber = (array: any[], number: number) => {
+		const length = Math.ceil(array.length / number);
+		return new Array(length)
+			.fill(undefined)
+			.map((_, i) => array.slice(i * number, (i + 1) * number));
+	};
+	const filterGroups = [];
+	for (const filterGroup of sliceByNumber(mergeFilterForAddressableEvents(filters, 30030), 10)) {
+		filterGroups.push(filterGroup);
+	}
+	await Promise.all(
+		filterGroups.map(async (filterGroup) => {
+			await getEvents(emojiSearchRelay, filterGroup, (ev: NostrEvent) => {
+				resEvents.push(ev);
+			});
+		})
+	);
+	return resEvents;
+};
+
+const res_imanokibun = async (event: NostrEvent): Promise<[string, string[][]]> => {
+	const events30030: NostrEvent[] = await getEvents30030(event.pubkey);
+	const emojiMap: Map<string, string> = new Map<string, string>();
+	for (const ev30030 of events30030) {
+		for (const tag of ev30030.tags.filter(isEmojiTag)) {
+			emojiMap.set(tag[1], tag[2]);
+		}
+	}
+	const emojis: [string, string][] = Array.from(emojiMap.entries());
+	const emoji16: [string, string][] = [];
+	for (let i = 0; i < 16; i++) {
+		const r = Math.floor(Math.random() * emojis.length);
+		emoji16.push(emojis[r]);
+	}
+	const content: string = [0, 4, 8, 12]
+		.map((i) =>
+			emoji16
+				.slice(i, i + 4)
+				.map((e) => `:${e[0]}:`)
+				.join('')
+		)
+		.join('\n');
+	const tags: string[][] = [...emoji16.map((t) => ['emoji', t[0], t[1]]), ...getTagsReply(event)];
 	return [content, tags];
 };
 
