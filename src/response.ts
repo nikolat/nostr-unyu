@@ -649,7 +649,7 @@ const mode_zap = async (event: NostrEvent, signer: Signer): Promise<EventTemplat
 		return null;
 	}
 	const zapEndPoint: string | null = await getZapEndPoint(event);
-	if (zapEndPoint !== null) {
+	if (event9734.pubkey !== (await signer.getPublicKey()) && zapEndPoint !== null) {
 		try {
 			await zapByNIP47(zapEndPoint, event9734, signer, 39, 'ありがとさん');
 		} catch (error) {
