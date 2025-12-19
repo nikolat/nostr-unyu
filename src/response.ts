@@ -231,8 +231,10 @@ const selectResponse = async (
 			author: pollEventSigned.pubkey,
 			relays: pollRelays
 		});
-		res.content = `アンケートやで\nnostr:${nevent}`;
+		const pollUrl = `https://pollerama.fun/respond/${nevent}`;
+		res.content = `アンケートやで\nnostr:${nevent}\n${pollUrl}`;
 		res.tags.push(['q', pollEventSigned.id, pollRelays[0], pollEventSigned.pubkey]);
+		res.tags.push(['r', pollUrl]);
 		return [pollEvent, res];
 	}
 	if (/^\\_b$/.test(res.content)) {
