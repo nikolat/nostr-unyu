@@ -30,6 +30,7 @@ const profileRelay = 'wss://yabu.me/';
 const shogiRelay = 'wss://yabu.me/';
 const zapCheckRelay = 'wss://yabu.me/';
 const emojiSearchRelay = 'wss://yabu.me/';
+const followSearchRelay = 'wss://yabu.me/';
 
 export const getResponseEvent = async (
 	requestEvent: NostrEvent,
@@ -361,6 +362,7 @@ const getResmap = (
 		[/りとりん|つぎはなにから？/, res_ritorin],
 		[/バッジ$/, res_badge],
 		[/バッジを授与して/, res_others_badge],
+		[/最近の(アンケート|投票)/, res_resent_poll],
 		[/アンケート|投票/, res_poll],
 		[/まだ(助|たす)かる|マダガスカル/, res_madagasukaru],
 		[/いいスタート|イースター島/, res_iisutato],
@@ -2602,6 +2604,38 @@ const getOthersBadgeEventTemplate = (event: NostrEvent): EventTemplate => {
 		created_at: event.created_at + 1
 	};
 	return badgeEvent;
+};
+
+const res_resent_poll = async (event: NostrEvent): Promise<[string, string[][]]> => {
+	const event3: NostrEvent | undefined = await getEvent(followSearchRelay, [
+		{ kinds: [3], authors: [event.pubkey], until: Math.floor(Date.now() / 1000), limit: 1 }
+	]);
+	const pubkeys: string[] = event3?.tags.filter((tag) => tag[0] === 'p').map((tag) => tag[1]) ?? [];
+	const events1068: NostrEvent[] = [];
+	const filter: Filter = {
+		kinds: [1068],
+		authors: pubkeys,
+		until: Math.floor(Date.now() / 1000),
+		limit: 5
+	};
+	await getEvents(followSearchRelay, [filter], (ev: NostrEvent) => {
+		events1068.push(ev);
+	});
+	if (events1068.length === 0) {
+		return ['見つからへん', getTagsReply(event)];
+	}
+	const tags: string[][] = [];
+	const nevents: string[] = [];
+	for (const event1068 of events1068) {
+		const nevent: string = `nostr:${nip19.neventEncode({ ...event1068, author: event1068.pubkey, relays: [followSearchRelay] })}`;
+		nevents.push(nevent);
+		tags.push(['q', event1068.id, followSearchRelay, event1068.pubkey]);
+	}
+	const pollUrl = `https://pollerama.fun/`;
+	const content = `${nevents.join('\n')}\n${pollUrl}`;
+	tags.push(...getTagsReply(event));
+	tags.push(['r', pollUrl]);
+	return [content, tags];
 };
 
 const res_poll = (event: NostrEvent): [string, string[][]] | null => {
