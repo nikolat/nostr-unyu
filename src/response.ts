@@ -2305,6 +2305,10 @@ const res_slot = (event: NostrEvent): [string, string[][]] => {
 			[
 				'negi',
 				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/d2ef5a469735c945f867f9c86738d1b53bc18428deabce6ef9afe4a2984e202f.webp'
+			],
+			[
+				'kinkai',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/3a0145f9259f9b06d6e106f58913e8c4dca7c0336618b244c2fb3f777f55f276.webp'
 			]
 		]);
 		return Array.from(r)[Math.floor(Math.random() * r.size)];
