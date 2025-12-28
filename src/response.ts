@@ -2256,62 +2256,70 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_slot = (event: NostrEvent): [string, string[][]] => {
+	const slotBase: [string, string][] = [
+		[
+			'wakame',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/1a656f3d22d289ffaf7cc49f2e75b80fe7b47bc4e37bea9c3a26f7c485401a78.webp'
+		],
+		[
+			'donguri',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/5c13be7d82c1c0fc885d8256e19ff2d924f604aef2aafff9129bac967e01c2a5.webp'
+		],
+		[
+			'nan',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4d0bf4959bf1d2ff7ec4084a8d1c15ee4866a3c0189bb4f0930b60e93b79e8de.webp'
+		],
+		[
+			'uni',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/64edaf193e60541431b74442ee07bf4d4b5afd1ecdf35bb580349abd988e32d7.webp'
+		],
+		[
+			'kagami_mochi',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/ae4e2d0aa7b0bbaab2ba70183537c0026f28c31e3073ed621de0b56d9abdf047.webp'
+		],
+		[
+			'drill',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/e413d45c53f7c903088ef7ee8a2ebb147e2486bd5504dd698667eaf69a947379.webp'
+		],
+		[
+			'green_piman',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/5f9cbd1650150c3fbe64d38b11a1769e07a72ad7ee4ea563aabbdb68bff8997b.webp'
+		],
+		[
+			'yellow_piman',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4db46434171be71a9b482a09afa91e46971b821b6284c0b13c986a721d8079a5.webp'
+		],
+		[
+			'red_piman',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/823516d937c751cbcb4cc9f72c683cf16f425e1cea5ea83f8344b5a298de1408.webp'
+		],
+		[
+			'kyabetu',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/633a6ce843a27decbde123709787029ea78636a1949c32811b799dc3d97361f5.webp'
+		],
+		[
+			'colocolo',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/014db72c2b23cdc1dabd380a3b2f2e1006a7a888a978428402158d5c03286d36.webp'
+		],
+		[
+			'negi',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/d2ef5a469735c945f867f9c86738d1b53bc18428deabce6ef9afe4a2984e202f.webp'
+		],
+		[
+			'kinkai',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/3a0145f9259f9b06d6e106f58913e8c4dca7c0336618b244c2fb3f777f55f276.webp'
+		]
+	];
+	const shuffle = (array: [string, string][]) => {
+		for (let i = array.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
+		}
+		return array;
+	};
+	const slot_shuffle = shuffle(slotBase).slice(0, 5);
 	const getImage = (): [string, string] => {
-		const r: Map<string, string> = new Map([
-			[
-				'wakame',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/1a656f3d22d289ffaf7cc49f2e75b80fe7b47bc4e37bea9c3a26f7c485401a78.webp'
-			],
-			[
-				'donguri',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/5c13be7d82c1c0fc885d8256e19ff2d924f604aef2aafff9129bac967e01c2a5.webp'
-			],
-			[
-				'nan',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4d0bf4959bf1d2ff7ec4084a8d1c15ee4866a3c0189bb4f0930b60e93b79e8de.webp'
-			],
-			[
-				'uni',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/64edaf193e60541431b74442ee07bf4d4b5afd1ecdf35bb580349abd988e32d7.webp'
-			],
-			[
-				'kagami_mochi',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/ae4e2d0aa7b0bbaab2ba70183537c0026f28c31e3073ed621de0b56d9abdf047.webp'
-			],
-			[
-				'drill',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/e413d45c53f7c903088ef7ee8a2ebb147e2486bd5504dd698667eaf69a947379.webp'
-			],
-			[
-				'green_piman',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/5f9cbd1650150c3fbe64d38b11a1769e07a72ad7ee4ea563aabbdb68bff8997b.webp'
-			],
-			[
-				'yellow_piman',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4db46434171be71a9b482a09afa91e46971b821b6284c0b13c986a721d8079a5.webp'
-			],
-			[
-				'red_piman',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/823516d937c751cbcb4cc9f72c683cf16f425e1cea5ea83f8344b5a298de1408.webp'
-			],
-			[
-				'kyabetu',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/633a6ce843a27decbde123709787029ea78636a1949c32811b799dc3d97361f5.webp'
-			],
-			[
-				'colocolo',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/014db72c2b23cdc1dabd380a3b2f2e1006a7a888a978428402158d5c03286d36.webp'
-			],
-			[
-				'negi',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/d2ef5a469735c945f867f9c86738d1b53bc18428deabce6ef9afe4a2984e202f.webp'
-			],
-			[
-				'kinkai',
-				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/3a0145f9259f9b06d6e106f58913e8c4dca7c0336618b244c2fb3f777f55f276.webp'
-			]
-		]);
-		return Array.from(r)[Math.floor(Math.random() * r.size)];
+		return slot_shuffle[Math.floor(Math.random() * slot_shuffle.length)];
 	};
 	const slot: [string, string][] = [getImage(), getImage(), getImage()];
 	const imageEmojiMap: Map<string, string> = new Map<string, string>(slot.map((e) => [e[0], e[1]]));
