@@ -367,6 +367,7 @@ const getResmap = (
 		[/まだ(助|たす)かる|マダガスカル/, res_madagasukaru],
 		[/いいスタート|イースター島/, res_iisutato],
 		[/占って|占い/, res_uranai],
+		[/きょもなん/, res_kyomonan],
 		[/カレーの材料/, res_curry],
 		[/タツノオトシゴの絵文字/, res_tatsunootoshigo],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
@@ -2798,6 +2799,20 @@ const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
 		content = `${type}のあなたの今日の運勢は『${star}』\nラッキーゴーストは『${feed.items[index].title}』やで\n${feed.items[index].link}`;
 		tags.push(['r', link]);
 	}
+	return [content, tags];
+};
+
+const res_kyomonan = (event: NostrEvent): [string, string[][]] => {
+	const content: string = ':kyomu::nantoka:';
+	const tags: string[][] = [
+		...getTagsReply(event),
+		['emoji', 'kyomu', 'https://lokuyow.github.io/images/nostr/emoji/generalJP/kyomu.webp'],
+		[
+			'emoji',
+			'nantoka',
+			'https://cdn.nostrcheck.me/a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf/8cd387ad21474ecb772d6cb5491ca3b9879d1fcf077047fbb8cfcbb4d82754a1.webp'
+		]
+	];
 	return [content, tags];
 };
 
