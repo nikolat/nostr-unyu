@@ -368,6 +368,7 @@ const getResmap = (
 		[/いいスタート|イースター島/, res_iisutato],
 		[/占って|占い/, res_uranai],
 		[/きょもなん/, res_kyomonan],
+		[/(午後|ごご)なん/, res_gogonan],
 		[/(よしえ|みゆき)$/, res_yoshie],
 		[/カレーの材料/, res_curry],
 		[/タツノオトシゴの絵文字/, res_tatsunootoshigo],
@@ -2808,6 +2809,24 @@ const res_kyomonan = (event: NostrEvent): [string, string[][]] => {
 	const tags: string[][] = [
 		...getTagsReply(event),
 		['emoji', 'kyomu', 'https://lokuyow.github.io/images/nostr/emoji/generalJP/kyomu.webp'],
+		[
+			'emoji',
+			'nantoka',
+			'https://cdn.nostrcheck.me/a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf/8cd387ad21474ecb772d6cb5491ca3b9879d1fcf077047fbb8cfcbb4d82754a1.webp'
+		]
+	];
+	return [content, tags];
+};
+
+const res_gogonan = (event: NostrEvent): [string, string[][]] => {
+	const content: string = ':gogo_chance::nantoka:';
+	const tags: string[][] = [
+		...getTagsReply(event),
+		[
+			'emoji',
+			'gogo_chance',
+			'https://raw.githubusercontent.com/invertedtriangle358/images/main/EMOJI/%E3%82%B4%E3%83%BC%E3%82%B4%E3%83%BC%E3%83%81%E3%83%A3%E3%83%B3%E3%82%B9.png'
+		],
 		[
 			'emoji',
 			'nantoka',
