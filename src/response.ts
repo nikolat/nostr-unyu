@@ -368,6 +368,7 @@ const getResmap = (
 		[/いいスタート|イースター島/, res_iisutato],
 		[/占って|占い/, res_uranai],
 		[/きょもなん/, res_kyomonan],
+		[/(よしえ|みゆき)$/, res_yoshie],
 		[/カレーの材料/, res_curry],
 		[/タツノオトシゴの絵文字/, res_tatsunootoshigo],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
@@ -2814,6 +2815,21 @@ const res_kyomonan = (event: NostrEvent): [string, string[][]] => {
 		]
 	];
 	return [content, tags];
+};
+
+const res_yoshie = (event: NostrEvent): [string, string[][]] => {
+	const a: [string, string[][]][] = [
+		[
+			':yoshie:',
+			[...getTagsReply(event), ['emoji', 'yoshie', 'https://tac-lan.net/.well-known/yoshie.png']]
+		],
+		[
+			':miyuki:',
+			[...getTagsReply(event), ['emoji', 'miyuki', 'https://tac-lan.net/.well-known/miyuki.png']]
+		]
+	];
+	const i = Math.floor(Math.random() * a.length);
+	return a[i];
 };
 
 const res_curry = (event: NostrEvent): [string, string[][]] => {
