@@ -393,6 +393,7 @@ const getResmap = (
 		[/中身/, res_nakami],
 		[/誕生日/, res_tanjobi],
 		[/どんぐり/, res_donguri],
+		[/まりも|マリモ/, res_marimo],
 		[/ゼリー$/, res_jelly],
 		[/ウカチュウ$/, res_ukachu],
 		[/ゴムまり$/, res_gomumari],
@@ -3283,6 +3284,10 @@ const res_donguri = (event: NostrEvent): [string, string[][]] => {
 		]),
 		getTagsReply(event)
 	];
+};
+
+const res_marimo = (event: NostrEvent): [string, string[][]] => {
+	return ['阿寒にきまっとるやろ', getTagsReply(event)];
 };
 
 const res_jelly = (event: NostrEvent, mode: Mode): [string, string[][]] => {
