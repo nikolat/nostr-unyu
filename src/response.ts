@@ -580,6 +580,8 @@ const mode_fav = (event: NostrEvent): EventTemplate | null => {
 		[/虚無/, ''],
 		[/マイナス|まいなす|dislike|downvote/i, '-'],
 		[/さくら/, ':uka_sakurah00:'],
+		[/:en_e:/, ':en_e:'],
+		[/:yen_e:/, ':yen_e:'],
 		[/ぎゅうにゅう|とうにゅう/, '🥛'],
 		[/こうにゅう/, '💸'],
 		[/しゅうにゅう/, '💰'],
@@ -597,14 +599,25 @@ const mode_fav = (event: NostrEvent): EventTemplate | null => {
 		if (reg.test(event.content)) {
 			const kind: number = 7;
 			const tags: string[][] = getTagsFav(event);
-			if (content === ':unyu:') {
-				tags.push(['emoji', 'unyu', 'https://nikolat.github.io/avatar/disc2.png']);
-			} else if (content === ':uka_sakurah00:') {
-				tags.push([
-					'emoji',
-					'uka_sakurah00',
-					'https://ukadon-cdn.de10.moe/system/custom_emojis/images/000/006/840/original/uka_sakurah00.png'
-				]);
+			switch (content) {
+				case ':unyu:':
+					tags.push(['emoji', 'unyu', 'https://nikolat.github.io/avatar/disc2.png']);
+					break;
+				case ':uka_sakurah00:':
+					tags.push([
+						'emoji',
+						'uka_sakurah00',
+						'https://ukadon-cdn.de10.moe/system/custom_emojis/images/000/006/840/original/uka_sakurah00.png'
+					]);
+					break;
+				case ':en_e:':
+					tags.push(['emoji', 'en_e', 'https://ompomz.github.io/docs/ene.webp']);
+					break;
+				case ':yen_e:':
+					tags.push(['emoji', 'yen_e', 'https://ompomz.github.io/docs/yene.webp']);
+					break;
+				default:
+					break;
 			}
 			return { content, kind, tags, created_at: event.created_at + 1 };
 		}
