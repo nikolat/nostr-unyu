@@ -372,6 +372,7 @@ const getResmap = (
 		[/(よしえ|みゆき)$/, res_yoshie],
 		[/カレーの材料/, res_curry],
 		[/タツノオトシゴの絵文字/, res_tatsunootoshigo],
+		[/赤ちゃんの身長/, res_akachannoshincho],
 		[/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(\S+)の(週間)?天気/, res_tenki],
 		[/(^|\s+)うにゅう、自(\S+)しろ/, res_aura],
 		[
@@ -2902,6 +2903,13 @@ const res_tatsunootoshigo = (event: NostrEvent): [string, string[][]] => {
 	content += ary.at(-1) + 'やで';
 	const tags: string[][] = getTagsReply(event);
 	return [content, tags];
+};
+
+const res_akachannoshincho = (event: NostrEvent): [string, string[][]] => {
+	return [
+		any(['赤ちゃんの身長のことやで', '赤ちゃんの身長のことやな', '赤ちゃんの身長を指す言葉や']),
+		getTagsReply(event)
+	];
 };
 
 const res_tenki = async (
