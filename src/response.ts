@@ -2820,15 +2820,45 @@ const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
 };
 
 const res_kyomonan = (event: NostrEvent): [string, string[][]] => {
-	const content: string = ':kyomu::nantoka:';
-	const tags: string[][] = [
-		...getTagsReply(event),
-		['emoji', 'kyomu', 'https://lokuyow.github.io/images/nostr/emoji/generalJP/kyomu.webp'],
+	const emojiList: [string, string][] = [
 		[
-			'emoji',
+			'nan',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4d0bf4959bf1d2ff7ec4084a8d1c15ee4866a3c0189bb4f0930b60e93b79e8de.webp'
+		],
+		[
+			'nan_dato',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/119812c7a9353ffb18c14b3bd6fbc8651a84072428fbb9ceab25c908b0c5eb7a.webp'
+		],
+		['nanii', 'https://images.kinoko.pw/drive/13b87a84-63fc-4696-858d-fc70ef8c68e8.webp'],
+		[
+			'nanikaga_okashii',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/3d777183918b973f0a21de446a73b22d6c88a94e3f006d404b331496a3698de5.webp'
+		],
+		[
+			'nanikore',
+			'https://images.kinoko.pw/drive/thumbnail-65564448-a167-4f19-b393-5f28771897f5.webp'
+		],
+		[
+			'nanimowakaranai',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/811d6ef1c6a21b19296680dd21182c0ce11114482a6c448dc3be7aba13f337ed.webp'
+		],
+		['nanmoda', 'https://haniwar.com/emoji/akitaben/nanmoda.png'],
+		['nanmoya', 'https://haniwar.com/emoji/akitaben/nanmoya.png'],
+		[
+			'nannwaka',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/65c01a324a2f6a1be1681d94064b50a14a83c84fd6d8c36b99db4eaf6a3516b3.webp'
+		],
+		[
 			'nantoka',
 			'https://cdn.nostrcheck.me/a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf/8cd387ad21474ecb772d6cb5491ca3b9879d1fcf077047fbb8cfcbb4d82754a1.webp'
 		]
+	];
+	const [shortcode, url] = emojiList[Math.floor(Math.random() * emojiList.length)];
+	const content: string = `:kyomu::${shortcode}:`;
+	const tags: string[][] = [
+		...getTagsReply(event),
+		['emoji', 'kyomu', 'https://lokuyow.github.io/images/nostr/emoji/generalJP/kyomu.webp'],
+		['emoji', shortcode, url]
 	];
 	return [content, tags];
 };
