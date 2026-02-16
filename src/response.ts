@@ -351,7 +351,6 @@ const getResmap = (
 			res_shogi_turn
 		],
 		[/アルパカ|🦙|ものパカ|モノパカ|夏パカ/, res_arupaka],
-		[/スロット/, res_slot],
 		[/ケルベ[ロノ]ス/, res_kerubenos],
 		[/タイガー|🐯|🐅/u, res_tiger],
 		[/クマダス|🐻/u, res_bear],
@@ -387,6 +386,11 @@ const getResmap = (
 			/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)を(CW|warning|ワーニング|わーにんぐ|nip36)にして$/iu,
 			res_cwnishite
 		],
+		[
+			/(^|\s+)(うにゅう、|うにゅう[くさた]ん、|うにゅう[ちに]ゃん、)?(.+)をスロットにして$/u,
+			res_slotnishite
+		],
+		[/スロット/, res_slot],
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
 		[/(ブクマ|ブックマーク)して/, res_bukuma],
 		[/馬券|予想して/, res_keiba],
@@ -3083,6 +3087,62 @@ const res_tanzakunishite = (
 		]);
 	}
 	return [content, [...getTagsReply(event), ...emoji_tags]];
+};
+
+const res_slotnishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const text = match[3];
+	const textAry: string[] = [];
+	const emojiUrlMap: Map<string, string> = new Map<string, string>();
+	for (const tag of event.tags) {
+		if (isEmojiTag(tag)) {
+			emojiUrlMap.set(`:${tag[1]}:`, tag[2]);
+		}
+	}
+	if (emojiUrlMap.size > 0) {
+		const regMatchStr: string = `(${Array.from(emojiUrlMap.keys()).join('|')})`;
+		const regSplit = new RegExp(regMatchStr);
+		const plainTexts = text.split(regSplit);
+		for (const t of plainTexts) {
+			if (emojiUrlMap.has(t)) {
+				textAry.push(t);
+			} else {
+				textAry.push(...Array.from(t));
+			}
+		}
+	} else {
+		textAry.push(...Array.from(text));
+	}
+	const [hiraText, emoji_tags] = getResEmojinishite(textAry.join('\n'), event.tags);
+	const hiraArray: string[] = hiraText.split('\n');
+	const content: string = [
+		`:kubipaca_summer_kubi_migisita:${hiraArray.map((e) => ':kubipaca_summer_kubi_T:').join(':kubipaca_summer_kubi_yoko:')}:kubipaca_summer_kubi_hidarisita:`,
+		`:kubipaca_summer_kubi:${hiraArray.join(':kubipaca_summer_kubi:')}:kubipaca_summer_kubi:`,
+		`:kubipaca_summer_kubi_uemigi:${hiraArray.map((e) => ':kubipaca_summer_kubi_gyakuT:').join(':kubipaca_summer_kubi_yoko:')}:kubipaca_summer_kubi_uehidari:`
+	].join('\n');
+	const emoji = [
+		'kubipaca_summer_kubi_migisita',
+		'kubipaca_summer_kubi_yoko',
+		'kubipaca_summer_kubi_T',
+		'kubipaca_summer_kubi_hidarisita',
+		'kubipaca_summer_kubi',
+		'kubipaca_summer_kubi_uemigi',
+		'kubipaca_summer_kubi_gyakuT',
+		'kubipaca_summer_kubi_uehidari'
+	];
+	const tags = [
+		...getTagsReply(event),
+		...emoji.map((s) => [
+			'emoji',
+			s,
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`
+		]),
+		...emoji_tags
+	];
+	return [content, tags];
 };
 
 const res_emojinishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
