@@ -3119,9 +3119,9 @@ const res_slotnishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string
 	const [hiraText, emoji_tags] = getResEmojinishite(textAry.join('\n'), event.tags);
 	const hiraArray: string[] = hiraText.split('\n');
 	const content: string = [
-		`:kubipaca_summer_kubi_migisita:${hiraArray.map((e) => ':kubipaca_summer_kubi_T:').join(':kubipaca_summer_kubi_yoko:')}:kubipaca_summer_kubi_hidarisita:`,
+		`:kubipaca_summer_kubi_migisita:${hiraArray.map((e) => ':kubipaca_summer_kubi_yoko:').join(':kubipaca_summer_kubi_T:')}:kubipaca_summer_kubi_hidarisita:`,
 		`:kubipaca_summer_kubi:${hiraArray.join(':kubipaca_summer_kubi:')}:kubipaca_summer_kubi:`,
-		`:kubipaca_summer_kubi_uemigi:${hiraArray.map((e) => ':kubipaca_summer_kubi_gyakuT:').join(':kubipaca_summer_kubi_yoko:')}:kubipaca_summer_kubi_uehidari:`
+		`:kubipaca_summer_kubi_uemigi:${hiraArray.map((e) => ':kubipaca_summer_kubi_yoko:').join(':kubipaca_summer_kubi_gyakuT:')}:kubipaca_summer_kubi_uehidari:`
 	].join('\n');
 	const emoji = [
 		'kubipaca_summer_kubi_migisita',
