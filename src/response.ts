@@ -2868,8 +2868,8 @@ const res_kyomonan = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_gogonan = (event: NostrEvent): [string, string[][]] => {
-	const content: string = ':gogo_chance::nantoka:';
-	const tags: string[][] = [
+	const content1: string = ':gogo_chance::nantoka:';
+	const tags1: string[][] = [
 		...getTagsReply(event),
 		[
 			'emoji',
@@ -2882,7 +2882,21 @@ const res_gogonan = (event: NostrEvent): [string, string[][]] => {
 			'https://cdn.nostrcheck.me/a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf/8cd387ad21474ecb772d6cb5491ca3b9879d1fcf077047fbb8cfcbb4d82754a1.webp'
 		]
 	];
-	return [content, tags];
+	const res1: [string, string[][]] = [content1, tags1];
+	const content2: string =
+		'nevent1qvzqqqqqqypzqh6xs7flnfaawzp8ekk4c4nhu0jejla985yjp24vfccz4sx53688qy88wumn8ghj77tpvf6jumt99uqjzamnwvaz7tmjv4kxz7fddfczumn0wd68ytnhd9ex2erwv46zu6ns9uqzq0x7pjgalykzrnj7amfh3klz0wgp8qjd0tz6z0lzme0cm8g82wtryy27m8';
+	const tags2: string[][] = [
+		...getTagsReply(event),
+		[
+			'q',
+			'3cde0c91df92c21ce5eeed378dbe27b9013824d7ac5a13fe2de5f8d9d0753963',
+			'wss://yabu.me/',
+			'5f468793f9a7bd70827cdad5c5677e3e5997fa53d0920aaac4e302ac0d48e8e7'
+		]
+	];
+	const res2: [string, string[][]] = [content2, tags2];
+	const res: [string, string[][]][] = [res1, res2];
+	return res[Math.floor(Math.random() * res.length)];
 };
 
 const res_yoshie = (event: NostrEvent): [string, string[][]] => {
