@@ -2884,7 +2884,7 @@ const res_gogonan = (event: NostrEvent): [string, string[][]] => {
 	];
 	const res1: [string, string[][]] = [content1, tags1];
 	const content2: string =
-		'nevent1qvzqqqqqqypzqh6xs7flnfaawzp8ekk4c4nhu0jejla985yjp24vfccz4sx53688qy88wumn8ghj77tpvf6jumt99uqjzamnwvaz7tmjv4kxz7fddfczumn0wd68ytnhd9ex2erwv46zu6ns9uqzq0x7pjgalykzrnj7amfh3klz0wgp8qjd0tz6z0lzme0cm8g82wtryy27m8';
+		'nostr:nevent1qvzqqqqqqypzqh6xs7flnfaawzp8ekk4c4nhu0jejla985yjp24vfccz4sx53688qy88wumn8ghj77tpvf6jumt99uqjzamnwvaz7tmjv4kxz7fddfczumn0wd68ytnhd9ex2erwv46zu6ns9uqzq0x7pjgalykzrnj7amfh3klz0wgp8qjd0tz6z0lzme0cm8g82wtryy27m8';
 	const tags2: string[][] = [
 		...getTagsReply(event),
 		[
