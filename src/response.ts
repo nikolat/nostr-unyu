@@ -616,10 +616,20 @@ const mode_fav = (event: NostrEvent): EventTemplate | null => {
 					]);
 					break;
 				case ':en_e:':
-					tags.push(['emoji', 'en_e', 'https://ompomz.github.io/docs/ene.webp']);
+					tags.push([
+						'emoji',
+						'en_e',
+						'https://ompomz.github.io/docs/ene.webp',
+						'30030:a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf:odaijini'
+					]);
 					break;
 				case ':yen_e:':
-					tags.push(['emoji', 'yen_e', 'https://ompomz.github.io/docs/yene.webp']);
+					tags.push([
+						'emoji',
+						'yen_e',
+						'https://ompomz.github.io/docs/yene.webp',
+						'30030:a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf:odaijini'
+					]);
 					break;
 				default:
 					break;
@@ -1879,12 +1889,14 @@ const showBanmen = (event: NostrEvent, data: Shogi): [string, string[][]] => {
 		...Array.from(emojiKubipaka).map((s) => [
 			'emoji',
 			s,
-			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`,
+			'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:kubipaca summer'
 		]),
 		...Array.from(emojiShogi).map((s) => [
 			'emoji',
 			`shogi_${s}`,
-			`https://nikolat.github.io/image/shogi/${s}.png`
+			`https://nikolat.github.io/image/shogi/${s}.png`,
+			'30030:6b0a60cff3eca5a2b2505ccb3f7133d8422045cbef40f3d2c6189fb0b952e7d4:shogi'
 		])
 	];
 	return [content, tags];
@@ -2269,17 +2281,20 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 						.replace('kubipaca_', 'kubipaca_summer_')
 						.replaceAll('kubipaca_summer_null', 'kubipaca_summer_empty')
 				: s,
-			`https://lokuyow.github.io/images/nostr/emoji/${isSummer ? 'kubipaca_summer' : s.endsWith('_gaming') ? 'kubipaca_gaming' : 'kubipaca'}/${isSummer ? s.replace('kubipaca_', 'kubipaca_summer_').replaceAll('kubipaca_summer_null', 'kubipaca_summer_empty') : s}.webp`
+			`https://lokuyow.github.io/images/nostr/emoji/${isSummer ? 'kubipaca_summer' : s.endsWith('_gaming') ? 'kubipaca_gaming' : 'kubipaca'}/${isSummer ? s.replace('kubipaca_', 'kubipaca_summer_').replaceAll('kubipaca_summer_null', 'kubipaca_summer_empty') : s}.webp`,
+			`30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:${isSummer ? 'kubipaca summer' : s.endsWith('_gaming') ? 'kubipaca gaming' : 'kubipaca'}`
 		]),
 		...Array.from(emoji_seigen).map((s) => [
 			'emoji',
 			s,
-			`https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/${s}.png`
+			`https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/${s}.png`,
+			'30030:e62f27d2814a25171c466d2d7612ad1a066db1362b4e259db5c076f9e6b21cb7:seigen-set'
 		]),
 		...Array.from(emoji_mono).map((s) => [
 			'emoji',
 			s,
-			`https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/${s}.webp`
+			`https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/${s}.webp`,
+			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:mono'
 		])
 	];
 	return [content, tags];
@@ -2370,42 +2385,73 @@ const res_slot = (event: NostrEvent): [string, string[][]] => {
 	].join('\n');
 	const tags = [
 		...getTagsReply(event),
-		...Array.from(imageEmojiMap.entries()).map((e) => ['emoji', e[0], e[1]]),
+		...Array.from(imageEmojiMap.entries()).map(
+			(e) => ['emoji', e[0], e[1]],
+			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:iroiro'
+		),
 		...emoji.map((s) => [
 			'emoji',
 			s,
-			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`,
+			'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:kubipaca summer'
 		])
 	];
 	return [content, tags];
 };
 
 const res_kerubenos = (event: NostrEvent): [string, string[][]] => {
-	const getKubi = (): [string, string] => {
-		const normal: Map<string, string> = new Map([
-			['nostopus_eating', 'https://awayuki.github.io/emoji/np-027.png'],
-			['kubipaca_kao', 'https://lokuyow.github.io/images/nostr/emoji/kubipaca/kubipaca_kao.webp'],
+	const getKubi = (): [string, [string, string]] => {
+		const normal: Map<string, [string, string]> = new Map([
+			[
+				'nostopus_eating',
+				[
+					'https://awayuki.github.io/emoji/np-027.png',
+					'30030:cd408a69cc6c737ca1a76efc3fa247c6ca53ec807f6e7c9574164164797e8162:Nostopus'
+				]
+			],
+			[
+				'kubipaca_kao',
+				[
+					'https://lokuyow.github.io/images/nostr/emoji/kubipaca/kubipaca_kao.webp',
+					'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:kubipaca'
+				]
+			],
 			[
 				'monopaca_kao',
-				'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/monopaka.webp'
+				[
+					'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/monopaka.webp',
+					'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:mono'
+				]
 			]
 		]);
-		const rare: Map<string, string> = new Map([
+		const rare: Map<string, [string, string]> = new Map([
 			[
 				'shining_tiger_close_up',
-				'https://raw.githubusercontent.com/shibayamap/Custom_emoji/main/tiger_close_up.webp'
+				[
+					'https://raw.githubusercontent.com/shibayamap/Custom_emoji/main/tiger_close_up.webp',
+					'30030:d947f9664226bd61d2791e57b9eda7ed6a863558f0ca5b633a57d665abf1c11f:hoshii-yatsu'
+				]
 			],
 			[
 				'monobeampaca_kao',
-				'https://image.nostr.build/b63e654b02d001c0f49a0a6d4b2a766215be1571709d7576f6fc238e9b21f572.png'
+				[
+					'https://image.nostr.build/b63e654b02d001c0f49a0a6d4b2a766215be1571709d7576f6fc238e9b21f572.png',
+					'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:mono'
+				]
 			],
-			['very_sad', 'https://i.floppy.media/d2a0f27fe29bbee7eb2a7abc669e25d1.png']
+			[
+				'very_sad',
+				[
+					'https://i.floppy.media/d2a0f27fe29bbee7eb2a7abc669e25d1.png',
+					'30030:b707d6be7fd9cc9e1aee83e81c3994156cfcf74ded5b09111930fdeeeb5a0c20:MatsudaiTalk™'
+				]
+			]
 		]);
 		const r = Math.floor(Math.random() * 10) === 0 ? rare : normal;
 		return Array.from(r)[Math.floor(Math.random() * r.size)];
 	};
-	const slot: [string, string][] = [getKubi(), getKubi(), getKubi()];
-	const headEmojiMap: Map<string, string> = new Map<string, string>(
+	const slot: [string, [string, string]][] = [getKubi(), getKubi(), getKubi()];
+	const headEmojiMap: Map<string, [string, string]> = new Map<string, [string, string]>(
 		slot.map((kubi) => [kubi[0], kubi[1]])
 	);
 	const emoji = [
@@ -2421,11 +2467,12 @@ const res_kerubenos = (event: NostrEvent): [string, string[][]] => {
 		`\n:${emoji[0]}::${emoji[1]}::${emoji[2]}:\n:${emoji[3]}::${emoji[4]}::${emoji[5]}:`;
 	const tags = [
 		...getTagsReply(event),
-		...Array.from(headEmojiMap.entries()).map((kubi) => ['emoji', kubi[0], kubi[1]]),
+		...Array.from(headEmojiMap.entries()).map((kubi) => ['emoji', kubi[0], kubi[1][0], kubi[1][1]]),
 		...emoji.map((s) => [
 			'emoji',
 			s,
-			`https://lokuyow.github.io/images/nostr/emoji/kubipaca/${s}.webp`
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca/${s}.webp`,
+			'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:kubipaca'
 		])
 	];
 	return [content, tags];
@@ -2451,7 +2498,12 @@ const res_tiger = (event: NostrEvent): [string, string[][]] => {
 	const content: string = `${tiger_shuffle[0]}${tiger_shuffle[1]}\n${tiger_shuffle[2]}${tiger_shuffle[3]}\n${tiger_shuffle[4]}${tiger_shuffle[5]}`;
 	const url_base = 'https://raw.githubusercontent.com/shibayamap/Custom_emoji/main/';
 	const tags: string[][] = [
-		...tigers.map((t) => ['emoji', t, `${url_base}${t}.webp`]),
+		...tigers.map((t) => [
+			'emoji',
+			t,
+			`${url_base}${t}.webp`,
+			'30030:d947f9664226bd61d2791e57b9eda7ed6a863558f0ca5b633a57d665abf1c11f:hoshii-yatsu'
+		]),
 		...getTagsReply(event)
 	];
 	return [content, tags];
@@ -2480,7 +2532,12 @@ const res_seigen = (event: NostrEvent): [string, string[][]] => {
 	const content: string = seigens_shuffle_for_content.join('');
 	const url_base = 'https://raw.githubusercontent.com/uchijo/my-emoji/main/seigen_set/';
 	const tags: string[][] = [
-		...seigens_shuffle.map((t) => ['emoji', t, `${url_base}${t}.png`]),
+		...seigens_shuffle.map((t) => [
+			'emoji',
+			t,
+			`${url_base}${t}.png`,
+			'30030:e62f27d2814a25171c466d2d7612ad1a066db1362b4e259db5c076f9e6b21cb7:seigen-set'
+		]),
 		...getTagsReply(event)
 	];
 	return [content, tags];
@@ -2500,7 +2557,12 @@ const res_akamimigame = (event: NostrEvent): [string, string[][]] => {
 	const content: string = kames_shuffle_for_content.join('');
 	const url_base = 'https://raw.githubusercontent.com/uchijo/my-emoji/main/kame_set/';
 	const tags: string[][] = [
-		...kames_shuffle.map((t) => ['emoji', t, `${url_base}${t}.png`]),
+		...kames_shuffle.map((t) => [
+			'emoji',
+			t,
+			`${url_base}${t}.png`,
+			'30030:e62f27d2814a25171c466d2d7612ad1a066db1362b4e259db5c076f9e6b21cb7:カメ'
+		]),
 		...getTagsReply(event)
 	];
 	return [content, tags];
@@ -2831,45 +2893,69 @@ const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
 };
 
 const res_kyomonan = (event: NostrEvent): [string, string[][]] => {
-	const emojiList: [string, string][] = [
+	const emojiList: [string, string, string][] = [
 		[
 			'nan',
-			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4d0bf4959bf1d2ff7ec4084a8d1c15ee4866a3c0189bb4f0930b60e93b79e8de.webp'
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/4d0bf4959bf1d2ff7ec4084a8d1c15ee4866a3c0189bb4f0930b60e93b79e8de.webp',
+			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:iroiro'
 		],
 		[
 			'nan_dato',
-			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/119812c7a9353ffb18c14b3bd6fbc8651a84072428fbb9ceab25c908b0c5eb7a.webp'
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/119812c7a9353ffb18c14b3bd6fbc8651a84072428fbb9ceab25c908b0c5eb7a.webp',
+			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:moji'
 		],
-		['nanii', 'https://images.kinoko.pw/drive/13b87a84-63fc-4696-858d-fc70ef8c68e8.webp'],
+		[
+			'nanii',
+			'https://images.kinoko.pw/drive/13b87a84-63fc-4696-858d-fc70ef8c68e8.webp',
+			'30030:2dd8b84b6ba6fc3bf6b128f6d839541b115a0b3f9954646ba5bd57059b9934d5:kinoko.pw'
+		],
 		[
 			'nanikaga_okashii',
-			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/3d777183918b973f0a21de446a73b22d6c88a94e3f006d404b331496a3698de5.webp'
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/3d777183918b973f0a21de446a73b22d6c88a94e3f006d404b331496a3698de5.webp',
+			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:moji'
 		],
 		[
 			'nanikore',
-			'https://images.kinoko.pw/drive/thumbnail-65564448-a167-4f19-b393-5f28771897f5.webp'
+			'https://images.kinoko.pw/drive/thumbnail-65564448-a167-4f19-b393-5f28771897f5.webp',
+			'30030:2dd8b84b6ba6fc3bf6b128f6d839541b115a0b3f9954646ba5bd57059b9934d5:kinoko.pw'
 		],
 		[
 			'nanimowakaranai',
-			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/811d6ef1c6a21b19296680dd21182c0ce11114482a6c448dc3be7aba13f337ed.webp'
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/811d6ef1c6a21b19296680dd21182c0ce11114482a6c448dc3be7aba13f337ed.webp',
+			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:moji'
 		],
-		['nanmoda', 'https://haniwar.com/emoji/akitaben/nanmoda.png'],
-		['nanmoya', 'https://haniwar.com/emoji/akitaben/nanmoya.png'],
+		[
+			'nanmoda',
+			'https://haniwar.com/emoji/akitaben/nanmoda.png',
+			'30030:f08a93704245801d7e5e6377f878e9c3ea2dfdf7419dc89efcf2b5d7a5f627d9:Akitaben'
+		],
+		[
+			'nanmoya',
+			'https://haniwar.com/emoji/akitaben/nanmoya.png',
+			'30030:f08a93704245801d7e5e6377f878e9c3ea2dfdf7419dc89efcf2b5d7a5f627d9:Akitaben'
+		],
 		[
 			'nannwaka',
-			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/65c01a324a2f6a1be1681d94064b50a14a83c84fd6d8c36b99db4eaf6a3516b3.webp'
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/65c01a324a2f6a1be1681d94064b50a14a83c84fd6d8c36b99db4eaf6a3516b3.webp',
+			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:moji'
 		],
 		[
 			'nantoka',
-			'https://cdn.nostrcheck.me/a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf/8cd387ad21474ecb772d6cb5491ca3b9879d1fcf077047fbb8cfcbb4d82754a1.webp'
+			'https://cdn.nostrcheck.me/a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf/8cd387ad21474ecb772d6cb5491ca3b9879d1fcf077047fbb8cfcbb4d82754a1.webp',
+			'30030:a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf:odaijini'
 		]
 	];
-	const [shortcode, url] = emojiList[Math.floor(Math.random() * emojiList.length)];
+	const [shortcode, url, address] = emojiList[Math.floor(Math.random() * emojiList.length)];
 	const content: string = `:kyomu::${shortcode}:`;
 	const tags: string[][] = [
 		...getTagsReply(event),
-		['emoji', 'kyomu', 'https://lokuyow.github.io/images/nostr/emoji/generalJP/kyomu.webp'],
-		['emoji', shortcode, url]
+		[
+			'emoji',
+			'kyomu',
+			'https://lokuyow.github.io/images/nostr/emoji/generalJP/kyomu.webp',
+			'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:generalJP'
+		],
+		['emoji', shortcode, url, address]
 	];
 	return [content, tags];
 };
@@ -2881,12 +2967,14 @@ const res_gogonan = (event: NostrEvent): [string, string[][]] => {
 		[
 			'emoji',
 			'gogo_chance',
-			'https://raw.githubusercontent.com/invertedtriangle358/images/main/EMOJI/%E3%82%B4%E3%83%BC%E3%82%B4%E3%83%BC%E3%83%81%E3%83%A3%E3%83%B3%E3%82%B9.png'
+			'https://raw.githubusercontent.com/invertedtriangle358/images/main/EMOJI/%E3%82%B4%E3%83%BC%E3%82%B4%E3%83%BC%E3%83%81%E3%83%A3%E3%83%B3%E3%82%B9.png',
+			'30030:7dc1677112f05eaf49547806543b1c006ce3257278e52b1c9abff63270ed704f:Nostr Japan meme'
 		],
 		[
 			'emoji',
 			'nantoka',
-			'https://cdn.nostrcheck.me/a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf/8cd387ad21474ecb772d6cb5491ca3b9879d1fcf077047fbb8cfcbb4d82754a1.webp'
+			'https://cdn.nostrcheck.me/a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf/8cd387ad21474ecb772d6cb5491ca3b9879d1fcf077047fbb8cfcbb4d82754a1.webp',
+			'30030:a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf:odaijini'
 		]
 	];
 	const res1: [string, string[][]] = [content1, tags1];
@@ -2910,11 +2998,27 @@ const res_yoshie = (event: NostrEvent): [string, string[][]] => {
 	const a: [string, string[][]][] = [
 		[
 			':yoshie:',
-			[...getTagsReply(event), ['emoji', 'yoshie', 'https://tac-lan.net/.well-known/yoshie.png']]
+			[
+				...getTagsReply(event),
+				[
+					'emoji',
+					'yoshie',
+					'https://tac-lan.net/.well-known/yoshie.png',
+					'30030:81bbb510f2a6ecb221d1df36219e37a63ce2372795b4cb14759c8cd8468799a6:moji pack'
+				]
+			]
 		],
 		[
 			':miyuki:',
-			[...getTagsReply(event), ['emoji', 'miyuki', 'https://tac-lan.net/.well-known/miyuki.png']]
+			[
+				...getTagsReply(event),
+				[
+					'emoji',
+					'miyuki',
+					'https://tac-lan.net/.well-known/miyuki.png',
+					'30030:81bbb510f2a6ecb221d1df36219e37a63ce2372795b4cb14759c8cd8468799a6:moji pack'
+				]
+			]
 		]
 	];
 	const i = Math.floor(Math.random() * a.length);
@@ -3104,7 +3208,8 @@ const res_tanzakunishite = (
 		emoji_tags.push([
 			'emoji',
 			emoji,
-			`https://lokuyow.github.io/images/nostr/emoji/hukidasi/${emoji}.webp`
+			`https://lokuyow.github.io/images/nostr/emoji/hukidasi/${emoji}.webp`,
+			'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:hukidasi'
 		]);
 	}
 	return [content, [...getTagsReply(event), ...emoji_tags]];
@@ -3159,7 +3264,8 @@ const res_slotnishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string
 		...emoji.map((s) => [
 			'emoji',
 			s,
-			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`,
+			'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:kubipaca summer'
 		]),
 		...emoji_tags
 	];
@@ -3299,7 +3405,12 @@ const getResEmojinishite = (text: string, tags: string[][]): [string, string[][]
 		emoji_tags.push(emojiTag);
 	}
 	for (const [k, v] of emojitaglist) {
-		emoji_tags.push(['emoji', k, v]);
+		emoji_tags.push([
+			'emoji',
+			k,
+			v,
+			'30030:81bbb510f2a6ecb221d1df36219e37a63ce2372795b4cb14759c8cd8468799a6:hiragana50'
+		]);
 	}
 	return [content, emoji_tags];
 };
@@ -4486,12 +4597,14 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			[
 				'emoji',
 				'tenshi_wing1',
-				'https://lokuyow.github.io/images/nostr/emoji/item/tenshi_wing1.webp'
+				'https://lokuyow.github.io/images/nostr/emoji/item/tenshi_wing1.webp',
+				'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:item'
 			],
 			[
 				'emoji',
 				'tenshi_wing2',
-				'https://lokuyow.github.io/images/nostr/emoji/item/tenshi_wing2.webp'
+				'https://lokuyow.github.io/images/nostr/emoji/item/tenshi_wing2.webp',
+				'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:item'
 			]
 		];
 	} else if (/出して[^るた]?$/u.test(event.content)) {
@@ -4501,7 +4614,8 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			[
 				'emoji',
 				'dora_te',
-				'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/te.webp'
+				'https://raw.githubusercontent.com/TsukemonoGit/TsukemonoGit.github.io/main/img/emoji/te.webp',
+				'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:mono'
 			]
 		];
 	} else if (/(積んで|重ねて)[^るた]?$/u.test(event.content)) {
@@ -4596,7 +4710,15 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			}
 			content += fire.repeat(n + 2);
 			if (fire === ':monocheer:') {
-				tags = [...tags, ['emoji', 'monocheer', 'https://i.imgur.com/mltgqxE.gif']];
+				tags = [
+					...tags,
+					[
+						'emoji',
+						'monocheer',
+						'https://i.imgur.com/mltgqxE.gif',
+						'30030:cbcb0e0b602ec3a9adfc6956bfbe3e2bc12379ee13bf8505ce45f1c831d2e52a:mono₍ ･ᴗ･ ₎emoji (by stok33)'
+					]
+				];
 			}
 		} else if (/詰んで[^るた]?$/u.test(event.content)) {
 			const n = count <= 1 ? 1 : count / len;
