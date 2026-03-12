@@ -2611,18 +2611,23 @@ const getEvents30030 = async (pubkey: string): Promise<NostrEvent[]> => {
 
 const res_imanokibun = async (event: NostrEvent): Promise<[string, string[][]]> => {
 	const events30030: NostrEvent[] = await getEvents30030(event.pubkey);
-	const emojiMap: Map<string, string> = new Map<string, string>();
+	const emojiMap: Map<string, [string, string]> = new Map<string, [string, string]>();
 	for (const ev30030 of events30030) {
 		for (const tag of ev30030.tags.filter(isEmojiTag)) {
-			emojiMap.set(tag[1], tag[2]);
+			const d: string | undefined = ev30030.tags
+				.find((tag) => tag.length >= 2 && tag[0] === 'd')
+				?.at(1);
+			if (d !== undefined) {
+				emojiMap.set(tag[1], [tag[2], `30030:${ev30030.pubkey}:${d}`]);
+			}
 		}
 	}
 	if (emojiMap.size === 0) {
 		return ['なんとも言えん気分やな', getTagsReply(event)];
 	}
-	const emojis: [string, string][] = Array.from(emojiMap.entries());
-	const emoji16: [string, string][] = [];
-	const eomji16Map: Map<string, string> = new Map<string, string>();
+	const emojis: [string, [string, string]][] = Array.from(emojiMap.entries());
+	const emoji16: [string, [string, string]][] = [];
+	const eomji16Map: Map<string, [string, string]> = new Map<string, [string, string]>();
 	for (let i = 0; i < 16; i++) {
 		const r = Math.floor(Math.random() * emojis.length);
 		emoji16.push(emojis[r]);
@@ -2637,7 +2642,7 @@ const res_imanokibun = async (event: NostrEvent): Promise<[string, string[][]]> 
 		)
 		.join('\n');
 	const tags: string[][] = [
-		...Array.from(eomji16Map.entries()).map((t) => ['emoji', t[0], t[1]]),
+		...Array.from(eomji16Map.entries()).map((t) => ['emoji', t[0], t[1][0], t[1][1]]),
 		...getTagsReply(event)
 	];
 	return [content, tags];
