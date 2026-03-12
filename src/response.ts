@@ -2385,10 +2385,12 @@ const res_slot = (event: NostrEvent): [string, string[][]] => {
 	].join('\n');
 	const tags = [
 		...getTagsReply(event),
-		...Array.from(imageEmojiMap.entries()).map(
-			(e) => ['emoji', e[0], e[1]],
+		...Array.from(imageEmojiMap.entries()).map((e) => [
+			'emoji',
+			e[0],
+			e[1],
 			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:iroiro'
-		),
+		]),
 		...emoji.map((s) => [
 			'emoji',
 			s,
