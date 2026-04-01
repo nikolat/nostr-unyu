@@ -369,6 +369,7 @@ const getResmap = (
 		[/きょもなん/, res_kyomonan],
 		[/(午後|ごご)なん/, res_gogonan],
 		[/(よしえ|みゆき)$/, res_yoshie],
+		[/ドライヤー|乾かして$/, res_dryer],
 		[/カレーの材料/, res_curry],
 		[/タツノオトシゴの絵文字/, res_tatsunootoshigo],
 		[/赤ちゃんの身長/, res_akachannoshincho],
@@ -3031,6 +3032,22 @@ const res_yoshie = (event: NostrEvent): [string, string[][]] => {
 	];
 	const i = Math.floor(Math.random() * a.length);
 	return a[i];
+};
+
+const res_dryer = (event: NostrEvent): [string, string[][]] => {
+	const r: [string, string[][]] = [
+		':colocolo:',
+		[
+			...getTagsReply(event),
+			[
+				'emoji',
+				'colocolo',
+				'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/014db72c2b23cdc1dabd380a3b2f2e1006a7a888a978428402158d5c03286d36.webp',
+				'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:iroiro'
+			]
+		]
+	];
+	return r;
 };
 
 const res_curry = (event: NostrEvent): [string, string[][]] => {
