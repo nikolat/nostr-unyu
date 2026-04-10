@@ -406,6 +406,7 @@ const getResmap = (
 		[/もじぴったん/, res_mojipittan],
 		[/わたあめ/, res_wataame],
 		[/うにみたい/, res_unimitai],
+		[/潜水艦/, res_sensuikan],
 		[/(びっちゃ|bitchat) [a-z0-9]{2,}$/i, res_bitchat],
 		[/時刻|時報|日時|何時/, res_jihou],
 		[/ログボ|ログインボーナス/, res_rogubo],
@@ -3600,6 +3601,16 @@ const res_unimitai = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const url = 'https://youtu.be/Chb0xKDTPQA';
+	content = url;
+	tags = getTagsReply(event);
+	tags.push(['r', url]);
+	return [content, tags];
+};
+
+const res_sensuikan = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://nighthawk.sabotenism.cc/n-depth/';
 	content = url;
 	tags = getTagsReply(event);
 	tags.push(['r', url]);
