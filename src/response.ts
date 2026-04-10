@@ -406,7 +406,7 @@ const getResmap = (
 		[/もじぴったん/, res_mojipittan],
 		[/わたあめ/, res_wataame],
 		[/うにみたい/, res_unimitai],
-		[/潜水艦/, res_sensuikan],
+		[/潜水艦|depth/, res_sensuikan],
 		[/(びっちゃ|bitchat) [a-z0-9]{2,}$/i, res_bitchat],
 		[/時刻|時報|日時|何時/, res_jihou],
 		[/ログボ|ログインボーナス/, res_rogubo],
