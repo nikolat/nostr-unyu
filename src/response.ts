@@ -681,17 +681,40 @@ const mode_zap = async (event: NostrEvent, signer: Signer): Promise<EventTemplat
 			created_at: event.created_at + 1
 		};
 	}
-	const amount = event9734.tags
+	const amount_str = event9734.tags
 		.find((tag: string[]) => tag.length >= 2 && tag[0] === 'amount')
 		?.at(1);
-	if (amount === undefined || !/^\d+$/.test(amount)) {
+	if (amount_str === undefined || !/^\d+$/.test(amount_str)) {
 		return null;
 	}
-	if (parseInt(amount) < 39 * 1000) {
+	const amount: number = parseInt(amount_str) / 1000;
+	if (amount < 39) {
 		return null;
+	}
+	if (event9734.pubkey === (await signer.getPublicKey())) {
+		return null;
+	}
+	//広告Zap
+	if (amount === 559) {
+		const shuffle = (array: string[]) => {
+			for (let i = array.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				[array[i], array[j]] = [array[j], array[i]];
+			}
+			return array;
+		};
+		const headerBase: string[] = ['今だけお得', 'Zap広告', '限定情報', '広告の品'];
+		const headers = ['#うにゅう広告', ...shuffle(headerBase).slice(0, 2)].map((t) => `【${t}】`);
+		const content = `${headers.join('')}\n\n${event9734.content}\n\nby nostr:${nip19.npubEncode(event9734.pubkey)}\n\n【⚡️559satsをうにゅうにZapで広告掲載⚡️】`;
+		return {
+			content,
+			kind: 1,
+			tags: [['t', 'うにゅう広告']],
+			created_at: event.created_at + 1
+		};
 	}
 	const zapEndPoint: string | null = await getZapEndPoint(event);
-	if (event9734.pubkey !== (await signer.getPublicKey()) && zapEndPoint !== null) {
+	if (zapEndPoint !== null) {
 		try {
 			await zapByNIP47(zapEndPoint, event9734, signer, 39, 'ありがとさん');
 		} catch (error) {
