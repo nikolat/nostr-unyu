@@ -906,7 +906,7 @@ const res_ohayo = async (
 		const mes = any([
 			'今日はこんなお得情報があるで',
 			'早起きのご褒美にええこと教えたるで',
-			'これ知っとったか？要チャックやな'
+			'これ知っとったか？要チェックやな'
 		]);
 		const content = `${mes}\n${quote}`;
 		tags.push(['q', eventKoukoku.id, koukokuRelay, eventKoukoku.pubkey]);
