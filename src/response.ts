@@ -31,6 +31,7 @@ const shogiRelay = 'wss://yabu.me/';
 const zapCheckRelay = 'wss://yabu.me/';
 const emojiSearchRelay = 'wss://yabu.me/';
 const followSearchRelay = 'wss://yabu.me/';
+const koukokuRelay = 'wss://yabu.me/';
 
 export const getResponseEvent = async (
 	requestEvent: NostrEvent,
@@ -362,6 +363,7 @@ const getResmap = (
 		[/バッジ$/, res_badge],
 		[/バッジを授与して/, res_others_badge],
 		[/最近の(アンケート|投票)/, res_resent_poll],
+		[/広告/, res_koukoku],
 		[/アンケート|投票/, res_poll],
 		[/まだ(助|たす)かる|マダガスカル/, res_madagasukaru],
 		[/いいスタート|イースター島/, res_iisutato],
@@ -2780,6 +2782,32 @@ const res_resent_poll = async (event: NostrEvent): Promise<[string, string[][]]>
 	const content = `${nevents.join('\n')}\n${pollUrl}`;
 	tags.push(...getTagsReply(event));
 	tags.push(['r', pollUrl]);
+	return [content, tags];
+};
+
+const res_koukoku = async (event: NostrEvent): Promise<[string, string[][]]> => {
+	const eventsKoukoku: NostrEvent[] = [];
+	const now = Math.floor(Date.now() / 1000);
+	const filter: Filter = {
+		kinds: [1],
+		authors: ['2bb2abbfc5892b7bda8f78d53682d913cc9a446b45e11929f0935d8fdfcb40bd'],
+		'#t': ['うにゅう広告'],
+		since: now - 24 * 60 * 60,
+		until: now,
+		limit: 5
+	};
+	await getEvents(koukokuRelay, [filter], (ev: NostrEvent) => {
+		eventsKoukoku.push(ev);
+	});
+	if (eventsKoukoku.length === 0) {
+		return ['最近のは見つからへん', getTagsReply(event)];
+	}
+	const eventKoukoku = eventsKoukoku[Math.floor(Math.random() * eventsKoukoku.length)];
+	const content = `nostr:${nip19.neventEncode({ ...eventKoukoku, author: eventKoukoku.pubkey, relays: [koukokuRelay] })}`;
+	const tags: string[][] = [
+		['q', eventKoukoku.id, koukokuRelay, eventKoukoku.pubkey],
+		...getTagsReply(event)
+	];
 	return [content, tags];
 };
 
