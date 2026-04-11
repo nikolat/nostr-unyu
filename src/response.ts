@@ -2821,9 +2821,9 @@ const getKoukoku = async (): Promise<NostrEvent | null> => {
 		kinds: [1],
 		authors: ['2bb2abbfc5892b7bda8f78d53682d913cc9a446b45e11929f0935d8fdfcb40bd'],
 		'#t': ['うにゅう広告'],
-		since: now - 24 * 60 * 60,
+		since: now - 3 * 24 * 60 * 60,
 		until: now,
-		limit: 5
+		limit: 30
 	};
 	await getEvents(koukokuRelay, [filter], (ev: NostrEvent) => {
 		eventsKoukoku.push(ev);
