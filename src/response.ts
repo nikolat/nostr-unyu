@@ -314,7 +314,11 @@ const getResmap = (
 ][] => {
 	const resmapNormal: [
 		RegExp,
-		(event: NostrEvent, mode: Mode, regstr: RegExp) => [string, string[][]] | null
+		(
+			event: NostrEvent,
+			mode: Mode,
+			regstr: RegExp
+		) => Promise<[string, string[][]]> | [string, string[][]] | null
 	][] = [
 		[/いいの?か?(？|\?)$/, res_iiyo],
 		[/\\e$/, res_enyee],
@@ -894,17 +898,29 @@ const res_ohayo = async (
 			}
 		}
 	}
-	return [
-		any([
-			'おはようやで',
-			'ほい、おはよう',
-			`もう${hour}時か、おはよう`,
-			'ワイの方が早起きやな',
-			'ほなワイは寝るわ',
-			'ぼちぼち起きる時間やな'
-		]),
-		getTagsReply(event)
+	const tags: string[][] = getTagsReply(event);
+	const eventKoukoku: NostrEvent | null = await getKoukoku();
+	const index = Math.floor(Math.random() * 10);
+	if (eventKoukoku !== null && index === 0) {
+		const quote = `nostr:${nip19.neventEncode({ ...eventKoukoku, author: eventKoukoku.pubkey, relays: [koukokuRelay] })}`;
+		const mes = any([
+			'今日はこんなお得情報があるで',
+			'早起きのご褒美にええこと教えたるで',
+			'これ知っとったか？要チャックやな'
+		]);
+		const content = `${mes}\n${quote}`;
+		tags.push(['q', eventKoukoku.id, koukokuRelay, eventKoukoku.pubkey]);
+		return [content, tags];
+	}
+	const mes = [
+		'おはようやで',
+		'ほい、おはよう',
+		`もう${hour}時か、おはよう`,
+		'ワイの方が早起きやな',
+		'ほなワイは寝るわ',
+		'ぼちぼち起きる時間やな'
 	];
+	return [any(mes), tags];
 };
 
 const getZapEndPoint = async (event: NostrEvent): Promise<string | null> => {
@@ -2786,6 +2802,19 @@ const res_resent_poll = async (event: NostrEvent): Promise<[string, string[][]]>
 };
 
 const res_koukoku = async (event: NostrEvent): Promise<[string, string[][]]> => {
+	const eventKoukoku: NostrEvent | null = await getKoukoku();
+	if (eventKoukoku === null) {
+		return ['最近のは見つからへん', getTagsReply(event)];
+	}
+	const content = `nostr:${nip19.neventEncode({ ...eventKoukoku, author: eventKoukoku.pubkey, relays: [koukokuRelay] })}`;
+	const tags: string[][] = [
+		['q', eventKoukoku.id, koukokuRelay, eventKoukoku.pubkey],
+		...getTagsReply(event)
+	];
+	return [content, tags];
+};
+
+const getKoukoku = async (): Promise<NostrEvent | null> => {
 	const eventsKoukoku: NostrEvent[] = [];
 	const now = Math.floor(Date.now() / 1000);
 	const filter: Filter = {
@@ -2800,15 +2829,10 @@ const res_koukoku = async (event: NostrEvent): Promise<[string, string[][]]> => 
 		eventsKoukoku.push(ev);
 	});
 	if (eventsKoukoku.length === 0) {
-		return ['最近のは見つからへん', getTagsReply(event)];
+		return null;
 	}
 	const eventKoukoku = eventsKoukoku[Math.floor(Math.random() * eventsKoukoku.length)];
-	const content = `nostr:${nip19.neventEncode({ ...eventKoukoku, author: eventKoukoku.pubkey, relays: [koukokuRelay] })}`;
-	const tags: string[][] = [
-		['q', eventKoukoku.id, koukokuRelay, eventKoukoku.pubkey],
-		...getTagsReply(event)
-	];
-	return [content, tags];
+	return eventKoukoku;
 };
 
 const res_poll = (event: NostrEvent): [string, string[][]] | null => {
@@ -4446,7 +4470,25 @@ const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 	return [content, tags];
 };
 
-const res_enyee = (event: NostrEvent, mode: Mode): [string, string[][]] => {
+const res_enyee = async (event: NostrEvent, mode: Mode): Promise<[string, string[][]]> => {
+	const index = Math.floor(Math.random() * 10);
+	if (index === 0) {
+		const eventKoukoku: NostrEvent | null = await getKoukoku();
+		if (eventKoukoku !== null) {
+			const quote = `nostr:${nip19.neventEncode({ ...eventKoukoku, author: eventKoukoku.pubkey, relays: [koukokuRelay] })}`;
+			const mes = any([
+				'そんなことより、これ知っとったか？',
+				'ご覧のスポンサーの提供でお送りしとるで',
+				'バズったので宣伝するで'
+			]);
+			const content = `${mes}\n${quote}`;
+			const tags: string[][] = [
+				...getTagsReply(event),
+				['q', eventKoukoku.id, koukokuRelay, eventKoukoku.pubkey]
+			];
+			return [content, tags];
+		}
+	}
 	let content: string;
 	let tags: string[][];
 	content = '\\s[10]えんいー';
