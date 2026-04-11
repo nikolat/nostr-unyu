@@ -2379,6 +2379,14 @@ const res_slot = (event: NostrEvent): [string, string[][]] => {
 		[
 			'kinkai',
 			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/3a0145f9259f9b06d6e106f58913e8c4dca7c0336618b244c2fb3f777f55f276.webp'
+		],
+		[
+			'nattou',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/3d8ab90518ff02d786b6cc4375acf7a502cf2c9917920988ad1b812e23b933f1.webp'
+		],
+		[
+			'nattou2',
+			'https://share.yabu.me/84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5/1544dbfe75f66ff6bf71b6ded2e0edd7150ac3bd082f14d8a9a37c03317ca40b.webp'
 		]
 	];
 	const shuffle = (array: [string, string][]) => {
