@@ -550,8 +550,8 @@ const mode_reply = async (event: NostrEvent, signer: Signer): Promise<EventTempl
 			};
 		}
 	}
-	let content;
-	let tags;
+	let content: string | undefined;
+	let tags: string[][] | undefined;
 	let created_at_res = event.created_at + 1;
 	if (event.tags.some((tag: string[]) => tag[0] === 't' && tag[1] === 'ぬるぽが生成画像')) {
 		const quote = event.kind === 1 ? nip19.noteEncode(event.id) : nip19.neventEncode(event);
@@ -568,8 +568,24 @@ const mode_reply = async (event: NostrEvent, signer: Signer): Promise<EventTempl
 			tags = getTagsReply(event);
 		}
 	} else {
-		content = '\\s[10]えんいー';
-		tags = getTagsAirrep(event);
+		const n = Math.floor(Math.random() * 10);
+		if (n === 0) {
+			const eventKoukoku: NostrEvent | null = await getKoukoku();
+			if (eventKoukoku !== null) {
+				const quote = `nostr:${nip19.neventEncode({ ...eventKoukoku, author: eventKoukoku.pubkey, relays: [koukokuRelay] })}`;
+				const mes = any([
+					'そんなことより、これ知っとったか？',
+					'ご覧のスポンサーの提供でお送りしとるで',
+					'バズったので宣伝するで'
+				]);
+				content = `${mes}\n${quote}`;
+				tags = [...getTagsReply(event), ['q', eventKoukoku.id, koukokuRelay, eventKoukoku.pubkey]];
+			}
+		}
+		if (content === undefined || tags === undefined) {
+			content = '\\s[10]えんいー';
+			tags = getTagsAirrep(event);
+		}
 	}
 	return { content, kind: event.kind, tags, created_at: created_at_res };
 };
@@ -4471,24 +4487,6 @@ const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 };
 
 const res_enyee = async (event: NostrEvent, mode: Mode): Promise<[string, string[][]]> => {
-	const index = Math.floor(Math.random() * 10);
-	if (index === 0) {
-		const eventKoukoku: NostrEvent | null = await getKoukoku();
-		if (eventKoukoku !== null) {
-			const quote = `nostr:${nip19.neventEncode({ ...eventKoukoku, author: eventKoukoku.pubkey, relays: [koukokuRelay] })}`;
-			const mes = any([
-				'そんなことより、これ知っとったか？',
-				'ご覧のスポンサーの提供でお送りしとるで',
-				'バズったので宣伝するで'
-			]);
-			const content = `${mes}\n${quote}`;
-			const tags: string[][] = [
-				...getTagsReply(event),
-				['q', eventKoukoku.id, koukokuRelay, eventKoukoku.pubkey]
-			];
-			return [content, tags];
-		}
-	}
 	let content: string;
 	let tags: string[][];
 	content = '\\s[10]えんいー';
