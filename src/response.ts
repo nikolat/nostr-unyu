@@ -703,21 +703,17 @@ const mode_zap = async (event: NostrEvent, signer: Signer): Promise<EventTemplat
 			created_at: event.created_at + 1
 		};
 	}
-	const amount_str = event9734.tags
-		.find((tag: string[]) => tag.length >= 2 && tag[0] === 'amount')
-		?.at(1);
-	if (amount_str === undefined || !/^\d+$/.test(amount_str)) {
-		return null;
-	}
-	const amount: number = parseInt(amount_str) / 1000;
-	if (amount < 39) {
+	const sats = nip57.getSatoshisAmountFromBolt11(
+		event.tags.find((tag) => tag.length >= 2 && tag[0] === 'bolt11')?.at(1) ?? ''
+	);
+	if (sats < 39) {
 		return null;
 	}
 	if (event9734.pubkey === (await signer.getPublicKey())) {
 		return null;
 	}
 	//広告Zap
-	if (amount === 559) {
+	if (sats === 559) {
 		const shuffle = (array: string[]) => {
 			for (let i = array.length - 1; i > 0; i--) {
 				const j = Math.floor(Math.random() * (i + 1));
