@@ -413,6 +413,7 @@ const getResmap = (
 		[/わたあめ/, res_wataame],
 		[/うにみたい/, res_unimitai],
 		[/潜水艦|depth/, res_sensuikan],
+		[/マイニング|キーマイナー/, res_mining],
 		[/(びっちゃ|bitchat) [a-z0-9]{2,}$/i, res_bitchat],
 		[/時刻|時報|日時|何時/, res_jihou],
 		[/ログボ|ログインボーナス/, res_rogubo],
@@ -3707,6 +3708,16 @@ const res_sensuikan = (event: NostrEvent): [string, string[][]] => {
 	let tags: string[][];
 	const url = 'https://nighthawk.sabotenism.cc/n-depth/';
 	content = `${url}\n200000点以上がボーダーやで`;
+	tags = getTagsReply(event);
+	tags.push(['r', url]);
+	return [content, tags];
+};
+
+const res_mining = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://nighthawk.sabotenism.cc/nostr/miner';
+	content = url;
 	tags = getTagsReply(event);
 	tags.push(['r', url]);
 	return [content, tags];
