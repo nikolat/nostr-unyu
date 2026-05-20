@@ -3705,8 +3705,8 @@ const res_unimitai = (event: NostrEvent): [string, string[][]] => {
 const res_sensuikan = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
-	const url = 'https://nighthawk.sabotenism.cc/n-depth/\n200000点以上がボーダーやで';
-	content = url;
+	const url = 'https://nighthawk.sabotenism.cc/n-depth/';
+	content = `${url}\n200000点以上がボーダーやで`;
 	tags = getTagsReply(event);
 	tags.push(['r', url]);
 	return [content, tags];
