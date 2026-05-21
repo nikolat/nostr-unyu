@@ -461,7 +461,10 @@ const getResmap = (
 		[/(ノス|のす)貢献.*(を?呼んで|どこ).?$/iu, res_nostr_contribution],
 		[/(chronostr|ちょろのす)(を?呼んで|どこ).?$/iu, res_chronostr],
 		[/((タイムライン|TL)(遡る|振り返る)やつ)|(nosaray|のさらい)(を?呼んで|どこ).?$/iu, res_nosaray],
-		[/(togetter|トゥギャッター|nosli|のすり|ノスリ|まとめっ?たー)(を?呼んで|どこ).?$/iu, res_nosli],
+		[
+			/(togetter|トゥギャッター|nosli|のすり|ノスリ|まとめ(っ?たー)?)(を?呼んで|どこ).?$/iu,
+			res_nosli
+		],
 		[/DM.*(を?呼んで|どこ).?$/iu, res_dm],
 		[/Zap.*(を?呼んで|どこ).?$/iu, res_zap],
 		[/おいくら(サッツ|さっつ|sats).*(を?呼んで|どこ).?$/iu, res_oikurasats],
