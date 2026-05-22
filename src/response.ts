@@ -2590,7 +2590,13 @@ const res_bear = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_egg = (event: NostrEvent): [string, string[][]] => {
-	const content: string = any(['🐣', '🍳']);
+	const getRandomString = (n: number): string => {
+		const str = Array.from(
+			'🐣🍳🐂🐜🦇🐛🦉🐏🐀🐻🐦🐗🦀🦌🦤🦆🐟🐸🐐🦭🦢🐺🪱🦅🐨🦙🦦🦈🦨🦥🐍🦑🐱🐶🐷🦡🦫🐈🐕🐉🦎🐒🦜🐖🦐🕷️🦃🐢🐔🦗🦍🐹🐆🦞🐙🦚🐧🦝🐓🐑🐝🐴🐭🐌🐯🐡🐿️🐘🦩🦊🦔🦘🦟🐽🐩🦕🦂🦖🐰🦋🐊🦮🦁🐁🦧🐅🐋🐮🐾🐳🐤🐄'
+		);
+		return [...Array(n)].map((_) => str.at(Math.floor(Math.random() * str.length))).join('');
+	};
+	const content: string = getRandomString(1);
 	const tags: string[][] = getTagsReply(event);
 	return [content, tags];
 };
