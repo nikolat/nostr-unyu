@@ -359,6 +359,7 @@ const getResmap = (
 		[/ケルベ[ロノ]ス/, res_kerubenos],
 		[/タイガー|🐯|🐅/u, res_tiger],
 		[/クマダス|🐻/u, res_bear],
+		[/🥚/u, res_egg],
 		[/俺達に制限/, res_seigen],
 		[/ミシシッピアカミミガメ/, res_akamimigame],
 		[/(今|いま)の(気分|きぶん)/, res_imanokibun],
@@ -2585,6 +2586,12 @@ const res_bear = (event: NostrEvent): [string, string[][]] => {
 	const url = 'https://kumadas.net/';
 	content = url;
 	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
+};
+
+const res_egg = (event: NostrEvent): [string, string[][]] => {
+	const content: string = any(['🐣', '🍳']);
+	const tags: string[][] = getTagsReply(event);
 	return [content, tags];
 };
 
