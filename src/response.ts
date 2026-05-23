@@ -442,6 +442,7 @@ const getResmap = (
 		[/(ブクマ|ブックマーク|口寄せ|クチヨセ|kuchiyose)(を?呼んで|どこ).?$/iu, res_kuchiyose],
 		[/(ハイク|はいく)(を?呼んで|どこ).?$/u, res_haiku],
 		[/(るみるみ|ルミルミ|lumilumi|もの(さん)?のクライアント)(を?呼んで|どこ).?$/iu, res_lumilumi],
+		[/ものツールズ?(を?呼んで|どこ).?$/iu, res_monotools],
 		[/(長文エディタ|まきもの|マキモノ|巻物|MAKIMONO)(を?呼んで|どこ).?$/iu, res_makimono],
 		[/検索(を?呼んで|どこ).?$/u, res_kensaku],
 		[/麻雀(を?呼んで|どこ).?$/u, res_mahojng],
@@ -3936,6 +3937,20 @@ const res_lumilumi = (event: NostrEvent): [string, string[][]] => {
 	const url = 'https://lumilumi.app/';
 	content = url;
 	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
+};
+
+const res_monotools = (event: NostrEvent): [string, string[][]] => {
+	const content: string =
+		'nostr:naddr1qvzqqqr4gupzpp9sc34tdxdvxh4jeg5xgu9ctcypmvsg0n00vwfjydkrjaqh0qh4qy88wumn8ghj77tpvf6jumt99uq3uamnwvaz7tmwwfjkccte9448qtnr94ehgetvd3shytnwv46z7qgjwaehxw309auzu6m0df5hycfwd9hj7qq2d4hkumedw3hk7mrnsapvtr';
+	const tags: string[][] = [
+		...getTagsReply(event),
+		[
+			'q',
+			'30023:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:mono-tools',
+			'wss://yabu.me/'
+		]
+	];
 	return [content, tags];
 };
 
