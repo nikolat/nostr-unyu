@@ -3771,7 +3771,7 @@ const res_jihou = (event: NostrEvent): [string, string[][]] => {
 };
 
 const res_jikyuu = (event: NostrEvent): [string, string[][]] => {
-	const jikyuu: number = Math.floor(Math.random() * 100) + Math.floor(Math.random() * 100) * 10;
+	const jikyuu: number = (Math.floor(Math.random() * 100) + Math.floor(Math.random() * 100)) * 10;
 	const content: string = `${jikyuu}円${any(['やで', 'やな', 'ってとこやな'])}`;
 	const tags = getTagsReply(event);
 	return [content, tags];
