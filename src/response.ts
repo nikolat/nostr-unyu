@@ -417,6 +417,7 @@ const getResmap = (
 		[/マイニング|キーマイナー/, res_mining],
 		[/(びっちゃ|bitchat) [a-z0-9]{2,}$/i, res_bitchat],
 		[/時刻|時報|日時|何時/, res_jihou],
+		[/時給/, res_jikyuu],
 		[/ログボ|ログインボーナス/, res_rogubo],
 		[/あなたの合計ログイン回数は(\d+)回です。/, res_get_rogubo],
 		[/(もらって|あげる|どうぞ).?$/u, res_ageru],
@@ -3766,6 +3767,13 @@ const res_jihou = (event: NostrEvent): [string, string[][]] => {
 	];
 	content = `${year}年${month}月${day}日 ${hour}時${minutes}分${seconds}秒 ${week}曜日やで`;
 	tags = getTagsReply(event);
+	return [content, tags];
+};
+
+const res_jikyuu = (event: NostrEvent): [string, string[][]] => {
+	const jikyuu: number = Math.floor(Math.random() * 100) + Math.floor(Math.random() * 100) * 10;
+	const content: string = `${jikyuu}円${any(['やで', 'やな', 'ってとこやな'])}`;
+	const tags = getTagsReply(event);
 	return [content, tags];
 };
 
