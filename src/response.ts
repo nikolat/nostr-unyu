@@ -4141,7 +4141,7 @@ const res_nosaray = (event: NostrEvent): [string, string[][]] => {
 const res_nosli = (event: NostrEvent): [string, string[][]] => {
 	const url1 = 'https://nosli.vercel.app/';
 	const url2 = 'https://koteitan.github.io/nosli/';
-	const url3 = 'https://naczuki.github.io/matometr/';
+	const url3 = 'https://matometr.naczuki.workers.dev/';
 	const urls = [url1, url2, url3];
 	const content: string = urls.join('\n');
 	const tags: string[][] = [...getTagsReply(event), ...urls.map((url) => ['r', url])];
