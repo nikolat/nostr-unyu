@@ -4198,8 +4198,8 @@ const res_emoji = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const url1 = 'https://nostr-emoji-edit.uchijo.com/';
-	const url2 = 'https://emojito.meme/';
-	content = `絵文字コネコネ\n${url1}\nEmojito\n${url2}`;
+	const url2 = 'https://hayabu1231.github.io/NosMoji-Library/';
+	content = `絵文字コネコネ\n${url1}\nNosMoji Library\n${url2}`;
 	tags = [...getTagsReply(event), ['r', url1], ['r', url2]];
 	return [content, tags];
 };
