@@ -4200,7 +4200,7 @@ const res_emoji = (event: NostrEvent): [string, string[][]] => {
 	const url1 = 'https://nostr-emoji-edit.uchijo.com/';
 	const url2 = 'https://hayabu1231.github.io/NosMoji-Library/';
 	const url3 = 'https://ngrid-art.mono3.workers.dev/';
-	content = `絵文字コネコネ\n${url1}\nNosMoji Library\n${url2}\nNostr Grid Art${url3}`;
+	content = `絵文字コネコネ\n${url1}\nNosMoji Library\n${url2}\nNostr Grid Art\n${url3}`;
 	tags = [...getTagsReply(event), ['r', url1], ['r', url2], ['r', url3]];
 	return [content, tags];
 };
