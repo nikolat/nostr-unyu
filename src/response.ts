@@ -738,7 +738,7 @@ const mode_zap = async (event: NostrEvent, signer: Signer): Promise<EventTemplat
 			created_at: event.created_at + 1
 		};
 	}
-	const zapEndPoint: string | null = await getZapEndPoint(event);
+	const zapEndPoint: string | null = await getZapEndPoint(event9734);
 	if (zapEndPoint !== null) {
 		try {
 			await zapByNIP47(zapEndPoint, event9734, signer, 39, 'ありがとさん');
