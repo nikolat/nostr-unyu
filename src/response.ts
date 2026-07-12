@@ -453,6 +453,7 @@ const getResmap = (
 		[/削除.*(を?呼んで|どこ).?$/iu, res_deletion_tool],
 		[/(status|ステータス).*(を?呼んで|どこ).?$/iu, res_status],
 		[/(flappy|フラッピー|ふらっぴー)(を?呼んで|どこ).?$/iu, res_flappy],
+		[/天和ガチャ(を?呼んで|どこ).?$/iu, res_tenhogacha],
 		[/やぶみ(ちゃ)?ん?(を?呼んで|どこ).?$/u, res_yabumin],
 		[/ぬるぽが?(を?呼んで|どこ).?$/u, res_nurupoga],
 		[/うにゅう(を?呼んで|どこ).?$/u, res_unyu],
@@ -4050,6 +4051,15 @@ const res_flappy = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const url = 'https://flappy-nostrich.vercel.app/';
+	content = url;
+	tags = [...getTagsReply(event), ['r', url]];
+	return [content, tags];
+};
+
+const res_tenhogacha = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://snowcait.github.io/tenhou-gacha/';
 	content = url;
 	tags = [...getTagsReply(event), ['r', url]];
 	return [content, tags];
