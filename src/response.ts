@@ -4831,7 +4831,7 @@ const res_fire = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, strin
 			]
 		];
 	} else if (/(積んで|重ねて)[^るた]?$/u.test(event.content)) {
-		content = `${text}\n`.repeat(3);
+		content = `${text}\n${text}\n${text}`;
 	} else if (/増やして[^るた]?$/u.test(event.content)) {
 		content = text.repeat(3);
 	} else {
