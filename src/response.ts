@@ -412,6 +412,7 @@ const getResmap = (
 		[/ゴムまり$/, res_gomumari],
 		[/もじぴったん/, res_mojipittan],
 		[/わたあめ/, res_wataame],
+		[/(ドーナツ|どーなつ)$/, res_donuts],
 		[/うにみたい/, res_unimitai],
 		[/潜水艦|depth/, res_sensuikan],
 		[/マイニング|キーマイナー/, res_mining],
@@ -3706,6 +3707,16 @@ const res_wataame = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const url = 'https://youtu.be/cUcq518Kc2I';
+	content = url;
+	tags = getTagsReply(event);
+	tags.push(['r', url]);
+	return [content, tags];
+};
+
+const res_donuts = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url = 'https://youtube.com/shorts/A-ob82CfdKc';
 	content = url;
 	tags = getTagsReply(event);
 	tags.push(['r', url]);
