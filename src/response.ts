@@ -3558,7 +3558,7 @@ const getResEmojinishite = (text: string, tags: string[][]): [string, string[][]
 };
 
 const isEmojiTag = (tag: string[]) =>
-	tag.length >= 3 && tag[0] === 'emoji' && /^\w+$/.test(tag[1]) && URL.canParse(tag[2]);
+	tag.length >= 3 && tag[0] === 'emoji' && /^[\w-]+$/.test(tag[1]) && URL.canParse(tag[2]);
 
 const res_cwnishite = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
 	const match = event.content.match(regstr);
