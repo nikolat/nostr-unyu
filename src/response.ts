@@ -266,6 +266,7 @@ const isAllowedToPost = (event: NostrEvent) => {
 		'c8d5c2709a5670d6f621ac8020ac3e4fc3057a4961a15319f7c0818309407723', //Nostr麻雀開発部
 		'5b0703f5add2bb9e636bcae1ef7870ba6a591a93b6b556aca0f14b0919006598', //₍ ﾃｽﾄ ₎
 		'addfe50481fb4edcf4ca42faaf0fa28e4b4caa36409f37f0cf0c1c6bf4acb3b5', //ノスハイクのテスト
+		'7f5475b40ce3350e161c24d7cea37ffd2c291c71e9118df5ec7395822c1f6302', //さびれたスナック
 		'e3e2fef762933fb7d4dd59d215a9616911d958cbf0ae0401cbf9b1a9764d2915' //おはよう
 	];
 	const disallowedNpubs = [
