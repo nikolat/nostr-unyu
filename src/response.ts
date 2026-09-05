@@ -1029,15 +1029,7 @@ const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
 
 type Teban = 'sente' | 'gote';
 type KomaNarazu =
-	| 'pawn'
-	| 'lance'
-	| 'knight'
-	| 'silver'
-	| 'gold'
-	| 'bishop'
-	| 'rook'
-	| 'king'
-	| 'king2';
+	'pawn' | 'lance' | 'knight' | 'silver' | 'gold' | 'bishop' | 'rook' | 'king' | 'king2';
 type KomaNari = 'prom_pawn' | 'prom_lance' | 'prom_knight' | 'prom_silver' | 'horse' | 'dragon';
 
 type Shogi = {
