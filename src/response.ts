@@ -3001,7 +3001,7 @@ const res_bingo = async (event: NostrEvent): Promise<[string, string[][]]> => {
 		);
 	}
 	let a = ['kubi_uemigi', 'kubi_yoko'];
-	for (let j = 0; j < sizeBingo; j++) {
+	for (let j = 0; j < sizeBingo - 1; j++) {
 		a.push('kubi_gyakuT', 'kubi_yoko');
 	}
 	a.push('kubi_uehidari');
