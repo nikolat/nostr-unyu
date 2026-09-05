@@ -2976,14 +2976,14 @@ const res_bingo = async (event: NostrEvent): Promise<[string, string[][]]> => {
 		if (isFirstLine) {
 			isFirstLine = false;
 			a = ['kubi_migisita', 'kubi_yoko'];
-			for (let j = 0; j < sizeBingo; j++) {
+			for (let j = 0; j < sizeBingo - 1; j++) {
 				a.push('kubi_T', 'kubi_yoko');
 			}
 			a.push('kubi_hidarisita');
 			a = a.map((e) => `kubipaca_summer_${e}`);
 		} else {
 			a = ['kubi_hidariT', 'kubi_yoko'];
-			for (let j = 0; j < sizeBingo; j++) {
+			for (let j = 0; j < sizeBingo - 1; j++) {
 				a.push('kubi_juji', 'kubi_yoko');
 			}
 			a.push('kubi_migiT');
@@ -3010,9 +3010,12 @@ const res_bingo = async (event: NostrEvent): Promise<[string, string[][]]> => {
 		emojiKubipaka.add(e);
 	}
 	contentArray.push(a.map((e) => `:${e}:`).join(''));
-	const content: string = contentArray.join('\n');
+	const content: string =
+		contentArray.join('\n') +
+		`\nnostr:${nip19.neventEncode({ ...pollEvent, author: pollEvent.pubkey, relays: [pollRelays[0]] })}`;
 	const tags = [
 		...getTagsReply(event),
+		['q', pollEventId, pollRelays[0], pollEvent.pubkey],
 		...Array.from(emojiKubipaka).map((s) => [
 			'emoji',
 			s,
