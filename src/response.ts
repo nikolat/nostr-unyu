@@ -371,6 +371,7 @@ const getResmap = (
 		[/最近の(アンケート|投票)/, res_resent_poll],
 		[/広告/, res_koukoku],
 		[/アンケート|投票/, res_poll],
+		[/ビンゴ$/, res_bingo],
 		[/まだ(助|たす)かる|マダガスカル/, res_madagasukaru],
 		[/いいスタート|イースター島/, res_iisutato],
 		[/占って|占い/, res_uranai],
@@ -2920,6 +2921,111 @@ const getPollEventTemplate = (event: NostrEvent, relaysToWrite: string[]): Event
 		created_at: event.created_at + 1
 	};
 	return pollEvent;
+};
+
+const res_bingo = async (event: NostrEvent): Promise<[string, string[][]]> => {
+	const voteEvent: NostrEvent | undefined = await getEvent(pollRelays[0], [
+		{ kinds: [1018], authors: [event.pubkey], limit: 1 }
+	]);
+	if (voteEvent === undefined) {
+		return ['投票が見つからへん', getTagsReply(event)];
+	}
+	const pollEventId: string | undefined = voteEvent.tags
+		.find((tag) => tag.length >= 2 && tag[0] === 'e')
+		?.at(1);
+	if (pollEventId === undefined) {
+		return ['投票先が書いてへん', getTagsReply(event)];
+	}
+	const pollEvent: NostrEvent | undefined = await getEvent(pollRelays[0], [{ ids: [pollEventId] }]);
+	if (pollEvent === undefined) {
+		return ['投票先が見つからへん', getTagsReply(event)];
+	}
+	const itemsMap: Map<string, String> = new Map<string, string>(
+		pollEvent.tags
+			.filter((tag) => tag.length >= 3 && tag[0] === 'option')
+			.map((tag) => [tag[1], tag[2]])
+	);
+	const items: string[] = Array.from(itemsMap.keys()).slice(0, 9);
+	const voteKeys: string[] = voteEvent.tags
+		.filter((tag) => tag.length >= 2 && tag[0] === 'response')
+		.map((tag) => tag[1]);
+
+	const sizeBingo = 3;
+	const lines: string[][] = [];
+	for (let i = 0; i < sizeBingo; i++) {
+		const line: string[] = [];
+		for (let j = 0; j < sizeBingo; j++) {
+			const n = 3 * i + j;
+			if (voteKeys.includes(items[n])) {
+				line.push(`${n + 1}`);
+			} else {
+				line.push('');
+			}
+		}
+		lines.push(line);
+	}
+	const emojiKubipaka: Set<string> = new Set<string>();
+	const emojiBingo: Set<string> = new Set<string>();
+	let contentArray: string[] = [];
+	let isFirstLine: boolean = true;
+	for (let i = 0; i < sizeBingo; i++) {
+		const line = lines[i];
+		let a: string[];
+		if (isFirstLine) {
+			isFirstLine = false;
+			a = ['kubi_migisita', 'kubi_yoko'];
+			for (let j = 0; j < sizeBingo; j++) {
+				a.push('kubi_T', 'kubi_yoko');
+			}
+			a.push('kubi_hidarisita');
+			a = a.map((e) => `kubipaca_summer_${e}`);
+		} else {
+			a = ['kubi_hidariT', 'kubi_yoko'];
+			for (let j = 0; j < sizeBingo; j++) {
+				a.push('kubi_juji', 'kubi_yoko');
+			}
+			a.push('kubi_migiT');
+			a = a.map((e) => `kubipaca_summer_${e}`);
+		}
+		for (const e of a) {
+			emojiKubipaka.add(e);
+		}
+		for (const e of line.filter((e) => e.length > 0)) {
+			emojiBingo.add(e);
+		}
+		contentArray.push(a.map((e) => `:${e}:`).join(''));
+		contentArray.push(
+			`:kubipaca_summer_kubi:${line.map((e) => (e === '' ? ':kubipaca_summer_empty:' : `:hira_40${e}_${e}:`)).join(':kubipaca_summer_kubi:')}:kubipaca_summer_kubi:`
+		);
+	}
+	let a = ['kubi_uemigi', 'kubi_yoko'];
+	for (let j = 0; j < sizeBingo; j++) {
+		a.push('kubi_gyakuT', 'kubi_yoko');
+	}
+	a.push('kubi_uehidari');
+	a = a.map((e) => `kubipaca_summer_${e}`);
+	for (const e of a) {
+		emojiKubipaka.add(e);
+	}
+	contentArray.push(a.map((e) => `:${e}:`).join(''));
+	const content: string = contentArray.join('\n');
+	const tags = [
+		...getTagsReply(event),
+		...Array.from(emojiKubipaka).map((s) => [
+			'emoji',
+			s,
+			`https://lokuyow.github.io/images/nostr/emoji/kubipaca_summer/${s}.webp`,
+			'30030:ec42c765418b3db9c85abff3a88f4a3bbe57535eebbdc54522041fa5328c0600:kubipaca summer'
+		]),
+		...Array.from(emojiBingo).map((s) => [
+			'emoji',
+			`hira_40${s}_${s}`,
+			`https://tac-lan.net/.well-known/hiragana/hira_40${s}_${s}.png`,
+			'30030:81bbb510f2a6ecb221d1df36219e37a63ce2372795b4cb14759c8cd8468799a6:hiragana50'
+		])
+	];
+	tags.push(...getTagsReply(event));
+	return [content, tags];
 };
 
 const res_madagasukaru = (event: NostrEvent): [string, string[][]] => {
