@@ -2965,6 +2965,8 @@ const res_bingo = async (event: NostrEvent): Promise<[string, string[][]]> => {
 		lines.push(line);
 	}
 	const emojiKubipaka: Set<string> = new Set<string>();
+	emojiKubipaka.add('kubipaca_summer_kubi');
+	emojiKubipaka.add('kubipaca_summer_empty');
 	const emojiBingo: Set<string> = new Set<string>();
 	let contentArray: string[] = [];
 	let isFirstLine: boolean = true;
@@ -3024,7 +3026,6 @@ const res_bingo = async (event: NostrEvent): Promise<[string, string[][]]> => {
 			'30030:81bbb510f2a6ecb221d1df36219e37a63ce2372795b4cb14759c8cd8468799a6:hiragana50'
 		])
 	];
-	tags.push(...getTagsReply(event));
 	return [content, tags];
 };
 
