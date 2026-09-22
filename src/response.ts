@@ -290,6 +290,8 @@ const isAllowedToPost = (event: NostrEvent) => {
 		} else {
 			throw new TypeError('root is not found');
 		}
+	} else if (event.kind === 1111) {
+		return true;
 	} else if (event.kind === 9735) {
 		return true;
 	} else if (event.kind === 20000) {
