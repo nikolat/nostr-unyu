@@ -5088,29 +5088,46 @@ const getTagsAirrep = (event: NostrEvent): string[][] => {
 
 const getTagsReply = (event: NostrEvent, addPTag: boolean = true): string[][] => {
 	const tagsReply: string[][] = [];
-	const tagRoot = event.tags.find(
-		(tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root'
-	);
-	if (tagRoot !== undefined) {
-		tagsReply.push(tagRoot);
-		tagsReply.push(['e', event.id, '', 'reply', event.pubkey]);
-	} else {
-		tagsReply.push(['e', event.id, '', 'root', event.pubkey]);
-	}
-	if (addPTag) {
-		for (const tag of event.tags.filter(
-			(tag: string[]) => tag.length >= 2 && tag[0] === 'p' && tag[1] !== event.pubkey
-		)) {
+	if ([1, 42, 20000].includes(event.kind)) {
+		const tagRoot = event.tags.find(
+			(tag: string[]) => tag.length >= 4 && tag[0] === 'e' && tag[3] === 'root'
+		);
+		if (tagRoot !== undefined) {
+			tagsReply.push(tagRoot);
+			tagsReply.push(['e', event.id, '', 'reply', event.pubkey]);
+		} else {
+			tagsReply.push(['e', event.id, '', 'root', event.pubkey]);
+		}
+		if (addPTag) {
+			for (const tag of event.tags.filter(
+				(tag: string[]) => tag.length >= 2 && tag[0] === 'p' && tag[1] !== event.pubkey
+			)) {
+				tagsReply.push(tag);
+			}
+			tagsReply.push(['p', event.pubkey]);
+		}
+		if (event.kind === 20000) {
+			tagsReply.push(
+				...event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'g'),
+				['n', 'うにゅう(bot)'],
+				['t', 'teleport']
+			);
+		}
+	} else if (event.kind === 1111) {
+		const tagsCopied = event.tags.filter(
+			(tag) => tag.length >= 2 && ['A', 'E', 'I', 'K', 'P'].includes(tag[0])
+		);
+		const kTag: string[] = ['k', String(event.kind)];
+		const eTag: string[] = ['e', event.id, '', event.pubkey];
+		const pTag: string[] = ['p', event.pubkey];
+		for (const tag of tagsCopied) {
 			tagsReply.push(tag);
 		}
-		tagsReply.push(['p', event.pubkey]);
-	}
-	if (event.kind === 20000) {
-		tagsReply.push(
-			...event.tags.filter((tag) => tag.length >= 2 && tag[0] === 'g'),
-			['n', 'うにゅう(bot)'],
-			['t', 'teleport']
-		);
+		tagsReply.push(eTag);
+		tagsReply.push(kTag);
+		if (addPTag) {
+			tagsReply.push(pTag);
+		}
 	}
 	return tagsReply;
 };
