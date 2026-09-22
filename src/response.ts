@@ -5135,7 +5135,7 @@ const getTagsReply = (event: NostrEvent, addPTag: boolean = true): string[][] =>
 };
 
 const getTagsQuote = (event: NostrEvent): string[][] => {
-	if (event.kind === 1) {
+	if ([1, 1111, 20000].includes(event.kind)) {
 		return [
 			['q', event.id, '', event.pubkey],
 			['p', event.pubkey]
