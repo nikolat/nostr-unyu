@@ -977,8 +977,11 @@ const zapByNIP47 = async (
 	}
 	const pubkey: string = typeof target === 'string' ? target : target.pubkey;
 	const lastZap = await getLastZap(pubkey);
-	if (lastZap !== undefined && Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10) {
-		//10分以内に誰かからZapをもらっている
+	if (lastZap !== undefined) {
+		if (Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10) {
+			//10分以内に誰かからZapをもらっている
+			return;
+		}
 		const evKind9734 = JSON.parse(
 			lastZap.tags.find((tag: string[]) => tag[0] === 'description')?.at(1) ?? '{}'
 		);
