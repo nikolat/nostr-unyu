@@ -405,6 +405,7 @@ const getResmap = (
 		[/スロット/, res_slot],
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
 		[/(ブクマ|ブックマーク)して/, res_bukuma],
+		[/\d+\.\d$/, res_percent],
 		[/馬券|予想して/, res_keiba],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
@@ -1035,7 +1036,15 @@ const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
 
 type Teban = 'sente' | 'gote';
 type KomaNarazu =
-	'pawn' | 'lance' | 'knight' | 'silver' | 'gold' | 'bishop' | 'rook' | 'king' | 'king2';
+	| 'pawn'
+	| 'lance'
+	| 'knight'
+	| 'silver'
+	| 'gold'
+	| 'bishop'
+	| 'rook'
+	| 'king'
+	| 'king2';
 type KomaNari = 'prom_pawn' | 'prom_lance' | 'prom_knight' | 'prom_silver' | 'horse' | 'dragon';
 
 type Shogi = {
@@ -3705,6 +3714,17 @@ const res_bukuma = (event: NostrEvent): [string, string[][]] => {
 	const tags: string[][] = getTagsReply(event);
 	content = '\\b';
 	return [content, tags];
+};
+
+const res_percent = (event: NostrEvent): [string, string[][]] => {
+	return [
+		any([
+			'人生は数字だけでは測れへんのや',
+			'己の直感を信じることも大事やで',
+			'数字に惑わされたらあかんで'
+		]),
+		getTagsAirrep(event)
+	];
 };
 
 const res_keiba = (event: NostrEvent): [string, string[][]] => {
