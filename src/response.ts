@@ -4685,7 +4685,11 @@ const res_iiyo = (event: NostrEvent, mode: Mode): [string, string[][]] => {
 	} else if (
 		/何|なに|なん|誰|だれ|どこ|いつ|どう|どんな|どの|どっち|どちら|どれ|いくら/.test(event.content)
 	) {
-		content = any(['難しいところやな', '自分の信じた道を進むんや', '知らんがな']);
+		if (Math.floor(Math.random() * 10) > 0) {
+			content = any(['難しいところやな', '自分の信じた道を進むんや', '知らんがな']);
+		} else {
+			content = `ルリ、${event.content}`;
+		}
 	} else {
 		content = any(['\\s[10]ええで', '\\s[10]ええんやで', '\\s[11]あかんに決まっとるやろ']);
 	}
