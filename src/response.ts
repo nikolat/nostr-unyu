@@ -406,6 +406,7 @@ const getResmap = (
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
 		[/(ブクマ|ブックマーク)して/, res_bukuma],
 		[/\d+\.\d%$/, res_percent],
+		[/なんてどう？$/, res_nantedou],
 		[/馬券|予想して/, res_keiba],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
@@ -3723,6 +3724,13 @@ const res_percent = (event: NostrEvent): [string, string[][]] => {
 			'己の直感を信じることも大事やで',
 			'数字に惑わされたらあかんで'
 		]),
+		getTagsAirrep(event)
+	];
+};
+
+const res_nantedou = (event: NostrEvent): [string, string[][]] => {
+	return [
+		any(['ワイはそうは思わへん', 'それでええんちゃうか', '決めるのは本人次第や']),
 		getTagsAirrep(event)
 	];
 };
