@@ -405,7 +405,7 @@ const getResmap = (
 		[/スロット/, res_slot],
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
 		[/(ブクマ|ブックマーク)して/, res_bukuma],
-		[/\d+\.\d$/, res_percent],
+		[/\d+\.\d%$/, res_percent],
 		[/馬券|予想して/, res_keiba],
 		[/ニュース/, res_news],
 		[/中身/, res_nakami],
