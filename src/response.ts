@@ -3184,6 +3184,11 @@ const res_kyomonan = (event: NostrEvent): [string, string[][]] => {
 			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:moji'
 		],
 		[
+			'sokowonantoka',
+			'https://media.misskeyusercontent.jp/io/5b4ae055-cfac-45d8-a03c-12d4d4b96f01.png',
+			'30030:7f41684033fd6191b9363cf74b3c98cb3b1adc95e107b822424dfcf65d35473e:Emoji'
+		],
+		[
 			'nantoka',
 			'https://cdn.nostrcheck.me/a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf/8cd387ad21474ecb772d6cb5491ca3b9879d1fcf077047fbb8cfcbb4d82754a1.webp',
 			'30030:a19caaa8404721584746fb0e174cf971a94e0f51baaf4c4e8c6e54fa88985eaf:odaijini'
