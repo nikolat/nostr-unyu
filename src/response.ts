@@ -817,12 +817,29 @@ const res_zaptest = async (
 	if (event.pubkey !== nip19.decode(npub_don).data) {
 		return ['イタズラしたらあかんで', getTagsReply(event)];
 	}
-	const zapEndPoint: string | null = await getZapEndPoint(event);
+	const m = event.content.match(/(npub\w{59})\s?(さん|ちゃん|くん)?に/su);
+	let zapEndPoint: string | null;
+	let targetPubkey: string | undefined;
+	if (m !== null) {
+		const dr: nip19.DecodedResult = nip19.decode(m[0]);
+		if (dr.type !== 'npub') {
+			return ['npubがおかしいで', getTagsReply(event)];
+		}
+		targetPubkey = dr.data;
+		const evKind0: NostrEvent | undefined = await getKind0(targetPubkey);
+		if (evKind0 === undefined) {
+			zapEndPoint = null;
+		} else {
+			zapEndPoint = await nip57.getZapEndpoint(evKind0);
+		}
+	} else {
+		zapEndPoint = await getZapEndPoint(event);
+	}
 	if (zapEndPoint === null) {
 		return ['LNアドレスが設定されてないで', getTagsReply(event)];
 	}
 	try {
-		await zapByNIP47(zapEndPoint, event, signer, 1, 'Zapのテストやで');
+		await zapByNIP47(zapEndPoint, targetPubkey ?? event, signer, 1, 'Zapのテストやで');
 	} catch (error) {
 		return ['何か失敗したみたいやで', getTagsReply(event)];
 	}
