@@ -821,7 +821,7 @@ const res_zaptest = async (
 	let zapEndPoint: string | null;
 	let targetPubkey: string | undefined;
 	if (m !== null) {
-		const dr: nip19.DecodedResult = nip19.decode(m[0]);
+		const dr: nip19.DecodedResult = nip19.decode(m[1]);
 		if (dr.type !== 'npub') {
 			return ['npubがおかしいで', getTagsReply(event)];
 		}
