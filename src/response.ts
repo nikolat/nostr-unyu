@@ -31,6 +31,7 @@ const shogiRelay = 'wss://yabu.me/';
 const zapCheckRelay = 'wss://yabu.me/';
 const emojiSearchRelay = 'wss://yabu.me/';
 const followSearchRelay = 'wss://yabu.me/';
+const clientSearchRelay = 'wss://yabu.me/';
 const koukokuRelay = 'wss://yabu.me/';
 
 export const getResponseEvent = async (
@@ -377,6 +378,7 @@ const getResmap = (
 		[/まだ(助|たす)かる|マダガスカル/, res_madagasukaru],
 		[/いいスタート|イースター島/, res_iisutato],
 		[/占って|占い/, res_uranai],
+		[/(おすすめ|オススメ)の?(クライアント|アプリ)/, res_osusume_client],
 		[/きょもなん/, res_kyomonan],
 		[/(午後|ごご)なん/, res_gogonan],
 		[/(よしえ|みゆき)$/, res_yoshie],
@@ -1054,15 +1056,7 @@ const getKind0 = (pubkey: string): Promise<NostrEvent | undefined> => {
 
 type Teban = 'sente' | 'gote';
 type KomaNarazu =
-	| 'pawn'
-	| 'lance'
-	| 'knight'
-	| 'silver'
-	| 'gold'
-	| 'bishop'
-	| 'rook'
-	| 'king'
-	| 'king2';
+	'pawn' | 'lance' | 'knight' | 'silver' | 'gold' | 'bishop' | 'rook' | 'king' | 'king2';
 type KomaNari = 'prom_pawn' | 'prom_lance' | 'prom_knight' | 'prom_silver' | 'horse' | 'dragon';
 
 type Shogi = {
@@ -3150,6 +3144,42 @@ const res_uranai = async (event: NostrEvent): Promise<[string, string[][]]> => {
 		content = `${type}のあなたの今日の運勢は『${star}』\nラッキーゴーストは『${feed.items[index].title}』やで\n${feed.items[index].link}`;
 		tags.push(['r', link]);
 	}
+	return [content, tags];
+};
+
+const res_osusume_client = async (event: NostrEvent): Promise<[string, string[][]]> => {
+	const event3: NostrEvent | undefined = await getEvent(followSearchRelay, [
+		{ kinds: [3], authors: [event.pubkey], until: Math.floor(Date.now() / 1000), limit: 1 }
+	]);
+	const pubkeys: string[] = event3?.tags.filter((tag) => tag[0] === 'p').map((tag) => tag[1]) ?? [];
+	const filter: Filter = {
+		kinds: [31990],
+		authors: pubkeys,
+		until: Math.floor(Date.now() / 1000),
+		limit: 30
+	};
+	const events31990: NostrEvent[] = [];
+	await getEvents(clientSearchRelay, [filter], (ev: NostrEvent) => {
+		events31990.push(ev);
+	});
+	if (events31990.length === 0) {
+		return ['あらへん', getTagsReply(event)];
+	}
+	const index = Math.floor(Math.random() * events31990.length);
+	const ev: NostrEvent = events31990[index];
+	const contentJSON = JSON.parse(ev.content);
+	const name: string | undefined = contentJSON.name;
+	const website: string | undefined = contentJSON.website;
+	if (name === undefined || website === undefined) {
+		return ['知ってるけど教えへん', getTagsReply(event)];
+	}
+	const mes: string = any([
+		`${name}はどうや？`,
+		`${name}がオススメやで`,
+		`ワイは${name}を使っとるで`
+	]);
+	const content = `${mes}\n${website}`;
+	const tags: string[][] = getTagsReply(event);
 	return [content, tags];
 };
 
