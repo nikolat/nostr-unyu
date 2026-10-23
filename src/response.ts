@@ -3167,7 +3167,12 @@ const res_osusume_client = async (event: NostrEvent): Promise<[string, string[][
 	}
 	const index = Math.floor(Math.random() * events31990.length);
 	const ev: NostrEvent = events31990[index];
-	const contentJSON = JSON.parse(ev.content);
+	let contentJSON: any;
+	try {
+		contentJSON = JSON.parse(ev.content);
+	} catch (error) {
+		return ['壊れたクライアントしか知らん', getTagsReply(event)];
+	}
 	const name: string | undefined = contentJSON.name;
 	const website: string | undefined = contentJSON.website;
 	if (name === undefined || website === undefined) {
