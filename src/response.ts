@@ -32,6 +32,7 @@ const zapCheckRelay = 'wss://yabu.me/';
 const emojiSearchRelay = 'wss://yabu.me/';
 const followSearchRelay = 'wss://yabu.me/';
 const clientSearchRelay = 'wss://yabu.me/';
+const musicSearchRelay = 'wss://yabu.me/';
 const koukokuRelay = 'wss://yabu.me/';
 
 export const getResponseEvent = async (
@@ -407,9 +408,10 @@ const getResmap = (
 		[/スロット/, res_slot],
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
 		[/(ブクマ|ブックマーク)して/, res_bukuma],
-		[/(おすすめ|オススメ).*(音楽|曲)$/, res_osusume_music],
-		[/youtu\.be\/.+$/, res_youtube],
-		[/\d+\.\d%$/, res_percent],
+		[/(おすすめ|オススメ).*(音楽|曲)$/u, res_osusume_music],
+		[/(おすすめ|オススメ).*(suno)$/iu, res_osusume_suno],
+		[/youtu\.be\/.+$/u, res_youtube],
+		[/\d+\.\d%$/u, res_percent],
 		[/(なんてどう？|がおすすめ|がいいな|がいいと思う|はどうかな)$/, res_nantedou],
 		[/馬券|予想して/, res_keiba],
 		[/ニュース/, res_news],
@@ -3787,6 +3789,34 @@ const res_osusume_music = (event: NostrEvent): [string, string[][]] => {
 	music.push(`${music.join('・')} どれがええ？`);
 	const content: string = `ルリ、${any(music)}`;
 	const tags: string[][] = getTagsReply(event);
+	return [content, tags];
+};
+
+const res_osusume_suno = async (event: NostrEvent): Promise<[string, string[][]]> => {
+	const event3: NostrEvent | undefined = await getEvent(followSearchRelay, [
+		{ kinds: [3], authors: [event.pubkey], until: Math.floor(Date.now() / 1000), limit: 1 }
+	]);
+	const pubkeys: string[] = event3?.tags.filter((tag) => tag[0] === 'p').map((tag) => tag[1]) ?? [];
+	const filter: Filter = {
+		kinds: [1, 42, 1111],
+		authors: pubkeys,
+		'#t': ['suno'],
+		until: Math.floor(Date.now() / 1000),
+		limit: 50
+	};
+	const eventsSuno: NostrEvent[] = [];
+	await getEvents(musicSearchRelay, [filter], (ev: NostrEvent) => {
+		if (ev.content.includes('https://suno.com/')) {
+			eventsSuno.push(ev);
+		}
+	});
+	if (eventsSuno.length === 0) {
+		return ['あらへん', getTagsReply(event)];
+	}
+	const index = Math.floor(Math.random() * eventsSuno.length);
+	const ev: NostrEvent = eventsSuno[index];
+	const content = `nostr:${nip19.neventEncode({ ...ev, author: ev.pubkey, relays: [musicSearchRelay] })}`;
+	const tags: string[][] = [...getTagsReply(event), ['q', ev.id, musicSearchRelay, ev.pubkey]];
 	return [content, tags];
 };
 
