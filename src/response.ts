@@ -407,6 +407,8 @@ const getResmap = (
 		[/スロット/, res_slot],
 		[/(npub\w{59})\s?(さん|ちゃん|くん)?に(.{1,50})を/su, res_okutte],
 		[/(ブクマ|ブックマーク)して/, res_bukuma],
+		[/(おすすめ|オススメ).*(音楽|曲)$/, res_osusume_music],
+		[/youtu\.be\/.+$/, res_youtube],
 		[/\d+\.\d%$/, res_percent],
 		[/(なんてどう？|がおすすめ|がいいな|がいいと思う|はどうかな)$/, res_nantedou],
 		[/馬券|予想して/, res_keiba],
@@ -3771,6 +3773,26 @@ const res_bukuma = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	const tags: string[][] = getTagsReply(event);
 	content = '\\b';
+	return [content, tags];
+};
+
+const res_osusume_music = (event: NostrEvent): [string, string[][]] => {
+	const music: string[] = [
+		'うにみたい',
+		'POP STAR',
+		'気まぐれロマンティック',
+		'散歩の邪魔',
+		'ふたりのもじぴったん'
+	];
+	music.push(`${music.join('・')} どれがええ？`);
+	const content: string = `ルリ、${any(music)}`;
+	const tags: string[][] = getTagsReply(event);
+	return [content, tags];
+};
+
+const res_youtube = (event: NostrEvent): [string, string[][]] => {
+	const content: string = 'えんい～♪';
+	const tags: string[][] = getTagsReply(event);
 	return [content, tags];
 };
 
