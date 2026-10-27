@@ -2021,7 +2021,7 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 		}
 	}
 	let n = Math.min(
-		(event.content.match(/アルパカ|🦙|ものパカ|モノパカ|夏パカ/g) || []).length,
+		(event.content.match(/クビパカ|アルパカ|🦙|ものパカ|モノパカ|夏パカ/g) || []).length,
 		LIMIT_BODY
 	);
 	if (/-?\d+[匹体]/.test(event.content)) {
@@ -2039,10 +2039,10 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 	const retry: number[] = [];
 	const gaming: boolean[] = [];
 	const matchesIterator = event.content.matchAll(
-		/((ゲーミング|光|虹|明|🌈)?(アルパカ|🦙|ものパカ|モノパカ|夏パカ))/g
+		/((ゲーミング|光|虹|明|🌈)?(クビパカ|アルパカ|🦙|ものパカ|モノパカ|夏パカ))/g
 	);
 	for (const match of matchesIterator) {
-		if (/(ゲーミング|光|虹|明|🌈)(アルパカ|🦙|ものパカ|モノパカ|夏パカ)/.test(match[0])) {
+		if (/(ゲーミング|光|虹|明|🌈)(クビパカ|アルパカ|🦙|ものパカ|モノパカ|夏パカ)/.test(match[0])) {
 			gaming.push(true);
 		} else {
 			gaming.push(false);
