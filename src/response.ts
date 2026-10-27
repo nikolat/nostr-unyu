@@ -1992,14 +1992,6 @@ const showBanmen = (event: NostrEvent, data: Shogi): [string, string[][]] => {
 };
 
 const res_arupaka = (event: NostrEvent): [string, string[][]] => {
-	if (event.kind === 1) {
-		const nevent =
-			'nevent1qvzqqqqq9qpzpmzzcaj5rzeah8y940ln4z855wa72af4a6aac4zjypql55egcpsqqy88wumn8ghj77tpvf6jumt99uqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejta8d4mx'; //カスタム絵文字の川
-		const ep: nip19.EventPointer = nip19.decode(nevent).data;
-		const content = `パブチャでやれ\nnostr:${nevent}`;
-		const tags = [...getTagsReply(event), ['q', ep.id, ep.relays?.at(0) ?? '', ep.author ?? '']];
-		return [content, tags];
-	}
 	let content: string;
 	let tags: string[][];
 	const LIMIT_WIDTH = 10;
@@ -2386,6 +2378,13 @@ const res_arupaka = (event: NostrEvent): [string, string[][]] => {
 			'30030:84b0c46ab699ac35eb2ca286470b85e081db2087cdef63932236c397417782f5:mono'
 		])
 	];
+	if (event.kind === 1) {
+		const nevent =
+			'nevent1qvzqqqqq9qpzpmzzcaj5rzeah8y940ln4z855wa72af4a6aac4zjypql55egcpsqqy88wumn8ghj77tpvf6jumt99uqzqvc0c4ly3cu5ylw4af24kp6p50m3tf27zrutkeskcflvjt4utejta8d4mx'; //カスタム絵文字の川
+		const ep: nip19.EventPointer = nip19.decode(nevent).data;
+		content += `\nパブチャもあるで\nnostr:${nevent}`;
+		tags.push(['q', ep.id, ep.relays?.at(0) ?? '', ep.author ?? '']);
+	}
 	return [content, tags];
 };
 
