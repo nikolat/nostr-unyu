@@ -485,6 +485,7 @@ const getResmap = (
 		[/DM.*(を?呼んで|どこ).?$/iu, res_dm],
 		[/Zap.*(を?呼んで|どこ).?$/iu, res_zap],
 		[/おいくら(サッツ|さっつ|sats).*(を?呼んで|どこ).?$/iu, res_oikurasats],
+		[/(ちょ|チョ)(びっとこいん|ビットコイン)(を?呼んで|どこ).?$/iu, res_chobitcoin],
 		[/(eHagaki|えはがき)(を?呼んで|どこ).?$/iu, res_ehagaki],
 		[/ここは?(どこ|ドコ).?$/iu, res_kokodoko],
 		[/絵文字.*(を?呼んで|どこ).?$/iu, res_emoji],
@@ -4436,6 +4437,15 @@ const res_oikurasats = (event: NostrEvent): [string, string[][]] => {
 	let content: string;
 	let tags: string[][];
 	const url1 = 'https://osats.money/';
+	content = url1;
+	tags = [...getTagsReply(event), ['r', url1]];
+	return [content, tags];
+};
+
+const res_chobitcoin = (event: NostrEvent): [string, string[][]] => {
+	let content: string;
+	let tags: string[][];
+	const url1 = 'https://chobitcoin.lokuyow.workers.dev/';
 	content = url1;
 	tags = [...getTagsReply(event), ['r', url1]];
 	return [content, tags];
