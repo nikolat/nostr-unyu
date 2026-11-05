@@ -2860,7 +2860,7 @@ const res_resent_poll = async (event: NostrEvent): Promise<[string, string[][]]>
 const res_koukoku = async (event: NostrEvent): Promise<[string, string[][]]> => {
 	const eventKoukoku: NostrEvent | null = await getKoukoku();
 	if (eventKoukoku === null) {
-		return ['最近のは見つからへん', getTagsReply(event)];
+		return ['最近のは見つからへん\nスポンサー募集中やで\nhttps://zenn.dev/nikolat/articles/a2ccaf2d2eaf96', getTagsReply(event)];
 	}
 	const content = `nostr:${nip19.neventEncode({ ...eventKoukoku, author: eventKoukoku.pubkey, relays: [koukokuRelay] })}`;
 	const tags: string[][] = [
