@@ -807,7 +807,7 @@ const res_profilezaptest = async (
 		return ['LNアドレスが設定されてないで', getTagsReply(event)];
 	}
 	try {
-		await zapByNIP47(zapEndPoint, event.pubkey, signer, 1, 'Zapのテストやで');
+		await zapByNIP47(zapEndPoint, event.pubkey, signer, 1, 'Zapのテストやで', false);
 	} catch (error) {
 		return ['何か失敗したみたいやで', getTagsReply(event)];
 	}
@@ -846,7 +846,7 @@ const res_zaptest = async (
 		return ['LNアドレスが設定されてないで', getTagsReply(event)];
 	}
 	try {
-		await zapByNIP47(zapEndPoint, targetPubkey ?? event, signer, 1, 'Zapのテストやで');
+		await zapByNIP47(zapEndPoint, targetPubkey ?? event, signer, 1, 'Zapのテストやで', false);
 	} catch (error) {
 		return ['何か失敗したみたいやで', getTagsReply(event)];
 	}
@@ -988,7 +988,8 @@ const zapByNIP47 = async (
 	target: NostrEvent | string,
 	signer: Signer,
 	sats: number,
-	zapComment: string
+	zapComment: string,
+	enableCooldown: boolean = true
 ): Promise<void> => {
 	const wc = process.env.NOSTR_WALLET_CONNECT;
 	if (wc === undefined) {
@@ -1004,7 +1005,7 @@ const zapByNIP47 = async (
 	const pubkey: string = typeof target === 'string' ? target : target.pubkey;
 	const lastZap = await getLastZap(pubkey);
 	if (lastZap !== undefined) {
-		if (Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10) {
+		if (enableCooldown && Math.floor(Date.now() / 1000) - lastZap.created_at < 60 * 10) {
 			//10分以内に誰かからZapをもらっている
 			return;
 		}
@@ -2863,7 +2864,10 @@ const res_resent_poll = async (event: NostrEvent): Promise<[string, string[][]]>
 const res_koukoku = async (event: NostrEvent): Promise<[string, string[][]]> => {
 	const eventKoukoku: NostrEvent | null = await getKoukoku();
 	if (eventKoukoku === null) {
-		return ['最近のは見つからへん\nスポンサー募集中やで\nhttps://zenn.dev/nikolat/articles/a2ccaf2d2eaf96', getTagsReply(event)];
+		return [
+			'最近のは見つからへん\nスポンサー募集中やで\nhttps://zenn.dev/nikolat/articles/a2ccaf2d2eaf96',
+			getTagsReply(event)
+		];
 	}
 	const content = `nostr:${nip19.neventEncode({ ...eventKoukoku, author: eventKoukoku.pubkey, relays: [koukokuRelay] })}`;
 	const tags: string[][] = [
