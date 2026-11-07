@@ -1034,11 +1034,13 @@ const zapByNIP47 = async (
 				};
 	const zapRequest = nip57.makeZapRequest(params);
 	const zapRequestEvent = await signer.signEvent(zapRequest);
-	const encoded = encodeURI(JSON.stringify(zapRequestEvent));
 
-	const url = `${zapEndpoint}?amount=${amount}&nostr=${encoded}`;
+	const url = new URL(zapEndpoint);
+	url.searchParams.append('amount', amount.toString());
+	url.searchParams.append('nostr', JSON.stringify(zapRequestEvent));
+	const zapUrl = url.toString();
 
-	const response = await fetch(url);
+	const response = await fetch(zapUrl);
 	if (!response.ok) {
 		throw Error('Cannot get invoice');
 	}
