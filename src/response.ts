@@ -4904,7 +4904,8 @@ const res_unyupic = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, st
 		'note1t42zhyefcqagjj2nhvhmx7eujx9s6a0e2vjsvlf3e4ct7z946hlqzpc6w3',
 		'note186rwyh6wltqymel0h5hlqrt8lwm25utpza87sks74ak5afx4rgzq84j2xh',
 		'note15fmd99pc89m3lgc0s6n23pd8hemyjv37qxavgw87r4duew7qy2wsnk8htz',
-		'note1pmed3hp048vxtfpxjcefap7uek2k3zrhvmf5st6m8xnuklvzakmqckyeep'
+		'note1pmed3hp048vxtfpxjcefap7uek2k3zrhvmf5st6m8xnuklvzakmqckyeep',
+		'note1mt5mt5kc0tcr0umc8eu5smatnakejrx4yvfzje4qr9gjhuvt0s0s6aq6cu'
 	];
 	let note: string;
 	if (isNaN(no)) {
