@@ -384,6 +384,7 @@ const getResmap = (
 		[/(午後|ごご)なん/, res_gogonan],
 		[/(よしえ|みゆき)$/, res_yoshie],
 		[/ドライヤー|乾かして$/, res_dryer],
+		[/叱って$/, res_shikatte],
 		[/カレーの材料/, res_curry],
 		[/タツノオトシゴの絵文字/, res_tatsunootoshigo],
 		[/赤ちゃんの身長/, res_akachannoshincho],
@@ -3350,6 +3351,17 @@ const res_dryer = (event: NostrEvent): [string, string[][]] => {
 		]
 	];
 	return r;
+};
+
+const res_shikatte = (event: NostrEvent): [string, string[][]] => {
+	return [
+		any([
+			'それが人にものを頼む態度なんか？',
+			'ワイがおらんと何もできへんのか？',
+			'そんなんで許されると思っとるんか？'
+		]),
+		getTagsReply(event)
+	];
 };
 
 const res_curry = (event: NostrEvent): [string, string[][]] => {
