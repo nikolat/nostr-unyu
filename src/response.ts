@@ -376,6 +376,7 @@ const getResmap = (
 		[/広告/, res_koukoku],
 		[/アンケート|投票/, res_poll],
 		[/ビンゴ$/, res_bingo],
+		[/(\d+)秒後に消える投稿/, res_expiration],
 		[/まだ(助|たす)かる|マダガスカル/, res_madagasukaru],
 		[/いいスタート|イースター島/, res_iisutato],
 		[/占って|占い/, res_uranai],
@@ -3067,6 +3068,18 @@ const res_bingo = async (event: NostrEvent): Promise<[string, string[][]]> => {
 		])
 	];
 	return [content, tags];
+};
+
+const res_expiration = (event: NostrEvent, mode: Mode, regstr: RegExp): [string, string[][]] => {
+	const match = event.content.match(regstr);
+	if (match === null) {
+		throw new Error();
+	}
+	const no: number = parseInt(match[1]);
+	return [
+		`${no}秒後に消えるはずやで`,
+		[['expiration', String(event.created_at + no) + 1], ...getTagsReply(event)]
+	];
 };
 
 const res_madagasukaru = (event: NostrEvent): [string, string[][]] => {
