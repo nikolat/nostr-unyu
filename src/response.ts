@@ -3078,7 +3078,7 @@ const res_expiration = (event: NostrEvent, mode: Mode, regstr: RegExp): [string,
 	const no: number = parseInt(match[1]);
 	return [
 		`${no}秒後に消えるはずやで`,
-		[['expiration', String(event.created_at + no) + 1], ...getTagsReply(event)]
+		[['expiration', String(event.created_at + no + 1)], ...getTagsReply(event)]
 	];
 };
 
