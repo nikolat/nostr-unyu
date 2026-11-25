@@ -367,6 +367,7 @@ const getResmap = (
 		[/🥚/u, res_egg],
 		[/俺達に制限/, res_seigen],
 		[/ミシシッピアカミミガメ/, res_akamimigame],
+		[/かわいそうに/, res_kawaisouni],
 		[/(今|いま)の(気分|きぶん)/, res_imanokibun],
 		[/画像生成/, res_gazouseisei],
 		[/りとりん|つぎはなにから？/, res_ritorin],
@@ -2678,6 +2679,31 @@ const res_akamimigame = (event: NostrEvent): [string, string[][]] => {
 			t,
 			`${url_base}${t}.png`,
 			'30030:e62f27d2814a25171c466d2d7612ad1a066db1362b4e259db5c076f9e6b21cb7:カメ'
+		]),
+		...getTagsReply(event)
+	];
+	return [content, tags];
+};
+
+const res_kawaisouni = (event: NostrEvent): [string, string[][]] => {
+	const shuffle = (array: string[]) => {
+		for (let i = array.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[array[i], array[j]] = [array[j], array[i]];
+		}
+		return array;
+	};
+	const kawaisosu = ['hira_046_wa', 'hira_002_i', 'hira_015_so', 'hira_003_u'];
+	const kawaisosu_shuffle = ['hira_006_ka', ...shuffle(kawaisosu), 'hira_022_ni'];
+	const kawaisosu_shuffle_for_content = kawaisosu_shuffle.map((t) => `:${t}:`);
+	const content: string = kawaisosu_shuffle_for_content.join('');
+	const url_base = 'https://tac-lan.net/.well-known/hiragana/';
+	const tags: string[][] = [
+		...kawaisosu_shuffle.map((t) => [
+			'emoji',
+			t,
+			`${url_base}${t}.png`,
+			'30030:81bbb510f2a6ecb221d1df36219e37a63ce2372795b4cb14759c8cd8468799a6:hiragana50'
 		]),
 		...getTagsReply(event)
 	];
